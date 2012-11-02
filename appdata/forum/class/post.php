@@ -5,8 +5,10 @@
  */
 class Post extends ForumElement
 {
-	public $id = 0;
 	private $timePosted;
+	
+	//The contents of this forum post.
+	private $content = "";
 	
 	function __construct($name, $moderators, $content)
 	{
@@ -19,6 +21,21 @@ class Post extends ForumElement
 	function getDate()
 	{
 		return date("F j, Y, g:i a", $this->timePosted);
+	}
+	
+	protected function getFileName()
+	{
+		return preg_replace('/\s+/ ', "_", trim($this->forum."_".$this->id.".pst"));
+	}
+	
+	static public function load($forum, $fileName)
+	{
+		return parent::load($forum."/".$fileName.".pst");
+	}
+	
+	protected function getForumElements()
+	{
+		return null;
 	}
 }
 ?>
