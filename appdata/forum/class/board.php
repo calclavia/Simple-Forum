@@ -21,7 +21,7 @@ class Board extends ForumElement
 	{
 		global $table_prefix;
 
-		mysql_query("CREATE TABLE {$table_prefix}boards (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Description TEXT)", $con) or die(mysql_error());
+		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}boards (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Description TEXT)", $con) or die(mysql_error());
 	}
 
 	public static function getByID($id)
@@ -39,7 +39,7 @@ class Board extends ForumElement
 		}
 		else
 		{
-			return new Board($row["ID"], $row["Name"], $row["Parent"], $row["Description"]);
+			return new Board($row["ID"], $row["Parent"], $row["Name"], $row["Description"]);
 		}
 	}
 	

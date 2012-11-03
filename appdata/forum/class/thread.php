@@ -16,13 +16,16 @@ class Thread extends ForumElement
 		$this->fields["Parent"] = $parent;
 		$this->fields["Sticky"] = "yes";
 		$this->fields["LockThread"] = "no";
+		/*
+		$this->fields["Views"] = 0;
+		 */
 	}
 
 	public static function setUp($con)
 	{
 		global $table_prefix;
 
-		mysql_query("CREATE TABLE {$table_prefix}threads (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Sticky varchar(5), LockThread varchar(5))", $con) or die(mysql_error());
+		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}threads (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Sticky varchar(5), LockThread varchar(5), Views int)", $con) or die(mysql_error());
 	}
 	
 	public static function getByID($id)
@@ -40,7 +43,7 @@ class Thread extends ForumElement
 		}
 		else
 		{
-			return new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Time"]);
+			return new Thread($row["ID"], $row["Parent"], $row["Name"]);
 		}
 	}
 
@@ -64,7 +67,50 @@ class Thread extends ForumElement
 	{
 		return new Post(-1, $this->id, $this->name, $content, $userID, $time);
 	}
+	
+	public function getFirstPost()
+	{
+		$threads = $this->getChildren();
+		
+		if(count($threads) > 0)
+		{
+			$earliestThread = $threads[0];
 
+			foreach($threads as $thread)
+			{
+				if($thread->fields["Time"] < $earliestThread->fields["Time"])
+				{
+					$earliestThread = $thread;
+				}
+			}
+			
+			return $earliestThread;
+		}
+		
+		return null;
+	}
+	
+	public function getLastestPost()
+	{
+		$threads = $this->getChildren();
+		
+		if(count($threads) > 0)
+		{
+			$lastestThread = $threads[0];
+
+			foreach($threads as $thread)
+			{
+				if($thread->fields["Time"] > $lastestThread->fields["Time"])
+				{
+					$lastestThread = $thread;
+				}
+			}
+			
+			return $lastestThread;
+		}
+		
+		return null;
+	}
 }
 
 ?>

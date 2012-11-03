@@ -95,7 +95,7 @@ abstract class ForumElement
 
 			$query .= ")";
 
-			mysql_query($query) or die(mysql_error());
+			mysql_query($query) or die("Failed to create forum element: ".mysql_error());
 			$result = mysql_query("SHOW TABLE STATUS LIKE '{$table_prefix}{$this->element_name}'");
 			$row = mysql_fetch_array($result);
 			$maxRows = intval($row['Auto_increment']);
