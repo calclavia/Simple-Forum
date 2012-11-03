@@ -137,6 +137,24 @@ abstract class ForumElement
 		return false;
 	}
 
+	public function delete($con)
+	{
+		global $table_prefix;
+		
+		$children = $this->getChildren();
+		
+		if($children != null && count($children) > 0)
+		{
+			foreach($children as $child)
+			{
+				$child->delete($con);
+			}
+		}
+		
+		mysql_query("DELETE FROM {$table_prefix}{$this->element_name} WHERE ID={$this->id} LIMIT 1");
+	}
+	
+	public abstract function getChildren();
 }
 
 ?>

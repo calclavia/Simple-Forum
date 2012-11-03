@@ -59,6 +59,8 @@ class Thread extends ForumElement
 		{
 			$returnArray[] = new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"], $row["User"], $row["Time"]);
 		}
+		
+		uasort($returnArray, function($a, $b){ return $a->fields["Time"] > $b->fields["Time"];});
 
 		return $returnArray;
 	}

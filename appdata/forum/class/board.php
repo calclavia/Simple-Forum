@@ -55,7 +55,7 @@ class Board extends ForumElement
 		{
 			$returnArray[] = new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Time"]);
 		}
-
+		
 		return $returnArray;
 	}
 	

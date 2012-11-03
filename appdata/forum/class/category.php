@@ -7,20 +7,20 @@
 class Category extends ForumElement
 {
 
-	function __construct($id, $name, $description)
+	function __construct($id, $name)
 	{
 		$this->id = $id;
 		$this->name = $name;
 
 		$this->element_name = "categories";
-		$this->fields["Description"] = $description;
+		$this->fields["Description"] = " ";
 	}
 
 	public static function setUp($con)
 	{
 		global $table_prefix;
 
-		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}categories (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Description TEXT)", $con) or die(mysql_error());
+		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}categories (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255))", $con) or die(mysql_error());
 	}
 
 	public static function getByID($id)
