@@ -1,41 +1,35 @@
 <?php
+
 /**
  * A post is what a user will post in a thread.
  * @author Calclavia
  */
 class Post extends ForumElement
 {
-	private $timePosted;
-	
-	//The contents of this forum post.
-	private $content = "";
-	
-	function __construct($name, $moderators, $content)
+
+	function __construct($id, $parent, $name, $content, $userID, $time)
 	{
+		$this->id = $id;
 		$this->name = $name;
-		$this->moderators = $moderators;
-		$this->content = $content;
-		$this->timePosted = time();
+
+		$this->element_name = "threads";
+		$this->fields["Parent"] = $parent;
+		$this->fields["User"] = $userID;
+		$this->fields["Content"] = $content;
+		$this->fields["Time"] = $time;
 	}
-	
 	function getDate()
 	{
 		return date("F j, Y, g:i a", $this->timePosted);
 	}
-	
-	protected function getFileName()
+
+	public static function setUp($con)
 	{
-		return preg_replace('/\s+/ ', "_", trim($this->forum."_".$this->id.".pst"));
+		global $table_prefix;
+
+		mysql_query("CREATE TABLE {$table_prefix}posts (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, User int, Time int)", $con) or die(mysql_error());
 	}
-	
-	static public function load($forum, $fileName)
-	{
-		return parent::load($forum."/".$fileName.".pst");
-	}
-	
-	protected function getForumElements()
-	{
-		return null;
-	}
+
 }
+
 ?>

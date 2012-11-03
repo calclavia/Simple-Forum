@@ -1,80 +1,70 @@
 <?php
+
 /**
  * A thread contains various posts within it.
  * @author Calclavia
  */
 class Thread extends ForumElement
 {
-	//The ID of the Board this is in.
-	private $board;
-	
-	private $timePosted;
-	
-	function __construct($id, $name, $forum, $board)
+
+	function __construct($id, $parent, $name)
 	{
 		$this->id = $id;
 		$this->name = $name;
-		$this->forum = $forum;
-		$this->board = $board;
-		$this->firstSave();
-		$this->timePosted = time();
+
+		$this->element_name = "threads";
+		$this->fields["Parent"] = $parent;
+		$this->fields["Sticky"] = "yes";
+		$this->fields["LockThread"] = "no";
+	}
+
+	public static function setUp($con)
+	{
+		global $table_prefix;
+
+		mysql_query("CREATE TABLE {$table_prefix}threads (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Sticky varchar(5), LockThread varchar(5))", $con) or die(mysql_error());
 	}
 	
-	function getDate()
+	public static function getByID($id)
 	{
-		return date("F j, Y, g:i a", $this->timePosted);
+		global $table_prefix;
+
+		$result = mysql_query("SELECT * FROM {$table_prefix}threads
+		WHERE ID={$id} LIMIT 1");
+
+		$row = mysql_fetch_array($result);
+
+		if ($row["ID"] <= 0)
+		{
+			return null;
+		}
+		else
+		{
+			return new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Time"]);
+		}
 	}
-	
-	//@post - A Post object.
-	function addPost($post)
+
+	public function getChildren()
 	{
-		$this->content = $this->content.",".$post->id;
-	}
-	
-	function getPosts()
-	{
-		return explode($this->content, ",");
-	}
-	
-	protected function getFileName()
-	{
-		return preg_replace('/\s+/ ', "_", trim($this->board."_".$this->id.".thrd"));
-	}
-	
-	static public function load($forum, $fileName)
-	{
-		return parent::load($forum."/".$fileName.".thrd");
-	}
-	
-	protected function getForumElements()
-	{
-		global $DATA_DIRECTORY;
-		
-		$extension = ".pst";
+		global $table_prefix;
+
 		$returnArray = array();
 
-		if($handle = opendir($DATA_DIRECTORY.$this->forum))
+		$result = mysql_query("SELECT * FROM {$table_prefix}posts WHERE Parent={$this->id}");
+
+		while ($row = mysql_fetch_array($result))
 		{
-			while (false !== ($entry = readdir($handle)))
-			{
-				if ($entry != "." && $entry != ".." && strstr($entry, $extension))
-				{
-					$element = Post::load($this->id, str_replace($extension, "", $entry));
-					
-					if($element != null)
-					{
-						if(strstr($entry, $this->id."_"))
-						{
-							$returnArray[] = $element;
-						}
-					}
-				}
-			}
-			
-			closedir($handle);
+			$returnArray[] = new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"], $row["User"], $row["Time"]);
 		}
-		
-		return array_reverse($returnArray);
+
+		return $returnArray;
 	}
+
+	public function createPost($content, $userID, $time)
+	{
+		return new Post(-1, $this->id, $this->name, $content, $userID, $time);
+	}
+
 }
+
 ?>
