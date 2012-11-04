@@ -60,38 +60,34 @@ abstract class ForumElement
 
 		if ($this->id < 0)
 		{
-			$query = "INSERT INTO {$table_prefix}{$this->element_name} (Name,";
+			$query = "INSERT INTO {$table_prefix}{$this->element_name} (Name";
 
 			$i = 0;
 
 			foreach ($this->fields as $key => $value)
 			{
+				$query .= ",";
 				$query .= $key;
-
-				if ($i++ != count($this->fields)-1)
-				{
-					$query .= ",";
-				}
 			}
 
-			$query .= ") VALUES ('" . $this->name . "', ";
+			$query .= ") VALUES ('" . $this->name . "'";
 
 			$i = 0;
 
 			foreach ($this->fields as $key => $value)
 			{
-				if (is_int($value))
-				{
-					$query .= $value;
-				}
-				else
-				{
-					$query .= "'" . $value . "'";
-				}
-
-				if ($i++ != count($this->fields)-1)
+				if (!empty($value))
 				{
 					$query .= ",";
+
+					if (is_int($value))
+					{
+						$query .= $value;
+					}
+					else
+					{
+						$query .= "'" . $value . "'";
+					}
 				}
 			}
 
@@ -106,12 +102,14 @@ abstract class ForumElement
 		}
 		else
 		{
-			$query = "UPDATE {$table_prefix}{$this->element_name} SET Name='{$this->name}', ";
+			$query = "UPDATE {$table_prefix}{$this->element_name} SET Name='{$this->name}' ";
 
 			$i = 0;
 
 			foreach ($this->fields as $key => $value)
 			{
+				$query .= ",";
+
 				$query .= $key . "=";
 
 				if (is_int($value))
@@ -121,12 +119,6 @@ abstract class ForumElement
 				else
 				{
 					$query .= "'" . $value . "'";
-				}
-
-
-				if ($i++ != count($this->fields)-1)
-				{
-					$query .= ",";
 				}
 			}
 

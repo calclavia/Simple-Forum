@@ -19,7 +19,7 @@ function getAllCategories()
 {
 	$printContent = "
 		<br />
-		<div class='forum_menu'>
+		<div class='forum_menu' action='{$_SERVER['PHP_SELF']}?a=new'>
 			<form method='post'>
 				<input type='text' name='title'>
 				<input type='submit' value='Add Category'>
@@ -118,11 +118,7 @@ function getEditCategoryForm($category)
 	<div id='editCategory{$category->getID()}' class='white_content'>
 		<h1>Edit Post</h1>
 		<form action='{$_SERVER['PHP_SELF']}?e=c{$category->getID()}' method='post'>
-			<b>Title:</b> <input type='text' name='title' size='80' maxlength='80' value='{$category->name}'/>
-			<textarea id='editableContentEditCategory{$category->getID()}' name='editableContent' wrap=\"virtual\">{$category->fields["Description"]}</textarea>
-			<script type='text/javascript'>
-				CKEDITOR.replace('editableContentEditCategory{$category->getID()}', {height:'300'});
-			</script>
+			<b>Category Name:</b> <input type='text' name='title' size='80' maxlength='80' value='{$category->name}'/>
 			<input type='submit' value='Edit'/>					
 		</form>
 	</div>";
@@ -197,7 +193,7 @@ function getBoard($board)
 				{
 					$thread = $child;
 
-					$stats = count($board->getPosts()) . " posts<br />" . $board->getViews() . " views";
+					$stats = count($thread->getChildren()) . " posts<br />" . $thread->fields["Views"] . " views";
 
 					$threadOwner = "Annoymous";
 

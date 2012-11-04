@@ -48,30 +48,42 @@ class Board extends ForumElement
 	{
 		global $table_prefix;
 
-		$returnArray = array();
+		$threads = array();
 
 		$result = mysql_query("SELECT * FROM {$table_prefix}threads WHERE Parent={$this->id}");
 
 		while ($row = mysql_fetch_array($result))
 		{
-			$returnArray[] = new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Time"], $row["Sticky"], $row["LockThread"], $row["Views"]);
+			$threads[] = new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Sticky"], $row["LockThread"], $row["Views"]);
 		}
-		
+
 		$result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='yes'");
+
+		uasort($threads, function($a, $b)
+			{
+				if ($a->fields["Sticky"] == "yes" && $b->fields["Sticky"] == "yes")
+				{
+					return true;
+				}
+
+				return $a->getLatestPost()->fields["Time"] < $b->getLatestPost()->fields["Time"];
+			});
+
+		$boards = array();
 
 		while ($row = mysql_fetch_array($result))
 		{
-			$returnArray[] = new Board($row["ID"], $row["Parent"], $row["Name"], $row["Description"], $row["SubBoard"]);
+			$boards[] = new Board($row["ID"], $row["Parent"], $row["Name"], $row["Description"], $row["SubBoard"]);
 		}
 
-		return $returnArray;
+		return array_merge($boards, $threads);
 	}
 
 	public function createThread($name)
 	{
 		return new Thread(-1, $this->id, $name, "no", "no", 1);
 	}
-	
+
 	public function createBoard($name, $description)
 	{
 		return new Board(-1, $this->id, $name, $description, "yes");
@@ -80,29 +92,34 @@ class Board extends ForumElement
 	public function getPosts()
 	{
 		$posts = array();
-		
+
 		$threads = $this->getChildren();
 
 		foreach ($threads as $thread)
 		{
 			$posts = array_merge($posts, $thread->getChildren());
 		}
-		
+
 		return $posts;
 	}
-	
+
 	public function getViews()
 	{
 		$views = 0;
-		
-		$threads = $this->getChildren();
 
-		foreach ($threads as $thread)
+		foreach ($this->getChildren() as $child)
 		{
-			$views += $thread->fields["Views"];
+			if($child instanceof Thread)
+			{
+				$views += intval($child->fields["Views"]);
+			}
+			else if($child instanceof Board)
+			{
+				$views += $child->getViews();
+			}			
 		}
-		
-		return $views;
+
+		return intval($views);
 	}
 
 	public function getLatestPost()
@@ -133,15 +150,24 @@ class Board extends ForumElement
 
 		$board = $this;
 
-		while ($board != null && $board instanceof Board && $board->fields["SubBoard"] == "yes")
+		while ($board != null && $board instanceof Board)
 		{
 			$tree = " -> <a href='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}'>{$board->name}</a>" . $tree;
-			$board = Board::getByID(intval($board->fields["Parent"]));
+
+			if ($board->fields["SubBoard"] == "yes")
+			{
+				$board = Board::getByID(intval($board->fields["Parent"]));
+			}
+			else
+			{
+				$board = null;
+			}
 		}
 
 		$tree = "<a href='{$_SERVER['PHP_SELF']}'>Main</a>" . $tree;
 		return $tree;
 	}
+
 }
 
 ?>

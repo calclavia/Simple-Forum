@@ -13,7 +13,6 @@ class Category extends ForumElement
 		$this->name = $name;
 
 		$this->element_name = "categories";
-		$this->fields["Description"] = " ";
 	}
 
 	public static function setUp($con)
@@ -78,10 +77,9 @@ class Category extends ForumElement
 		return $returnArray;
 	}
 	
-	public function edit($title, $descrption)
+	public function edit($title)
 	{
 		$this->name = $title;
-		$this->fields["Description"] = $descrption;		
 	}
 }
 
