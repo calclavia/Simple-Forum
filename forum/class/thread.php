@@ -25,7 +25,7 @@ class Thread extends ForumElement
 
 		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}threads (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Sticky varchar(5), LockThread varchar(5), Views int)", $con) or die(mysql_error());
 	}
-	
+
 	public static function getByID($id)
 	{
 		global $table_prefix;
@@ -57,8 +57,11 @@ class Thread extends ForumElement
 		{
 			$returnArray[] = new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"], $row["User"], $row["Time"], $row["LastEditTime"], $row["LastEditUser"]);
 		}
-		
-		uasort($returnArray, function($a, $b){ return $a->fields["Time"] > $b->fields["Time"];});
+
+		uasort($returnArray, function($a, $b)
+			{
+				return $a->fields["Time"] > $b->fields["Time"];
+			});
 
 		return $returnArray;
 	}
@@ -67,50 +70,56 @@ class Thread extends ForumElement
 	{
 		return new Post(-1, $this->id, $this->name, $content, $userID, $time, $time, $userID);
 	}
-	
+
 	public function getFirstPost()
 	{
 		$threads = $this->getChildren();
-		
-		if(count($threads) > 0)
+
+		if (count($threads) > 0)
 		{
 			$earliestThread = $threads[0];
 
-			foreach($threads as $thread)
+			foreach ($threads as $thread)
 			{
-				if($thread->fields["Time"] < $earliestThread->fields["Time"])
+				if ($thread->fields["Time"] < $earliestThread->fields["Time"])
 				{
 					$earliestThread = $thread;
 				}
 			}
-			
+
 			return $earliestThread;
 		}
-		
+
 		return null;
 	}
-	
+
 	public function getLatestPost()
 	{
 		$posts = $this->getChildren();
-		
-		if(count($posts) > 0)
+
+		if (count($posts) > 0)
 		{
 			$latestThread = $posts[0];
 
-			foreach($posts as $thread)
+			foreach ($posts as $thread)
 			{
-				if($thread->fields["Time"] > $latestThread->fields["Time"])
+				if ($thread->fields["Time"] > $latestThread->fields["Time"])
 				{
 					$latestThread = $thread;
 				}
 			}
-			
+
 			return $latestThread;
 		}
-		
+
 		return null;
 	}
+
+	public function getTreeAsString()
+	{
+		return Board::getByID(intval($this->fields["Parent"]))->getTreeAsString()."<a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a>";
+	}
+
 }
 
 ?>

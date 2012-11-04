@@ -7,7 +7,7 @@
 class Board extends ForumElement
 {
 
-	function __construct($id, $parent, $name, $description)
+	function __construct($id, $parent, $name, $description, $subBoard)
 	{
 		$this->id = $id;
 		$this->name = $name;
@@ -15,13 +15,14 @@ class Board extends ForumElement
 		$this->element_name = "boards";
 		$this->fields["Parent"] = $parent;
 		$this->fields["Description"] = $description;
+		$this->fields["SubBoard"] = $subBoard;
 	}
 
 	public static function setUp($con)
 	{
 		global $table_prefix;
 
-		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}boards (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Description TEXT)", $con) or die(mysql_error());
+		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}boards (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Description TEXT, SubBoard varchar(5))", $con) or die(mysql_error());
 	}
 
 	public static function getByID($id)
@@ -39,7 +40,7 @@ class Board extends ForumElement
 		}
 		else
 		{
-			return new Board($row["ID"], $row["Parent"], $row["Name"], $row["Description"]);
+			return new Board($row["ID"], $row["Parent"], $row["Name"], $row["Description"], $row["SubBoard"]);
 		}
 	}
 
@@ -55,6 +56,13 @@ class Board extends ForumElement
 		{
 			$returnArray[] = new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Time"], $row["Sticky"], $row["LockThread"], $row["Views"]);
 		}
+		
+		$result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='yes'");
+
+		while ($row = mysql_fetch_array($result))
+		{
+			$returnArray[] = new Board($row["ID"], $row["Parent"], $row["Name"], $row["Description"], $row["SubBoard"]);
+		}
 
 		return $returnArray;
 	}
@@ -62,6 +70,11 @@ class Board extends ForumElement
 	public function createThread($name)
 	{
 		return new Thread(-1, $this->id, $name, "no", "no", 1);
+	}
+	
+	public function createBoard($name, $description)
+	{
+		return new Board(-1, $this->id, $name, $description, "yes");
 	}
 
 	public function getPosts()
@@ -114,6 +127,21 @@ class Board extends ForumElement
 		return null;
 	}
 
+	public function getTreeAsString()
+	{
+		$tree = "";
+
+		$board = $this;
+
+		while ($board != null && $board instanceof Board && $board->fields["SubBoard"] == "yes")
+		{
+			$tree = " -> <a href='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}'>{$board->name}</a>" . $tree;
+			$board = Board::getByID(intval($board->fields["Parent"]));
+		}
+
+		$tree = "<a href='{$_SERVER['PHP_SELF']}'>Main</a>" . $tree;
+		return $tree;
+	}
 }
 
 ?>

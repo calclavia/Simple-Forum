@@ -59,7 +59,7 @@ class Category extends ForumElement
 
 	public function createBoard($name, $description)
 	{
-		return new Board(-1, $this->id, $name, $description);
+		return new Board(-1, $this->id, $name, $description, "no");
 	}
 
 	public function getChildren()
@@ -68,14 +68,20 @@ class Category extends ForumElement
 
 		$returnArray = array();
 
-		$result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id}");
+		$result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='no'");
 
 		while ($row = mysql_fetch_array($result))
 		{
-			$returnArray[] = new Board($row["ID"], $row["Parent"], $row["Name"], $row["Description"]);
+			$returnArray[] = new Board($row["ID"], $row["Parent"], $row["Name"], $row["Description"], $row["SubBoard"]);
 		}
 
 		return $returnArray;
+	}
+	
+	public function edit($title, $descrption)
+	{
+		$this->name = $title;
+		$this->fields["Description"] = $descrption;		
 	}
 }
 
