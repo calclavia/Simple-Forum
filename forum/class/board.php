@@ -63,6 +63,28 @@ class Board extends ForumElement
 	{
 		return new Thread(-1, $this->id, $name);
 	}
+	
+	public function getLatestPost()
+	{
+		$threads = $this->getChildren();
+		
+		if(count($threads) > 0)
+		{
+			$latestThread = $threads[0];
+
+			foreach($threads as $thread)
+			{
+				if($thread->getLastestPost()->fields["Time"] > $latestThread->getLastestPost()->fields["Time"])
+				{
+					$latestThread = $thread;
+				}
+			}
+			
+			return $latestThread->getLastestPost();
+		}
+		
+		return null;
+	}
 }
 
 ?>

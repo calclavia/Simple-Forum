@@ -94,21 +94,21 @@ class Thread extends ForumElement
 	
 	public function getLastestPost()
 	{
-		$threads = $this->getChildren();
+		$posts = $this->getChildren();
 		
-		if(count($threads) > 0)
+		if(count($posts) > 0)
 		{
-			$lastestThread = $threads[0];
+			$latestThread = $posts[0];
 
-			foreach($threads as $thread)
+			foreach($posts as $thread)
 			{
-				if($thread->fields["Time"] > $lastestThread->fields["Time"])
+				if($thread->fields["Time"] > $latestThread->fields["Time"])
 				{
-					$lastestThread = $thread;
+					$latestThread = $thread;
 				}
 			}
 			
-			return $lastestThread;
+			return $latestThread;
 		}
 		
 		return null;
