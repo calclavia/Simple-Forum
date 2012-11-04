@@ -8,6 +8,7 @@
 .forum a
 {
     text-decoration: none;
+    font-weight:bold;
 }
 
 .forum_table
@@ -33,6 +34,11 @@
     padding: 10px;
 }
 
+.forum_content
+{
+    padding: 10px;
+}
+
 .post_profile
 {
     padding: 10px;
@@ -46,7 +52,7 @@
     float:right;
 }
 
-.forum_element a
+.title_link
 {
     font-weight: bold;
     font-size: 15pt;
@@ -61,33 +67,45 @@
 
 .forum_element .element_content
 {
-    width: 70%;
+    width: 60%;
 }
 
-.black_overlay{
-	display: none;
-	position: absolute;
-	top: 0%;
-	left: 0%;
-	width: 100%;
-	height: 100%;
-	background-color: black;
-	z-index:1001;
-	-moz-opacity: 0.8;
-	opacity:.80;
-	filter: alpha(opacity=80);
+.forum_element .element_stats
+{
+    width: 60px;
 }
- 
-.white_content {
-	display: none;
-	position: absolute;
-	top: 25%;
-	left: 25%;
-	width: 50%;
-	height: 50%;
-	padding: 16px;
-	border: 16px solid orange;
-	background-color: white;
-	z-index:1002;
-	overflow: auto;
+
+.black_overlay
+{
+    display: none;
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    z-index:1001;
+    -moz-opacity: 0.8;
+    opacity:.80;
+    filter: alpha(opacity=80);
+}
+
+.white_content
+{
+    display: none;
+    position: absolute;
+    top: 10%;
+    left: 20%;
+    width: 60%;
+    height: 80%;
+    padding: 15px;
+    background-color: white;
+    z-index:1002;
+    overflow: auto;
+}
+
+.white_content h1
+{
+    display:inline;
+    margin: 5px;
 }

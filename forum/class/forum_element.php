@@ -60,21 +60,23 @@ abstract class ForumElement
 
 		if ($this->id < 0)
 		{
-			$query = "INSERT INTO {$table_prefix}{$this->element_name} (Name, ";
+			$query = "INSERT INTO {$table_prefix}{$this->element_name} (Name,";
 
-			$lastField = end(array_values($this->fields));
+			$i = 0;
 
 			foreach ($this->fields as $key => $value)
 			{
 				$query .= $key;
 
-				if ($value != $lastField)
+				if ($i++ != count($this->fields)-1)
 				{
 					$query .= ",";
 				}
 			}
 
 			$query .= ") VALUES ('" . $this->name . "', ";
+
+			$i = 0;
 
 			foreach ($this->fields as $key => $value)
 			{
@@ -87,7 +89,7 @@ abstract class ForumElement
 					$query .= "'" . $value . "'";
 				}
 
-				if ($value != $lastField)
+				if ($i++ != count($this->fields)-1)
 				{
 					$query .= ",";
 				}
@@ -95,7 +97,7 @@ abstract class ForumElement
 
 			$query .= ")";
 
-			mysql_query($query) or die("Failed to create forum element: ".mysql_error());
+			mysql_query($query) or die("Failed to create forum element: " . mysql_error() . $query);
 			$result = mysql_query("SHOW TABLE STATUS LIKE '{$table_prefix}{$this->element_name}'");
 			$row = mysql_fetch_array($result);
 			$maxRows = intval($row['Auto_increment']);
@@ -106,7 +108,7 @@ abstract class ForumElement
 		{
 			$query = "UPDATE {$table_prefix}{$this->element_name} SET Name='{$this->name}', ";
 
-			$lastField = end(array_values($this->fields));
+			$i = 0;
 
 			foreach ($this->fields as $key => $value)
 			{
@@ -122,7 +124,7 @@ abstract class ForumElement
 				}
 
 
-				if ($value != $lastField)
+				if ($i++ != count($this->fields)-1)
 				{
 					$query .= ",";
 				}
@@ -133,27 +135,27 @@ abstract class ForumElement
 			mysql_query($query) or die("Failed to save forum element: " . mysql_error());
 			return true;
 		}
-		
+
 		return false;
 	}
 
 	public function delete($con)
 	{
 		global $table_prefix;
-		
+
 		$children = $this->getChildren();
-		
-		if($children != null && count($children) > 0)
+
+		if ($children != null && count($children) > 0)
 		{
-			foreach($children as $child)
+			foreach ($children as $child)
 			{
 				$child->delete($con);
 			}
 		}
-		
+
 		mysql_query("DELETE FROM {$table_prefix}{$this->element_name} WHERE ID={$this->id} LIMIT 1");
 	}
-	
+
 	public abstract function getChildren();
 }
 

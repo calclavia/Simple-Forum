@@ -42,7 +42,7 @@ class Board extends ForumElement
 			return new Board($row["ID"], $row["Parent"], $row["Name"], $row["Description"]);
 		}
 	}
-	
+
 	public function getChildren()
 	{
 		global $table_prefix;
@@ -53,38 +53,67 @@ class Board extends ForumElement
 
 		while ($row = mysql_fetch_array($result))
 		{
-			$returnArray[] = new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Time"]);
+			$returnArray[] = new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Time"], $row["Sticky"], $row["LockThread"], $row["Views"]);
 		}
-		
+
 		return $returnArray;
 	}
-	
+
 	public function createThread($name)
 	{
-		return new Thread(-1, $this->id, $name);
+		return new Thread(-1, $this->id, $name, "no", "no", 1);
+	}
+
+	public function getPosts()
+	{
+		$posts = array();
+		
+		$threads = $this->getChildren();
+
+		foreach ($threads as $thread)
+		{
+			$posts = array_merge($posts, $thread->getChildren());
+		}
+		
+		return $posts;
 	}
 	
+	public function getViews()
+	{
+		$views = 0;
+		
+		$threads = $this->getChildren();
+
+		foreach ($threads as $thread)
+		{
+			$views += $thread->fields["Views"];
+		}
+		
+		return $views;
+	}
+
 	public function getLatestPost()
 	{
 		$threads = $this->getChildren();
-		
-		if(count($threads) > 0)
+
+		if (count($threads) > 0)
 		{
 			$latestThread = $threads[0];
 
-			foreach($threads as $thread)
+			foreach ($threads as $thread)
 			{
-				if($thread->getLastestPost()->fields["Time"] > $latestThread->getLastestPost()->fields["Time"])
+				if ($thread->getLatestPost()->fields["Time"] > $latestThread->getLatestPost()->fields["Time"])
 				{
 					$latestThread = $thread;
 				}
 			}
-			
-			return $latestThread->getLastestPost();
+
+			return $latestThread->getLatestPost();
 		}
-		
+
 		return null;
 	}
+
 }
 
 ?>

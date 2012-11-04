@@ -7,7 +7,7 @@
 class Post extends ForumElement
 {
 
-	function __construct($id, $parent, $name, $content, $userID, $time)
+	function __construct($id, $parent, $name, $content, $userID, $time, $lastEditTime, $lastEditUser)
 	{
 		$this->id = $id;
 		$this->name = $name;
@@ -17,11 +17,9 @@ class Post extends ForumElement
 		$this->fields["User"] = $userID;
 		$this->fields["Content"] = $content;
 		$this->fields["Time"] = $time;
-
-		/**
-		 * $this->fields["LastEditTime"] = $time;
-		 * $this->fields["LastEditUser"] = $time;
-		 */
+		$this->fields["LastEditTime"] = $lastEditTime;
+		$this->fields["LastEditUser"] = $lastEditUser;
+		
 	}
 
 	function getDate()
@@ -33,7 +31,7 @@ class Post extends ForumElement
 	{
 		global $table_prefix;
 
-		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}posts (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Content TEXT, User int, Time int)", $con) or die(mysql_error());
+		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}posts (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Content TEXT, User int, Time int, LastEditTime int, LastEditUser int)", $con) or die(mysql_error());
 	}
 	
 	public static function getByID($id)
@@ -51,13 +49,20 @@ class Post extends ForumElement
 		}
 		else
 		{
-			return new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"], $row["User"], $row["Time"]);
+			return new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"], $row["User"], $row["Time"], $row["LastEditTime"], $row["LastEditUser"]);
 		}
 	}
 
 	public function getChildren()
 	{
 		return null;
+	}
+	
+	public function edit($newContent, $userID, $time)
+	{
+		$this->fields["Content"] = $newContent;
+		$this->fields["LastEditUser"] = $userID;		
+		$this->fields["LastEditTime"] = $time;
 	}
 }
 

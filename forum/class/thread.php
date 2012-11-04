@@ -7,18 +7,16 @@
 class Thread extends ForumElement
 {
 
-	function __construct($id, $parent, $name)
+	function __construct($id, $parent, $name, $sticky, $lockThread, $views)
 	{
 		$this->id = $id;
 		$this->name = $name;
 
 		$this->element_name = "threads";
 		$this->fields["Parent"] = $parent;
-		$this->fields["Sticky"] = "yes";
-		$this->fields["LockThread"] = "no";
-		/*
-		$this->fields["Views"] = 0;
-		 */
+		$this->fields["Sticky"] = $sticky;
+		$this->fields["LockThread"] = $lockThread;
+		$this->fields["Views"] = $views;
 	}
 
 	public static function setUp($con)
@@ -43,7 +41,7 @@ class Thread extends ForumElement
 		}
 		else
 		{
-			return new Thread($row["ID"], $row["Parent"], $row["Name"]);
+			return new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Sticky"], $row["LockThread"], $row["Views"]);
 		}
 	}
 
@@ -57,7 +55,7 @@ class Thread extends ForumElement
 
 		while ($row = mysql_fetch_array($result))
 		{
-			$returnArray[] = new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"], $row["User"], $row["Time"]);
+			$returnArray[] = new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"], $row["User"], $row["Time"], $row["LastEditTime"], $row["LastEditUser"]);
 		}
 		
 		uasort($returnArray, function($a, $b){ return $a->fields["Time"] > $b->fields["Time"];});
@@ -67,7 +65,7 @@ class Thread extends ForumElement
 
 	public function createPost($content, $userID, $time)
 	{
-		return new Post(-1, $this->id, $this->name, $content, $userID, $time);
+		return new Post(-1, $this->id, $this->name, $content, $userID, $time, $time, $userID);
 	}
 	
 	public function getFirstPost()
@@ -92,7 +90,7 @@ class Thread extends ForumElement
 		return null;
 	}
 	
-	public function getLastestPost()
+	public function getLatestPost()
 	{
 		$posts = $this->getChildren();
 		
