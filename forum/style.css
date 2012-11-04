@@ -1,0 +1,58 @@
+.forum
+{
+    width:100%;
+    padding: 5px;
+    margin: 5px;
+}
+
+.forum a
+{
+    text-decoration: none;
+}
+
+.forum_table
+{
+    background-color:#DADADA;
+    width:100%;
+    border: 0px;
+}
+
+.forum_element
+{
+    background: white url('img/forum_element_bg.png') repeat-x bottom left;
+}
+
+.read_status
+{
+    width:40px;
+}
+
+.forum_element td
+{
+    padding: 10px;
+}
+
+.forum_post
+{
+    padding: 10px;
+    width: 220px;
+    text-align: center;
+    vertical-align:text-top;
+}
+
+.forum_menu
+{
+    float:right;
+}
+
+.forum_element a
+{
+    font-weight: bold;
+    font-size: 15pt;
+}
+
+.forum .category_title
+{
+    font-size: 18pt;
+    font-weight: bold;
+}
