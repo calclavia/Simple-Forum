@@ -51,8 +51,9 @@
     font-size: 15pt;
 }
 
-.forum .category_title
+.forum .title
 {
     font-size: 18pt;
     font-weight: bold;
+    display: inline-block;
 }
