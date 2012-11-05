@@ -7,20 +7,23 @@
 class Category extends ForumElement
 {
 
-	function __construct($id, $name, $order)
+	function __construct($id, $name, $order, $hidden)
 	{
 		$this->id = $id;
 		$this->name = $name;
 
 		$this->element_name = "categories";
+		$this->prefix = "c";
+		
 		$this->fields["ForumOrder"] = $order;
+		$this->fields["Hidden"] = $hidden;
 	}
 
 	public static function setUp($con)
 	{
 		global $table_prefix;
 
-		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}categories (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), ForumOrder int)", $con) or die(mysql_error());
+		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}categories (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), ForumOrder int, Hidden varchar(5))", $con) or die(mysql_error());
 	}
 
 	public static function getByID($id)
@@ -37,7 +40,7 @@ class Category extends ForumElement
 		}
 		else
 		{
-			return new Category($row["ID"], $row["Name"], $row["ForumOrder"]);
+			return new Category($row["ID"], $row["Name"], $row["ForumOrder"], $row["Hidden"]);
 		}
 	}
 
@@ -51,7 +54,7 @@ class Category extends ForumElement
 
 		while ($row = mysql_fetch_array($result))
 		{
-			$returnArray[] = new Category($row["ID"], $row["Name"], $row["ForumOrder"]);
+			$returnArray[] = new Category($row["ID"], $row["Name"], $row["ForumOrder"], $row["Hidden"]);
 		}
 
 		uasort($returnArray, function($a, $b)
@@ -88,11 +91,6 @@ class Category extends ForumElement
 		return $returnArray;
 	}
 
-	public function createBoard($name, $description)
-	{
-		return new Board(-1, $this->id, -1, $name, $description, "no");
-	}
-
 	public function getChildren()
 	{
 		global $table_prefix;
@@ -109,9 +107,19 @@ class Category extends ForumElement
 		return $returnArray;
 	}
 
-	public function edit($title)
+	public function edit($user, $title)
 	{
-		$this->name = $title;
+		global $edit_categories;
+		
+		if($user->hasPermission($edit_categories))
+		{
+			$this->name = $title;
+		}
+	}
+	
+	public function createBoard($name, $description)
+	{
+		return new Board(-1, $this->id, -1, $name, $description, "no");
 	}
 
 }

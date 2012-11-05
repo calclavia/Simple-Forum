@@ -10,6 +10,7 @@ abstract class ForumElement
 	protected $id = -1;
 	public $name;
 	public $element_name;
+	public $prefix;
 	public $fields = array();
 
 	public function getID()

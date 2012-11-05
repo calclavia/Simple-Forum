@@ -13,6 +13,8 @@ class Board extends ForumElement
 		$this->name = $name;
 
 		$this->element_name = "boards";
+		$this->prefix = "b";
+
 		$this->fields["Parent"] = $parent;
 		$this->fields["ForumOrder"] = $order;
 		$this->fields["Description"] = $description;

@@ -17,9 +17,14 @@ class ForumUser
 	 */
 	public $moderate = array();
 	
-	public function hasPermission($permission)
+	public function hasPermission($element, $permission)
 	{
-		return true;
+		if(in_array($element->prefix.$element->getID(), $moderate))
+		{
+			return true;
+		}
+		
+		return $permission->default;
 	}
 }
 

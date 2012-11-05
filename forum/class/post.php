@@ -13,13 +13,14 @@ class Post extends ForumElement
 		$this->name = $name;
 
 		$this->element_name = "posts";
+		$this->prefix = "p";
+
 		$this->fields["Parent"] = $parent;
 		$this->fields["User"] = $userID;
 		$this->fields["Content"] = $content;
 		$this->fields["Time"] = $time;
 		$this->fields["LastEditTime"] = $lastEditTime;
 		$this->fields["LastEditUser"] = $lastEditUser;
-		
 	}
 
 	function getDate()
@@ -33,7 +34,7 @@ class Post extends ForumElement
 
 		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}posts (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Content TEXT, User int, Time int, LastEditTime int, LastEditUser int)", $con) or die(mysql_error());
 	}
-	
+
 	public static function getByID($id)
 	{
 		global $table_prefix;
@@ -57,13 +58,14 @@ class Post extends ForumElement
 	{
 		return null;
 	}
-	
+
 	public function edit($newContent, $userID, $time)
 	{
 		$this->fields["Content"] = $newContent;
-		$this->fields["LastEditUser"] = $userID;		
+		$this->fields["LastEditUser"] = $userID;
 		$this->fields["LastEditTime"] = $time;
 	}
+
 }
 
 ?>

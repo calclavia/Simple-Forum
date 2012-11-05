@@ -13,6 +13,8 @@ class Thread extends ForumElement
 		$this->name = $name;
 
 		$this->element_name = "threads";
+		$this->prefix = "t";
+
 		$this->fields["Parent"] = $parent;
 		$this->fields["Sticky"] = $sticky;
 		$this->fields["LockThread"] = $lockThread;

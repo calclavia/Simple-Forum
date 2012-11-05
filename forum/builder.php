@@ -22,21 +22,28 @@ function clean($string, $veryClean = false)
  * Returns all categories
  * @return string - The HTML content.
  */
-function getAllCategories()
+function getAllCategories($user)
 {
-	$printContent = "
-		<br />
-		<form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
-			<input type='text' name='title'>
-			<input type='submit' value='Add Category'>
-		</form>
-		<br/><br/><br/>";
+	global $create_categories;
+	
+	$printContent = "";
+
+	if ($user->hasPermission($create_categories))
+	{
+		$printContent .= "
+			<br />
+			<form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
+				<input type='text' name='title'>
+				<input type='submit' value='Add Category'>
+			</form>
+			<br/><br/><br/>";
+	}
 
 	$categories = Category::getAll();
 
 	foreach ($categories as $category)
 	{
-		$printContent .= getCategory($category) . "</br></br>";
+		$printContent .= getCategory($user, $category) . "</br></br>";
 	}
 
 	return $printContent;
@@ -46,38 +53,52 @@ function getAllCategories()
  * @param Category $category - The Category Class.
  * @return string - The HTML content.
  */
-function getCategory($category)
+function getCategory($user, $category)
 {
+	global $edit_categories, $create_boards;
+	
 	if ($category != null)
 	{
-		$printContent = "
-		<div class='title'>" . $category->name . "</div>
-		<div class='forum_menu'>
-			<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$category->getID()}')\">Add Board</a> | 
-			<a href=\"javascript:void(0)\" onclick = \"lightBox('editCategory{$category->getID()}')\">Edit Category</a> | 
-			<a href='{$_SERVER['PHP_SELF']}?d=c{$category->getID()}'>Delete</a>
-		</div>";
-
-		$printContent .= "<table class='forum_table'><tr><td>Status</td><td>Board</td><td>Stats</td><td>Last Post</td></tr>";
-
-		if (count($category->getChildren()) > 0)
+		if ($category->fields["Hidden"] != "yes")
 		{
-			foreach ($category->getChildren() as $board)
+			$printContent = "
+			<div class='title'>" . $category->name . "</div>
+			<div class='forum_menu'>";
+			
+			if ($user->hasPermission($create_boards))
 			{
-				$printContent .= getSingleBoard($board);
+				$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$category->getID()}')\">Add Board</a> | ";
 			}
+			
+			if ($user->hasPermission($edit_categories))
+			{
+				$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('editCategory{$category->getID()}')\">Edit Category</a> | ";
+			}
+
+			$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$category->getID()}'>Delete</a>
+			</div>";
+
+			$printContent .= "<table class='forum_table'><tr><td>Status</td><td>Board</td><td>Stats</td><td>Last Post</td></tr>";
+
+			if (count($category->getChildren()) > 0)
+			{
+				foreach ($category->getChildren() as $board)
+				{
+					$printContent .= getSingleBoard($board);
+				}
+			}
+			else
+			{
+				$printContent .= "<tr class='forum_element'><td colspan='4'>No boards avaliable.</td></tr>";
+			}
+
+			$printContent .= "</table>";
+			$printContent .= getEditCategoryForm($category);
+			$printContent .= getNewBoardForm($category);
+
+
+			return $printContent;
 		}
-		else
-		{
-			$printContent .= "<tr class='forum_element'><td colspan='4'>No boards avaliable.</td></tr>";
-		}
-
-		$printContent .= "</table>";
-		$printContent .= getEditCategoryForm($category);
-		$printContent .= getNewBoardForm($category);
-
-
-		return $printContent;
 	}
 }
 
@@ -318,7 +339,7 @@ function getThread($thread)
 				{$userdetails["title"]}
 				</br>
 				<a href=\"javascript:void(0)\" onclick = \"lightBox('editPost{$post->getID()}')\">Edit Post</a> |
-				<a href='{$_SERVER['PHP_SELF']}?p=b{$post->fields["Parent"]}&d=p{$post->getID()}'>Remove Post</a>
+				<a href='{$_SERVER['PHP_SELF']}?p=t{$post->fields["Parent"]}&d=p{$post->getID()}'>Remove Post</a>
 				<br />
 				<small>Posted on {$post->getDate()}</small></td>
 				<td class='forum_content'>{$post->fields["Content"]}</td></tr>";
@@ -359,21 +380,23 @@ function getEditPostForm($post)
 	/**
 	 * Check if it is the first post. If so, allow the editing of the title.
 	 */
-	if (Thread::getByID($post->fields["Parent"]) != null)
+	$thread = Thread::getByID($post->fields["Parent"]);
+
+	if ($thread != null)
 	{
-		if (Thread::getByID($post->fields["Parent"])->getFirstPost() != null)
+		if ($thread->getFirstPost() != null)
 		{
-			if (Thread::getByID($post->fields["Parent"])->getFirstPost()->getID() == $post->getID())
+			if ($thread->getFirstPost()->getID() == $post->getID())
 			{
 				$isChecked = "";
 
-				if ($post->fields["LockThread"] == "yes")
+				if ($thread->fields["LockThread"] == "yes")
 				{
 					$isChecked = "checked='checked'";
 				}
-				
+
 				$additionalForm = "
-				<b>Title:</b> <input type='text' name='title' size='80' maxlength='80' value='" . Thread::getByID($post->fields["Parent"])->name . "'/>
+				<b>Title:</b> <input type='text' name='title' size='80' maxlength='80' value='" . $thread->name . "'/>
 				<br />
 				<input type='checkbox' name='lockTopic' value='Lock Topic' {$isChecked}> Lock Topic
 				<br />";
@@ -382,7 +405,7 @@ function getEditPostForm($post)
 				{
 					$isChecked = "";
 
-					if ($post->fields["Sticky"] == "yes")
+					if ($thread->fields["Sticky"] == "yes")
 					{
 						$isChecked = "checked='checked'";
 					}
