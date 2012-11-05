@@ -18,6 +18,12 @@
     border: 0px;
 }
 
+.forum_table td
+{
+		color: #000;
+
+}
+
 .forum_element
 {
     background: white url('img/forum_element_bg.png') repeat-x bottom left;
