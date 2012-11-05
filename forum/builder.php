@@ -8,7 +8,7 @@
 
 function clean($string, $veryClean = false)
 {
-	if($veryClean)
+	if ($veryClean)
 	{
 		return mysql_real_escape_string(htmlspecialchars(trim($string)));
 	}
@@ -26,12 +26,10 @@ function getAllCategories()
 {
 	$printContent = "
 		<br />
-		<div class='forum_menu'>
-			<form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
-				<input type='text' name='title'>
-				<input type='submit' value='Add Category'>
-			</form>
-		</div>
+		<form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
+			<input type='text' name='title'>
+			<input type='submit' value='Add Category'>
+		</form>
 		<br/><br/><br/>";
 
 	$categories = Category::getAll();
@@ -94,7 +92,7 @@ function getSingleBoard($board)
 		if ($board->getLatestPost()->fields["User"] != null)
 		{
 			$userdetails = fetchUserDetails(null, null, $board->getLatestPost()->fields["User"]);
-			$latestPost = "Last post <a href='{$_SERVER['PHP_SELF']}?p=t{$board->getLatestPost()->fields["Parent"]}'>\"".$board->getLatestPost()->name."\"</a> by " . $userdetails["display_name"] . " on " . $board->getLatestPost()->getDate();
+			$latestPost = "Last post <a href='{$_SERVER['PHP_SELF']}?p=t{$board->getLatestPost()->fields["Parent"]}'>\"" . $board->getLatestPost()->name . "\"</a> by " . $userdetails["display_name"] . " on " . $board->getLatestPost()->getDate();
 		}
 
 		$printContent .= "
@@ -178,18 +176,15 @@ function getEditBoardForm($board)
 	return "
 	<div id='editBoard{$board->getID()}' class='white_content'>
 		<h1>Edit Board</h1>
-		<table>
-			<tr><td>
-			<b>Name:</b>
-			</td><td>
-			<input type='text' name='title' size='80' maxlength='80'/>
-			</td></tr>
-		</table>
 		<form action='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}&e=b{$board->getID()}' method='post'>
-			<textarea id='editableContentEditBoard{$board->getID()}' name='editableContent' wrap=\"virtual\">{$board->fields["Description"]}</textarea>
-			<script type='text/javascript'>
-				CKEDITOR.replace('editableContentEditBoard{$board->getID()}', {height:'300'});
-			</script>
+			<table>
+				<tr><td>
+				<b>Name:</b>
+				</td><td>
+				<input type='text' name='title' size='80' maxlength='80' value='{$board->name}'/>
+				</td></tr>
+			</table>
+			<textarea id='editableContentEditBoard{$board->getID()}' name='editableContent' wrap=\"virtual\"  style=\"width:550px; height:200px\">{$board->fields["Description"]}</textarea>
 			<input type='submit' value='Edit'/>					
 		</form>
 	</div>";
@@ -201,10 +196,10 @@ function getBoard($board)
 	{
 		$printContent .= "
 			<h2>" . $board->name . "</h2>
+			<span>" . $board->getTreeAsString() . "</span>
 			<span class=\"forum_menu\">
-				".$board->getTreeAsString()." | 
 				<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$board->getID()}')\">Add Board</a> | 
-					<a href=\"javascript:void(0)\" onclick = \"lightBox('editBoard{$board->getID()}')\">Edit Board</a> | 
+				<a href=\"javascript:void(0)\" onclick = \"lightBox('editBoard{$board->getID()}')\">Edit Board</a> | 
 				<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\">Create Thread</a>
 			</span>
 			";
@@ -234,7 +229,7 @@ function getBoard($board)
 					if ($thread->getLatestPost()->fields["User"] != null)
 					{
 						$userdetails = fetchUserDetails(null, null, $thread->getLatestPost()->fields["User"]);
-						$latestPost = "Last post <a href='{$_SERVER['PHP_SELF']}?p=t{$thread->getLatestPost()->fields["Parent"]}'>\"".$thread->getLatestPost()->name."\" by " . $userdetails["display_name"] . " on " . $thread->getLatestPost()->getDate();
+						$latestPost = "Last post <a href='{$_SERVER['PHP_SELF']}?p=t{$thread->getLatestPost()->fields["Parent"]}'>\"" . $thread->getLatestPost()->name . "\" by " . $userdetails["display_name"] . " on " . $thread->getLatestPost()->getDate();
 					}
 
 					$printContent .= "
@@ -252,7 +247,7 @@ function getBoard($board)
 						</td>
 					</tr>";
 				}
-				else if($child instanceof Board)
+				else if ($child instanceof Board)
 				{
 					$printContent .= getSingleBoard($child);
 				}
@@ -298,9 +293,9 @@ function getThread($thread)
 	if ($thread != null)
 	{
 		$printContent .= "
-		<div class='title'>" . $thread->name . "</div>
+		<h2>" . $thread->name . "</h2>
+		<span>" . $thread->getTreeAsString() . "</span>
 		<span class=\"forum_menu\">
-			".$thread->getTreeAsString()." | 
 			<a href=\"javascript:void(0)\" onclick = \"lightBox('newPost')\">Create Post</a>
 		</span>";
 
@@ -322,8 +317,8 @@ function getThread($thread)
 				<br />
 				{$userdetails["title"]}
 				</br>
-				<a href=\"javascript:void(0)\" onclick = \"lightBox('editPost{$post->getID()}')\">Edit</a> |
-				<a href='{$_SERVER['PHP_SELF']}?p=t{$post->fields["Parent"]}&d=p{$post->getID()}'>Remove</a>
+				<a href=\"javascript:void(0)\" onclick = \"lightBox('editPost{$post->getID()}')\">Edit Post</a> |
+				<a href='{$_SERVER['PHP_SELF']}?p=b{$post->fields["Parent"]}&d=p{$post->getID()}'>Remove Post</a>
 				<br />
 				<small>Posted on {$post->getDate()}</small></td>
 				<td class='forum_content'>{$post->fields["Content"]}</td></tr>";
@@ -359,6 +354,8 @@ function getNewPostForm($thread)
 
 function getEditPostForm($post)
 {
+	global $currentUser;
+
 	/**
 	 * Check if it is the first post. If so, allow the editing of the title.
 	 */
@@ -368,9 +365,33 @@ function getEditPostForm($post)
 		{
 			if (Thread::getByID($post->fields["Parent"])->getFirstPost()->getID() == $post->getID())
 			{
+				$isChecked = "";
+
+				if ($post->fields["LockThread"] == "yes")
+				{
+					$isChecked = "checked='checked'";
+				}
+				
 				$additionalForm = "
 				<b>Title:</b> <input type='text' name='title' size='80' maxlength='80' value='" . Thread::getByID($post->fields["Parent"])->name . "'/>
-				";
+				<br />
+				<input type='checkbox' name='lockTopic' value='Lock Topic' {$isChecked}> Lock Topic
+				<br />";
+
+				if ($currentUser->hasPermission($topic_sticky))
+				{
+					$isChecked = "";
+
+					if ($post->fields["Sticky"] == "yes")
+					{
+						$isChecked = "checked='checked'";
+					}
+
+					$additionalForm .= "
+					<input type='checkbox' name='sticky' value='Stick Topic' {$isChecked}> Stick Topic
+					<br />
+					";
+				}
 			}
 		}
 	}

@@ -72,18 +72,15 @@ abstract class ForumElement
 
 			foreach ($this->fields as $key => $value)
 			{
-				if (!empty($value))
-				{
-					$query .= ",";
+				$query .= ",";
 
-					if (is_int($value))
-					{
-						$query .= $value;
-					}
-					else
-					{
-						$query .= "'" . $value . "'";
-					}
+				if (is_int($value))
+				{
+					$query .= $value;
+				}
+				else
+				{
+					$query .= "'" . $value . "'";
 				}
 			}
 

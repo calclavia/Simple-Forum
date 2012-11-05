@@ -80,9 +80,20 @@ class Board extends ForumElement
 		return array_merge($boards, $threads);
 	}
 
-	public function createThread($name)
+	public function createThread($name, $content, $userID = -1, $time = -1, $con = false)
 	{
-		return new Thread(-1, $this->id, $name, "no", "no", 1);
+		if ($userID > 0 && $time > 0 && $con)
+		{
+			$thread = $this->createThread($name);
+			$thread->save($con);
+
+			$post = $thread->createPost($content, $userID, $time);
+			$post->save($con);
+		}
+		else
+		{
+			return new Thread(-1, $this->id, $name, "no", "no", 1);
+		}
 	}
 
 	public function createBoard($name, $description)
@@ -110,14 +121,14 @@ class Board extends ForumElement
 
 		foreach ($this->getChildren() as $child)
 		{
-			if($child instanceof Thread)
+			if ($child instanceof Thread)
 			{
 				$views += intval($child->fields["Views"]);
 			}
-			else if($child instanceof Board)
+			else if ($child instanceof Board)
 			{
 				$views += $child->getViews();
-			}			
+			}
 		}
 
 		return intval($views);
@@ -174,6 +185,7 @@ class Board extends ForumElement
 		$this->name = $name;
 		$this->fields["Description"] = $description;
 	}
+
 }
 
 ?>

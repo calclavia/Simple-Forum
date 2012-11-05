@@ -117,13 +117,21 @@ class Thread extends ForumElement
 
 	public function getTreeAsString()
 	{
-		return Board::getByID(intval($this->fields["Parent"]))->getTreeAsString()." -> <a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a>";
+		return Board::getByID(intval($this->fields["Parent"]))->getTreeAsString() . " -> <a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a>";
 	}
 
 	public function view()
 	{
-		$this->fields["Views"] ++;
+		$this->fields["Views"]++;
 	}
+
+	public function edit($name, $sticky, $lockThread)
+	{
+		$this->name = $name;
+		$this->fields["Sticky"] = $sticky;
+		$this->fields["LockThread"] = $lockThread;
+	}
+
 }
 
 ?>

@@ -64,13 +64,6 @@
     font-size: 15pt;
 }
 
-.forum .title
-{
-    font-size: 18pt;
-    font-weight: bold;
-    display: inline-block;
-}
-
 .forum_element .element_content
 {
     width: 60%;

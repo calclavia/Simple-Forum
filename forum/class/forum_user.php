@@ -2,10 +2,10 @@
 
 class ForumUser
 {
-	/**
-	 * @var int ID of the user. 
-	 */
-	public $userID;
+	/*
+	 * The ID of the user.
+	*/
+	public $id;
 	
 	/**
 	 * @var int Posts posted.
@@ -16,6 +16,11 @@ class ForumUser
 	 * @var array Forum elements this user is moderating. 
 	 */
 	public $moderate = array();
+	
+	public function hasPermission($permission)
+	{
+		return true;
+	}
 }
 
 ?>
