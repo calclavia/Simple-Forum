@@ -6,9 +6,16 @@
  * @Calclavia
  */
 
-function clean($string)
+function clean($string, $veryClean = false)
 {
-	return mysql_real_escape_string(trim($string));
+	if($veryClean)
+	{
+		return mysql_real_escape_string(htmlspecialchars(trim($string)));
+	}
+	else
+	{
+		return mysql_real_escape_string(trim($string));
+	}
 }
 
 /**
@@ -19,8 +26,8 @@ function getAllCategories()
 {
 	$printContent = "
 		<br />
-		<div class='forum_menu' action='{$_SERVER['PHP_SELF']}?a=new'>
-			<form method='post'>
+		<div class='forum_menu'>
+			<form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
 				<input type='text' name='title'>
 				<input type='submit' value='Add Category'>
 			</form>
@@ -139,10 +146,8 @@ function getNewBoardForm($parent)
 					<input type='text' name='title' size='80' maxlength='80'/>
 					</td></tr>
 				</table>
-				<textarea id='editableContentNewBoard{$parent->getID()}' name='editableContent' wrap=\"virtual\"></textarea>
-				<script type='text/javascript'>
-					CKEDITOR.replace('editableContentNewBoard{$parent->getID()}', {height:'300'});
-				</script>
+				<textarea id='editableContentNewBoard{$parent->getID()}' name='editableContent' wrap=\"virtual\" style=\"width:550px; height:200px\"></textarea>
+				<br />
 				<input type='submit' value='Post'/>					
 			</form>
 		</div>";
@@ -160,14 +165,34 @@ function getNewBoardForm($parent)
 					<input type='text' name='board_name' size='80' maxlength='80'/>
 					</td></tr>
 				</table>
-				<textarea id='editableContentNewBoard{$parent->getID()}' name='editableContent' wrap=\"virtual\"></textarea>
-				<script type='text/javascript'>
-					CKEDITOR.replace('editableContentNewBoard{$parent->getID()}', {height:'300'});
-				</script>
+				<br />
+				<textarea id='editableContentNewBoard{$parent->getID()}' name='editableContent' wrap=\"virtual\" style=\"width:550px; height:200px\"></textarea>
 				<input type='submit' value='Post'/>					
 			</form>
 		</div>";
 	}
+}
+
+function getEditBoardForm($board)
+{
+	return "
+	<div id='editBoard{$board->getID()}' class='white_content'>
+		<h1>Edit Board</h1>
+		<table>
+			<tr><td>
+			<b>Name:</b>
+			</td><td>
+			<input type='text' name='title' size='80' maxlength='80'/>
+			</td></tr>
+		</table>
+		<form action='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}&e=b{$board->getID()}' method='post'>
+			<textarea id='editableContentEditBoard{$board->getID()}' name='editableContent' wrap=\"virtual\">{$board->fields["Description"]}</textarea>
+			<script type='text/javascript'>
+				CKEDITOR.replace('editableContentEditBoard{$board->getID()}', {height:'300'});
+			</script>
+			<input type='submit' value='Edit'/>					
+		</form>
+	</div>";
 }
 
 function getBoard($board)
@@ -179,6 +204,7 @@ function getBoard($board)
 			<span class=\"forum_menu\">
 				".$board->getTreeAsString()." | 
 				<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$board->getID()}')\">Add Board</a> | 
+					<a href=\"javascript:void(0)\" onclick = \"lightBox('editBoard{$board->getID()}')\">Edit Board</a> | 
 				<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\">Create Thread</a>
 			</span>
 			";
@@ -239,6 +265,7 @@ function getBoard($board)
 
 		$printContent .= "</table>";
 		$printContent .= getNewBoardForm($board);
+		$printContent .= getEditBoardForm($board);
 
 		return $printContent;
 	}

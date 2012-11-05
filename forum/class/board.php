@@ -7,13 +7,14 @@
 class Board extends ForumElement
 {
 
-	function __construct($id, $parent, $name, $description, $subBoard)
+	function __construct($id, $parent, $order, $name, $description, $subBoard)
 	{
 		$this->id = $id;
 		$this->name = $name;
 
 		$this->element_name = "boards";
 		$this->fields["Parent"] = $parent;
+		$this->fields["ForumOrder"] = $order;
 		$this->fields["Description"] = $description;
 		$this->fields["SubBoard"] = $subBoard;
 	}
@@ -22,7 +23,7 @@ class Board extends ForumElement
 	{
 		global $table_prefix;
 
-		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}boards (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Description TEXT, SubBoard varchar(5))", $con) or die(mysql_error());
+		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}boards (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, ForumOrder int, Description TEXT, SubBoard varchar(5))", $con) or die(mysql_error());
 	}
 
 	public static function getByID($id)
@@ -40,7 +41,7 @@ class Board extends ForumElement
 		}
 		else
 		{
-			return new Board($row["ID"], $row["Parent"], $row["Name"], $row["Description"], $row["SubBoard"]);
+			return new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
 		}
 	}
 
@@ -73,7 +74,7 @@ class Board extends ForumElement
 
 		while ($row = mysql_fetch_array($result))
 		{
-			$boards[] = new Board($row["ID"], $row["Parent"], $row["Name"], $row["Description"], $row["SubBoard"]);
+			$boards[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
 		}
 
 		return array_merge($boards, $threads);
@@ -86,7 +87,7 @@ class Board extends ForumElement
 
 	public function createBoard($name, $description)
 	{
-		return new Board(-1, $this->id, $name, $description, "yes");
+		return new Board(-1, $this->id, -1, $name, $description, "yes");
 	}
 
 	public function getPosts()
@@ -168,6 +169,11 @@ class Board extends ForumElement
 		return $tree;
 	}
 
+	public function edit($name, $description)
+	{
+		$this->name = $name;
+		$this->fields["Description"] = $description;
+	}
 }
 
 ?>

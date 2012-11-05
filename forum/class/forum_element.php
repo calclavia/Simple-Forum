@@ -62,8 +62,6 @@ abstract class ForumElement
 		{
 			$query = "INSERT INTO {$table_prefix}{$this->element_name} (Name";
 
-			$i = 0;
-
 			foreach ($this->fields as $key => $value)
 			{
 				$query .= ",";
@@ -71,8 +69,6 @@ abstract class ForumElement
 			}
 
 			$query .= ") VALUES ('" . $this->name . "'";
-
-			$i = 0;
 
 			foreach ($this->fields as $key => $value)
 			{
