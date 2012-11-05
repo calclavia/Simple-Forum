@@ -17,14 +17,54 @@ class ForumUser
 	 */
 	public $moderate = array();
 	
-	public function hasPermission($element, $permission)
+		/*
+	 * The display name of the user.
+	 */
+	public $username;
+
+	/*
+	 * The email of the user.
+	 */
+	public $email;
+		
+	function __construct($id, $username, $email)
 	{
-		if(in_array($element->prefix.$element->getID(), $moderate))
+		$this->id = $id;
+		$this->username = $username;
+		$this->email = $email;
+	}
+	
+	public function hasPermission($permission, $element = null)
+	{
+		if($this->id == -1)
 		{
-			return true;
+			return false;
 		}
 		
-		return $permission->default;
+		if($element != null)
+		{
+			if(in_array($element->prefix.$element->getID(), $moderate))
+			{
+				return true;
+			}
+			else if($element instanceof Post)
+			{
+				if($element->fields["User"] == $this->id)
+				{
+					return true;
+				}
+			}
+			else if($element instanceof Thread)
+			{
+				if($element->getFirstPost()->fields["User"] == $this->id)
+				{
+					return true;
+				}
+			}
+			
+		}
+		
+		return $permission->default || isUserAdmin();
 	}
 }
 

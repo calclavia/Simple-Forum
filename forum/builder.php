@@ -25,18 +25,19 @@ function clean($string, $veryClean = false)
 function getAllCategories($user)
 {
 	global $create_categories;
-	
+
 	$printContent = "";
 
 	if ($user->hasPermission($create_categories))
 	{
 		$printContent .= "
 			<br />
-			<form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
-				<input type='text' name='title'>
-				<input type='submit' value='Add Category'>
-			</form>
-			<br/><br/><br/>";
+			<div style='forum_menu'>
+				<form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
+					<input type='text' name='title'>
+					<input type='submit' value='Add Category'>
+				</form>
+			</div>";
 	}
 
 	$categories = Category::getAll();
@@ -55,28 +56,31 @@ function getAllCategories($user)
  */
 function getCategory($user, $category)
 {
-	global $edit_categories, $create_boards;
-	
+	global $edit_categories, $delete_categories, $create_boards;
+
 	if ($category != null)
 	{
 		if ($category->fields["Hidden"] != "yes")
 		{
 			$printContent = "
-			<div class='title'>" . $category->name . "</div>
 			<div class='forum_menu'>";
-			
-			if ($user->hasPermission($create_boards))
+
+			if ($user->hasPermission($create_boards, $category))
 			{
 				$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$category->getID()}')\">Add Board</a> | ";
 			}
-			
-			if ($user->hasPermission($edit_categories))
+
+			if ($user->hasPermission($edit_categories, $category))
 			{
 				$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('editCategory{$category->getID()}')\">Edit Category</a> | ";
 			}
 
-			$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$category->getID()}'>Delete</a>
-			</div>";
+			if ($user->hasPermission($delete_categories, $category))
+			{
+				$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$category->getID()}'>Delete</a>";
+			}
+
+			$printContent .= "</div>";
 
 			$printContent .= "<table class='forum_table'><tr><td>Status</td><td>Board</td><td>Stats</td><td>Last Post</td></tr>";
 
@@ -211,19 +215,36 @@ function getEditBoardForm($board)
 	</div>";
 }
 
-function getBoard($board)
+function getBoard($user, $board)
 {
+	global $create_boards, $edit_boards, $delete_boards, $create_threads;
+
 	if ($board != null)
 	{
 		$printContent .= "
-			<h2>" . $board->name . "</h2>
 			<span>" . $board->getTreeAsString() . "</span>
-			<span class=\"forum_menu\">
-				<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$board->getID()}')\">Add Board</a> | 
-				<a href=\"javascript:void(0)\" onclick = \"lightBox('editBoard{$board->getID()}')\">Edit Board</a> | 
-				<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\">Create Thread</a>
-			</span>
-			";
+			<span class=\"forum_menu\">";
+
+		if ($user->hasPermission($create_boards, $board))
+		{
+			$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$board->getID()}')\">Add Board</a> | ";
+		}
+		if ($user->hasPermission($edit_boards, $board))
+		{
+			$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('editBoard{$board->getID()}')\">Edit Board</a> | ";
+		}
+		
+		if ($user->hasPermission($delete_boards, $board))
+		{
+			$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=b{$board->getID()}'>Delete Board</a> | ";
+		}
+		
+		if ($user->hasPermission($create_threads, $board))
+		{
+			$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\">Create Thread</a>";
+		}
+
+		$printContent .= "</span>";
 
 		$printContent .= "<table class='forum_table'><tr><td>Status</td><td>Thread</td><td>Stats</td><td>Last Post</td></tr>";
 
@@ -309,16 +330,22 @@ function getNewThreadForm($board)
 	</div>";
 }
 
-function getThread($thread)
+function getThread($user, $thread)
 {
+	global $create_posts, $delete_posts, $edit_posts;
+
 	if ($thread != null)
 	{
 		$printContent .= "
-		<h2>" . $thread->name . "</h2>
 		<span>" . $thread->getTreeAsString() . "</span>
-		<span class=\"forum_menu\">
-			<a href=\"javascript:void(0)\" onclick = \"lightBox('newPost')\">Create Post</a>
-		</span>";
+		<span class=\"forum_menu\">";
+
+		if ($user->hasPermission($create_posts, $thread))
+		{
+			$printContent .= "<a href = \"javascript:void(0)\" onclick = \"lightBox('newPost')\">Create Post</a>";
+		}
+
+		$printContent .= "</span>";
 
 		$printContent .= "<table class='forum_table' border='1'>";
 
@@ -337,9 +364,19 @@ function getThread($thread)
 				<b><a rel='t{$post->getID()}'>{$userdetails["display_name"]}</a></b>
 				<br />
 				{$userdetails["title"]}
-				</br>
-				<a href=\"javascript:void(0)\" onclick = \"lightBox('editPost{$post->getID()}')\">Edit Post</a> |
-				<a href='{$_SERVER['PHP_SELF']}?p=t{$post->fields["Parent"]}&d=p{$post->getID()}'>Remove Post</a>
+				</br>";
+				
+				if ($user->hasPermission($edit_posts, $post))
+				{
+					$printContent .= "<a href = \"javascript:void(0)\" onclick = \"lightBox('editPost{$post->getID()}')\">Edit Post</a> |";
+				}
+				
+				if ($user->hasPermission($delete_posts, $post))
+				{
+					$printContent .= "<a href='{$_SERVER['PHP_SELF']}?p=t{$post->fields["Parent"]}&d=p{$post->getID()}'>Remove Post</a>";
+				}
+				
+				$printContent .= "
 				<br />
 				<small>Posted on {$post->getDate()}</small></td>
 				<td class='forum_content'>{$post->fields["Content"]}</td></tr>";
@@ -401,7 +438,7 @@ function getEditPostForm($post)
 				<input type='checkbox' name='lockTopic' value='Lock Topic' {$isChecked}> Lock Topic
 				<br />";
 
-				if ($currentUser->hasPermission($topic_sticky))
+				if ($currentUser->hasPermission($topic_sticky, $post))
 				{
 					$isChecked = "";
 
