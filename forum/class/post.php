@@ -65,7 +65,6 @@ class Post extends ForumElement
 		$this->fields["LastEditUser"] = $userID;
 		$this->fields["LastEditTime"] = $time;
 	}
-
 }
 
 ?>

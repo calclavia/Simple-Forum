@@ -31,13 +31,12 @@ function getAllCategories($user)
 	if ($user->hasPermission($create_categories))
 	{
 		$printContent .= "
-			<br />
-			<div style='forum_menu'>
+			<div class='forum_menu'>
 				<form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
 					<input type='text' name='title'>
 					<input type='submit' value='Add Category'>
 				</form>
-			</div>";
+			</div><br/><br/>";
 	}
 
 	$categories = Category::getAll();
@@ -63,6 +62,7 @@ function getCategory($user, $category)
 		if ($category->fields["Hidden"] != "yes")
 		{
 			$printContent = "
+			<h2 style='display:inline'>{$category->name}</h2>
 			<div class='forum_menu'>";
 
 			if ($user->hasPermission($create_boards, $category))
@@ -97,8 +97,17 @@ function getCategory($user, $category)
 			}
 
 			$printContent .= "</table>";
-			$printContent .= getEditCategoryForm($category);
-			$printContent .= getNewBoardForm($category);
+			global $create_boards;
+
+			if ($user->hasPermission($edit_categories))
+			{
+				$printContent .= getEditCategoryForm($category);
+			}
+
+			if ($user->hasPermission($create_boards))
+			{
+				$printContent .= getNewBoardForm($category);
+			}
 
 
 			return $printContent;
@@ -119,6 +128,21 @@ function getSingleBoard($board)
 			$userdetails = fetchUserDetails(null, null, $board->getLatestPost()->fields["User"]);
 			$latestPost = "Last post <a href='{$_SERVER['PHP_SELF']}?p=t{$board->getLatestPost()->fields["Parent"]}'>\"" . $board->getLatestPost()->name . "\"</a> by " . $userdetails["display_name"] . " on " . $board->getLatestPost()->getDate();
 		}
+		
+		$subBoards = "";
+		
+		foreach($board->getChildren() as $child)
+		{
+			if($child instanceof Board)
+			{
+				$subBoards .= "<a href='{$_SERVER['PHP_SELF']}?p=b{$child->getID()}'>{$child->name}</a> ";
+			}
+		}
+		
+		if(!empty($subBoards))
+		{
+			$subBoards = "Sub-Boards: ".$subBoards;
+		}
 
 		$printContent .= "
 		<tr class='forum_element'>
@@ -129,6 +153,10 @@ function getSingleBoard($board)
 				<a class='title_link' href='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}'>{$board->name}</a>
 				<br/>
 				{$board->fields["Description"]}
+				<br />
+				<span style='font:9'>
+					{$subBoards}
+				</span>
 			</td>
 			<td class='element_stats'>
 				$stats
@@ -233,12 +261,12 @@ function getBoard($user, $board)
 		{
 			$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('editBoard{$board->getID()}')\">Edit Board</a> | ";
 		}
-		
+
 		if ($user->hasPermission($delete_boards, $board))
 		{
 			$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=b{$board->getID()}'>Delete Board</a> | ";
 		}
-		
+
 		if ($user->hasPermission($create_threads, $board))
 		{
 			$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\">Create Thread</a>";
@@ -301,8 +329,16 @@ function getBoard($user, $board)
 		}
 
 		$printContent .= "</table>";
-		$printContent .= getNewBoardForm($board);
-		$printContent .= getEditBoardForm($board);
+
+		if ($user->hasPermission($create_boards))
+		{
+			$printContent .= getNewBoardForm($board);
+		}
+
+		if ($user->hasPermission($edit_boards))
+		{
+			$printContent .= getEditBoardForm($board);
+		}
 
 		return $printContent;
 	}
@@ -313,7 +349,7 @@ function getNewThreadForm($board)
 	return "
 	<div id='newThread' class='white_content'>
 		<h1>New Thread</h1>
-		<form action='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}' method='post'>
+		<form action='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}&a=new' method='post'>
 			<table>
 				<tr><td>
 				<b>Title:</b>
@@ -323,7 +359,7 @@ function getNewThreadForm($board)
 			</table>
 			<textarea id='editableContentNewThread' name='editableContent' wrap=\"virtual\"></textarea>
 			<script type='text/javascript'>
-				CKEDITOR.replace('editableContentNewThread', {height:'300'});
+				CKEDITOR.replace('editableContentNewThread', {height:'200'});
 			</script>
 			<input type='submit' value='Post'/>					
 		</form>
@@ -340,7 +376,7 @@ function getThread($user, $thread)
 		<span>" . $thread->getTreeAsString() . "</span>
 		<span class=\"forum_menu\">";
 
-		if ($user->hasPermission($create_posts, $thread))
+		if ($user->hasPermission($create_posts, $thread) && $thread->fields["LockThread"] != "yes")
 		{
 			$printContent .= "<a href = \"javascript:void(0)\" onclick = \"lightBox('newPost')\">Create Post</a>";
 		}
@@ -365,17 +401,17 @@ function getThread($user, $thread)
 				<br />
 				{$userdetails["title"]}
 				</br>";
-				
+
 				if ($user->hasPermission($edit_posts, $post))
 				{
 					$printContent .= "<a href = \"javascript:void(0)\" onclick = \"lightBox('editPost{$post->getID()}')\">Edit Post</a> |";
 				}
-				
+
 				if ($user->hasPermission($delete_posts, $post))
 				{
 					$printContent .= "<a href='{$_SERVER['PHP_SELF']}?p=t{$post->fields["Parent"]}&d=p{$post->getID()}'>Remove Post</a>";
 				}
-				
+
 				$printContent .= "
 				<br />
 				<small>Posted on {$post->getDate()}</small></td>
@@ -403,7 +439,7 @@ function getNewPostForm($thread)
 		<form action='{$_SERVER['PHP_SELF']}?p=t{$thread->getID()}&a=new' method='post'>
 			<textarea id='editableContentNewPost' name='editableContent' wrap=\"virtual\"></textarea>
 			<script type='text/javascript'>
-				CKEDITOR.replace('editableContentNewPost', {height:'300'});
+				CKEDITOR.replace('editableContentNewPost', {height:'200'});
 			</script>
 			<input type='submit' value='Post'/>					
 		</form>
@@ -462,7 +498,7 @@ function getEditPostForm($post)
 			{$additionalForm}
 			<textarea id='editableContentEditPost{$post->getID()}' name='editableContent' wrap=\"virtual\">{$post->fields["Content"]}</textarea>
 			<script type='text/javascript'>
-				CKEDITOR.replace('editableContentEditPost{$post->getID()}', {height:'300'});
+				CKEDITOR.replace('editableContentEditPost{$post->getID()}', {height:'200'});
 			</script>
 			<input type='submit' value='Edit'/>					
 		</form>

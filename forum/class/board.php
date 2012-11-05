@@ -59,18 +59,22 @@ class Board extends ForumElement
 		{
 			$threads[] = new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Sticky"], $row["LockThread"], $row["Views"]);
 		}
+		
+		usort($threads, function($a, $b)
+		{
+			if ($a->fields["Sticky"] == "yes" && $b->fields["Sticky"] == "no")
+			{
+				return -1;
+			}
+			else if ($a->fields["Sticky"] == "no" && $b->fields["Sticky"] == "yes")
+			{
+				return 1;
+			}
+
+			return $a->getLatestPost()->fields["Time"] < $b->getLatestPost()->fields["Time"];
+		});
 
 		$result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='yes'");
-
-		uasort($threads, function($a, $b)
-			{
-				if ($a->fields["Sticky"] == "yes" && $b->fields["Sticky"] == "yes")
-				{
-					return true;
-				}
-
-				return $a->getLatestPost()->fields["Time"] < $b->getLatestPost()->fields["Time"];
-			});
 
 		$boards = array();
 
@@ -82,25 +86,39 @@ class Board extends ForumElement
 		return array_merge($boards, $threads);
 	}
 
-	public function createThread($name, $content, $userID = -1, $time = -1, $con = false)
+	public function createThread($user, $name, $content, $time = -1, $con = false)
 	{
-		if ($userID > 0 && $time > 0 && $con)
-		{
-			$thread = $this->createThread($name);
-			$thread->save($con);
+		global $create_threads;
 
-			$post = $thread->createPost($content, $userID, $time);
-			$post->save($con);
-		}
-		else
+		if ($user != null)
 		{
-			return new Thread(-1, $this->id, $name, "no", "no", 1);
+			if ($user->hasPermission($create_threads))
+			{
+				if ($time > 0 && $con && !empty($content))
+				{
+					$thread = $this->createThread($user, $name);
+					$thread->save($con);
+
+					$post = $thread->createPost($content, $user->id, $time);
+					$post->save($con);
+				}
+				else
+				{
+					return new Thread(-1, $this->id, $name, "no", "no", 1);
+				}
+			}
 		}
 	}
 
-	public function createBoard($name, $description)
+	public function createBoard($user, $name, $description)
 	{
-		return new Board(-1, $this->id, -1, $name, $description, "yes");
+		global $create_boards;
+
+		if ($user->hasPermission($create_boards))
+		{
+			return new Board(-1, $this->id, -1, $name, $description, "yes");
+		}
+		return null;
 	}
 
 	public function getPosts()

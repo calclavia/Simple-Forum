@@ -69,8 +69,13 @@ class Thread extends ForumElement
 	}
 
 	public function createPost($content, $userID, $time)
-	{
-		return new Post(-1, $this->id, $this->name, $content, $userID, $time, $time, $userID);
+	{	
+		if($this->fields["LockThread"] != "yes")
+		{
+			return new Post(-1, $this->id, $this->name, $content, $userID, $time, $time, $userID);
+		}
+		
+		return null;
 	}
 
 	public function getFirstPost()

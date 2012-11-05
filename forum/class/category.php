@@ -117,9 +117,16 @@ class Category extends ForumElement
 		}
 	}
 	
-	public function createBoard($name, $description)
+	public function createBoard($user, $name, $description)
 	{
-		return new Board(-1, $this->id, -1, $name, $description, "no");
+		global $create_boards;
+		
+		if($user->hasPermission($create_boards))
+		{
+			return new Board(-1, $this->id, -1, $name, $description, "no");
+		}
+		
+		return null;
 	}
 
 }
