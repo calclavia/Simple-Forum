@@ -61,7 +61,6 @@ class ForumUser
 					return true;
 				}
 			}
-			
 		}
 		
 		return $permission->default || isUserAdmin();
