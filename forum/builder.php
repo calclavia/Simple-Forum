@@ -82,7 +82,7 @@ function getCategory($user, $category)
 
 			$printContent .= "</div>";
 
-			$printContent .= "<table class='forum_table'><tr><td>Status</td><td>Board</td><td>Stats</td><td>Last Post</td></tr>";
+			$printContent .= "<div draggable='true'><table class='forum_table'><tr><td>Status</td><td>Board</td><td>Stats</td><td>Last Post</td></tr>";
 
 			if (count($category->getChildren()) > 0)
 			{
@@ -96,7 +96,7 @@ function getCategory($user, $category)
 				$printContent .= "<tr class='forum_element'><td colspan='4'>No boards avaliable.</td></tr>";
 			}
 
-			$printContent .= "</table>";
+			$printContent .= "</table></div>";
 			global $create_boards;
 
 			if ($user->hasPermission($edit_categories))
