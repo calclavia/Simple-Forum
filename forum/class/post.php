@@ -17,7 +17,7 @@ class Post extends ForumElement
 
 		$this->fields["Parent"] = $parent;
 		$this->fields["User"] = $userID;
-		$this->fields["Content"] = str_replace("\\r\\n", "", $content);
+		$this->fields["Content"] = stripslashes(str_replace("\\r\\n", "", $content));
 		$this->fields["Time"] = $time;
 		$this->fields["LastEditTime"] = $lastEditTime;
 		$this->fields["LastEditUser"] = $lastEditUser;
