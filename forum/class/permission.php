@@ -31,7 +31,9 @@ $delete_boards = new Permission(6, "Delete Boards", "Allows the user to create b
 $create_threads = new Permission(7, "Create Threads", "Allows the user to create threads.", true);
 
 $create_posts = new Permission(8, "Create Posts", "Allows the user to create posts.", true);
-$edit_posts = new Permission(9, "Create Posts", "Allows the user to create posts.");
-$delete_posts = new Permission(10, "Create Posts", "Allows the user to create posts.");
+$edit_posts = new Permission(9, "Edit Posts", "Allows the user to create posts.");
+$edit_posts_any = new Permission(9, "Edit anyones Posts", "Allows the user to edit anyones posts. Excluding Admin posts");
+$delete_posts = new Permission(10, "Delete Posts", "Allows the user to delete posts.");
+$delete_posts_any = new Permission(10, "Delete anyones Posts", "Allows the user to delete posts. of any user Excluding Admin posts ");
 
 ?>
