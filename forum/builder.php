@@ -10,7 +10,7 @@ function clean($string, $veryClean = false)
 {
 	if ($veryClean)
 	{
-		return mysql_real_escape_string(htmlspecialchars(trim($string)));
+		return mysql_real_escape_string(htmlspecialchars(strip_tags(trim($string))));
 	}
 	else
 	{

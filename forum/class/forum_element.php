@@ -69,7 +69,7 @@ abstract class ForumElement
 				$query .= $key;
 			}
 
-			$query .= ") VALUES ('" . $this->name . "'";
+			$query .= ") VALUES ('" . mysql_real_escape_string($this->name) . "'";
 
 			foreach ($this->fields as $key => $value)
 			{
@@ -81,13 +81,13 @@ abstract class ForumElement
 				}
 				else
 				{
-					$query .= "'" . $value . "'";
+					$query .= "'" . mysql_real_escape_string($value) . "'";
 				}
 			}
 
 			$query .= ")";
 
-			mysql_query($query) or die("Failed to create forum element: " . mysql_error() . $query);
+			mysql_query($query) or die("Failed to create forum element: " . mysql_error() . ", Q = " . $query);
 			$result = mysql_query("SHOW TABLE STATUS LIKE '{$table_prefix}{$this->element_name}'");
 			$row = mysql_fetch_array($result);
 			$maxRows = intval($row['Auto_increment']);
@@ -96,7 +96,7 @@ abstract class ForumElement
 		}
 		else
 		{
-			$query = "UPDATE {$table_prefix}{$this->element_name} SET Name='{$this->name}' ";
+			$query = "UPDATE {$table_prefix}{$this->element_name} SET Name='" . mysql_real_escape_string($this->name)."'";
 
 			$i = 0;
 
@@ -112,13 +112,14 @@ abstract class ForumElement
 				}
 				else
 				{
-					$query .= "'" . $value . "'";
+					$query .= "'" . mysql_real_escape_string($value) . "'";
 				}
+				
 			}
 
 			$query .= " WHERE ID={$this->id} LIMIT 1";
 
-			mysql_query($query) or die("Failed to save forum element: " . mysql_error());
+			mysql_query($query) or die("Failed to save forum element: " . mysql_error() . ", Q = " . $query);
 			return true;
 		}
 
