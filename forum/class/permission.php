@@ -19,21 +19,24 @@ class Permission
 }
 
 $topic_sticky = new Permission(0, "Sticky", "Allows the user to make topics sticky.");
+$topic_promote = new Permission(1, "Promote", "Allows the user to make promote topics.");
 
-$create_categories = new Permission(1, "Create Categories", "Allows the user to create categories.");
-$edit_categories = new Permission(2, "Edit Categories", "Allows the user to edit categories.");
-$delete_categories = new Permission(3, "Delete Categories", "Allows the user to delete categories.");
+$create_categories = new Permission(2, "Create Categories", "Allows the user to create categories.");
+$edit_categories = new Permission(3, "Edit Categories", "Allows the user to edit categories.");
+$delete_categories = new Permission(4, "Delete Categories", "Allows the user to delete categories.");
 
-$create_boards = new Permission(4, "Create Boards", "Allows the user to create boards.");
-$edit_boards = new Permission(5, "Edit Boards", "Allows the user to create boards.");
-$delete_boards = new Permission(6, "Delete Boards", "Allows the user to create boards.");
+$create_boards = new Permission(5, "Create Boards", "Allows the user to create boards.");
+$edit_boards = new Permission(6, "Edit Boards", "Allows the user to edit boards.");
+$delete_boards = new Permission(7, "Delete Boards", "Allows the user to delete boards.");
 
-$create_threads = new Permission(7, "Create Threads", "Allows the user to create threads.", true);
+$create_threads = new Permission(8, "Create Threads", "Allows the user to create threads.", true);
 
-$create_posts = new Permission(8, "Create Posts", "Allows the user to create posts.", true);
-$edit_posts = new Permission(9, "Edit Posts", "Allows the user to create posts.");
-$edit_posts_any = new Permission(10, "Edit anyones Posts", "Allows the user to edit anyones posts. Excluding Admin posts");
-$delete_posts = new Permission(11, "Delete Posts", "Allows the user to delete posts.");
-$delete_posts_any = new Permission(12, "Delete anyones Posts", "Allows the user to delete posts. of any user Excluding Admin posts ");
+$create_posts = new Permission(9, "Create Posts", "Allows the user to create posts.", true);
+$edit_posts = new Permission(10, "Edit Posts", "Allows the user to create posts.");
+$edit_posts_any = new Permission(11, "Edit anyones Posts", "Allows the user to edit anyones posts. Excluding Admin posts");
+$delete_posts = new Permission(12, "Delete Posts", "Allows the user to delete posts.");
+$delete_posts_any = new Permission(13, "Delete anyones Posts", "Allows the user to delete posts. of any user Excluding Admin posts ");
+
+$edit_news = new Permission(14, "Edit News", "Allows the user to edit the New Section.");
 
 ?>
