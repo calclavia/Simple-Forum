@@ -39,4 +39,8 @@ $delete_posts_any = new Permission(13, "Delete anyones Posts", "Allows the user 
 
 $edit_news = new Permission(14, "Edit News", "Allows the user to edit the New Section.");
 
+$view_Board_admin = new Permission(15, "View admin board", "Allows the user to see and post in the admin catergory.");
+$view_board_dev = new Permission(16, "View dev only board", "Allows the user to see and view the dev only category.");
+
+
 ?>
