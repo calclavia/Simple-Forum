@@ -10,7 +10,7 @@ class Post extends ForumElement
 	function __construct($id, $parent, $name, $content, $userID, $time, $lastEditTime, $lastEditUser)
 	{
 		$this->id = $id;
-		$this->name = $name;
+		$this->name = stripslashes(str_replace("\\r\\n", "", $name));
 
 		$this->element_name = "posts";
 		$this->prefix = "p";

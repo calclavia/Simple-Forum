@@ -36,14 +36,15 @@ function getAllCategories($user)
 					<input type='text' name='title'>
 					<input type='submit' value='Add Category'>
 				</form>
-			</div><br/><br/>";
+			</div>";
 	}
 
 	$categories = Category::getAll();
 
 	foreach ($categories as $category)
 	{
-		$printContent .= getCategory($user, $category) . "</br></br>";
+		$printContent .= getCategory($user, $category);
+		$printContent .= "<div style='height:50px; width: 100%; border:1px' ondrop='drop(event)' ondragover='allowDrop(event)'></div>";
 	}
 
 	return $printContent;
@@ -62,6 +63,7 @@ function getCategory($user, $category)
 		if ($category->fields["Hidden"] != "yes")
 		{
 			$printContent = "
+			<div draggable='true' ondragstart='drag(event)'>
 			<h2 style='display:inline'>{$category->name}</h2>
 			<div class='forum_menu'>";
 
@@ -82,7 +84,7 @@ function getCategory($user, $category)
 
 			$printContent .= "</div>";
 
-			$printContent .= "<div draggable='true'><table class='forum_table'><tr><td>Status</td><td>Board</td><td>Stats</td><td>Last Post</td></tr>";
+			$printContent .= "<table class='forum_table'><tr><td>Status</td><td>Board</td><td>Stats</td><td>Last Post</td></tr>";
 
 			if (count($category->getChildren()) > 0)
 			{

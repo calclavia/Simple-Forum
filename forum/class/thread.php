@@ -10,7 +10,7 @@ class Thread extends ForumElement
 	function __construct($id, $parent, $name, $sticky, $lockThread, $views)
 	{
 		$this->id = $id;
-		$this->name = $name;
+		$this->name = stripslashes(str_replace("\\r\\n", "", $name));
 
 		$this->element_name = "threads";
 		$this->prefix = "t";
