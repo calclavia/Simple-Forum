@@ -44,9 +44,13 @@ function getAllCategories($user)
     foreach ($categories as $category)
     {
         $printContent .= getCategory($user, $category);
-        $printContent .= "<div style='height:60px; width: 100%;' ondrop=\"drop(event, 'c{$category->getID()}')\" ondragover='allowDrop(event)'></div>";
+        
+        if($user->hasPermission($edit_categories, $category))
+        {
+        	$printContent .= "<div style='height:60px; width: 100%;' ondrop=\"drop(event, 'c{$category->getID()}')\" ondragover='allowDrop(event)'></div>";
+    	}
     }
-
+    
     return $printContent;
 }
 
@@ -152,7 +156,7 @@ function getSingleBoard($board)
 				<img src='forum/img/off.png'/>
 			</td>
 			<td class='element_content'>
-				<h3><a href='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}'>{$board->name}</a></h3>
+				<h2><a href='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}'>{$board->name}</a></h2>
 				<br/>
 				{$board->fields["Description"]}
 				<br />

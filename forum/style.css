@@ -58,6 +58,11 @@
     float:right;
 }
 
+.forum_element h2
+{
+	display: inline;
+}
+
 .forum_element .element_content
 {
     width: 60%;
