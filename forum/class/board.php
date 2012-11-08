@@ -82,6 +82,21 @@ class Board extends ForumElement
         {
             $boards[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
         }
+        
+        usort($boards, function($a, $b)
+        {
+        	if ($a->fields["ForumOrder"] == $b->fields["ForumOrder"] || $a->fields["ForumOrder"] == -1)
+        	{
+        		return -1;
+        	}
+        
+        	if ($b->fields["ForumOrder"] == $a->getID())
+        	{
+        		return -1;
+        	}
+        
+        	return 1;
+        });
 
         return array_merge($boards, $threads);
     }
@@ -204,6 +219,29 @@ class Board extends ForumElement
     {
         $this->name = $name;
         $this->fields["Description"] = $description;
+    }
+    
+    public function move($user, $id, $con)
+    {
+    	global $edit_boards;
+    
+    	if($user->hasPermission($edit_boards, $this))
+    	{
+    		if ($id == $this->id)
+    		{
+    			$id = -1;
+    		}
+    		
+    		$newParent = Board::getByID($id)->fields["Parent"];
+    		
+    		if(Category::getByID($newParent) != null)
+    		{
+    			$this->fields["Parent"] = $newParent;
+    		}
+    		
+    		$this->fields["ForumOrder"] = $id;
+    		$this->save($con);
+    	}
     }
 
 }

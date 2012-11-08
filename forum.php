@@ -35,14 +35,17 @@ $printContent = "";
 $title = "Forum";
 
 /**
- * Different actions.
+ * Process different GET submitted actions.
  * a = Adding
  * e = Editing
  * d = Deleting
+ * o = Reordering
+ * m = Moving
  */
+
 if (!empty($_GET["o"]))
 {
-    if (strstr($_GET["p"], "c") && strstr($_GET["o"], "c"))
+	if (strstr($_GET["p"], "c") && strstr($_GET["o"], "c"))
     {
         $category = Category::getByID(intval(str_replace("c", "", $_GET["p"])));
 
@@ -50,10 +53,19 @@ if (!empty($_GET["o"]))
         {
             $category->move($currentUser, str_replace("c", "", $_GET["o"]), $con);
         }
-
-        header("Location: forum.php");
-        die();
     }
+    else if (strstr($_GET["p"], "b") && strstr($_GET["o"], "b"))
+    {
+        $board = Board::getByID(intval(str_replace("b", "", $_GET["p"])));
+
+        if ($board != null)
+        {
+            $board->move($currentUser, str_replace("b", "", $_GET["o"]), $con);
+        }
+    }
+
+    header("Location: forum.php");
+    die();
 }
 
 if (!empty($_GET["e"]) && !empty($_POST))
@@ -64,8 +76,7 @@ if (!empty($_GET["e"]) && !empty($_POST))
 
         if ($category != null)
         {
-            $category->edit(clean($_POST["title"]));
-            $category->save($con);
+            $category->edit(clean($_POST["title"]), $con);
         }
     }
     else if (strstr($_GET["e"], "b") && $_POST["title"])
@@ -297,15 +308,37 @@ $head = "<link href=\"forum/style.css\" rel=\"stylesheet\" type=\"text/css\" />
                     function drop(ev, targetID)
                     {
                             ev.preventDefault();
-                            
-                            if(ev != ev.dataTransfer.getData('id'))
-                            {
-                                window.location = 'forum.php?p='+ev.dataTransfer.getData('id')+'&o='+targetID;
-                            }
+		
+							if(targetID != ev.dataTransfer.getData('id'))
+							{
+					        	window.location = 'forum.php?p='+ev.dataTransfer.getData('id')+'&o='+targetID;
+							}
                     }
+		
+					function move(ev, targetID)
+                    {
+                            ev.preventDefault();
+		
+							if(targetID != ev.dataTransfer.getData('id'))
+							{
+					        	window.location = 'forum.php?p='+ev.dataTransfer.getData('id')+'&m='+targetID;
+							}
+                    }
+		
+					$(document).ready(function() {
+						$('.draggable').hover(function(){
+							$(this).find('.dragText').stop(true, true).fadeIn('slow');
+						},
+						function(){
+							$(this).find('.dragText').stop(true, true).fadeOut('slow');
+						});
+					});
             </script>
             ";
 
+/**
+ * Echo the variable $head in your head and $content in the place where you have your main body.
+ */
 require_once("template.php");
 
 /*

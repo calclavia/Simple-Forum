@@ -47,8 +47,10 @@ function getAllCategories($user)
         
         if($user->hasPermission($edit_categories, $category))
         {
-        	$printContent .= "<div style='height:60px; width: 100%;' ondrop=\"drop(event, 'c{$category->getID()}')\" ondragover='allowDrop(event)'></div>";
+        	$dropData = "ondrop=\"drop(event, 'c{$category->getID()}')\" ondragover='allowDrop(event)'";
     	}
+    	
+    	$printContent .= "<div style='height:60px; width: 100%;' {$dropData}></div>";
     }
     
     return $printContent;
@@ -66,9 +68,17 @@ function getCategory($user, $category)
     {
         if ($category->fields["Hidden"] != "yes")
         {
+        	if($user->hasPermission($edit_categories, $category))
+        	{
+        		$dropData = "class='draggable' draggable='true' ondragstart=\"drag(event, 'c{$category->getID()}')\"";
+        	}
+        	
             $printContent = "
-			<div id='category{$category->getID()}' draggable='true' ondragstart=\"drag(event, 'c{$category->getID()}')\">
-			<h2 style='display:inline'>{$category->name}</h2>
+            <span id='c{$category->getID()}' $dropData>
+				<h2 id='category{$category->getID()}' style='display:inline'>{$category->name}</h2>
+				<span class='dragText'>Drag to Reorder</span>
+			</span>
+			
 			<div class='forum_menu'>";
 
             if ($user->hasPermission($create_boards, $category))
@@ -94,7 +104,7 @@ function getCategory($user, $category)
             {
                 foreach ($category->getChildren() as $board)
                 {
-                    $printContent .= getSingleBoard($board);
+                    $printContent .= getSingleBoard($user, $board);
                 }
             }
             else
@@ -102,7 +112,7 @@ function getCategory($user, $category)
                 $printContent .= "<tr class='forum_element'><td colspan='4'>No boards avaliable.</td></tr>";
             }
 
-            $printContent .= "</table></div>";
+            $printContent .= "</table>";
             global $create_boards;
 
             if ($user->hasPermission($edit_categories))
@@ -121,8 +131,10 @@ function getCategory($user, $category)
     }
 }
 
-function getSingleBoard($board)
+function getSingleBoard($user, $board)
 {
+	global $edit_boards;
+	
     if ($board != null)
     {
         $stats = count($board->getPosts()) . " posts<br />" . $board->getViews() . " views";
@@ -149,19 +161,37 @@ function getSingleBoard($board)
         {
             $subBoards = "Sub-Boards: " . $subBoards;
         }
+        
+        if($user->hasPermission($edit_boards, $board))
+        {
+        	$dropData = "
+        		class='draggable' draggable='true' ondragstart=\"drag(event, 'b{$board->getID()}')\"
+        		ondrop=\"drop(event, 'b{$board->getID()}')\" ondragover='allowDrop(event)'
+        	";
+        	
+        	$dropData2 = "
+        		class='draggable' draggable='true' ondragstart=\"drag(event, 'b{$board->getID()}')\"
+        		ondrop=\"move(event, 'b{$board->getID()}')\" ondragover='allowDrop(event)'
+        	";
+        }
 
         $printContent .= "
 		<tr class='forum_element'>
 			<td class='read_status'>
-				<img src='forum/img/off.png'/>
+				<span {$dropData}>
+					<img src='forum/img/off.png'/>
+					<span class='dragText'>Drag</span>
+				</span>
 			</td>
 			<td class='element_content'>
-				<h2><a href='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}'>{$board->name}</a></h2>
-				<br/>
-				{$board->fields["Description"]}
-				<br />
-				<span style='font:9'>
-					{$subBoards}
+				<span {$dropData2}>
+					<h2><a href='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}'>{$board->name}</a></h2>
+					<br/>
+					{$board->fields["Description"]}
+					<br />
+					<span style='font:9'>
+						{$subBoards}
+					</span>
 				</span>
 			</td>
 			<td class='element_stats'>
@@ -324,7 +354,7 @@ function getBoard($user, $board)
                 }
                 else if ($child instanceof Board)
                 {
-                    $printContent .= getSingleBoard($child);
+                    $printContent .= getSingleBoard($user, $child);
                 }
             }
         }

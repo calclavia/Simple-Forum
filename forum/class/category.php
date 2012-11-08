@@ -68,7 +68,7 @@ class Category extends ForumElement
 			{
 				return -1;
 			}
-				
+
 			return 1;
 		});
 
@@ -87,17 +87,37 @@ class Category extends ForumElement
 		{
 			$returnArray[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
 		}
+		
+		usort($returnArray, function($a, $b)
+		{
+			if ($a->fields["ForumOrder"] == $b->fields["ForumOrder"] || $a->fields["ForumOrder"] == -1)
+			{
+				return -1;
+			}
+		
+			if ($b->fields["ForumOrder"] == $a->getID())
+			{
+				return -1;
+			}
+		
+			return 1;
+		});
 
 		return $returnArray;
 	}
 
-	public function edit($user, $title)
+	public function edit($user, $title, $con = null)
 	{
 		global $edit_categories;
 
 		if ($user->hasPermission($edit_categories))
 		{
 			$this->name = $title;
+		}
+
+		if($con != null)
+		{
+			$this->save($con);
 		}
 	}
 
@@ -123,7 +143,7 @@ class Category extends ForumElement
 			{
 				$id = -1;
 			}
-				
+
 			$this->fields["ForumOrder"] = $id;
 			$this->save($con);
 		}

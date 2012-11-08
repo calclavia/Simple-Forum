@@ -73,6 +73,11 @@
     width: 60px;
 }
 
+.dragText
+{
+	display:none;
+}
+
 .black_overlay
 {
     display: none;
