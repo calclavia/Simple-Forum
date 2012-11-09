@@ -7,137 +7,137 @@
 class Thread extends ForumElement
 {
 
-	function __construct($id, $parent, $name, $sticky, $lockThread, $views)
-	{
-		$this->id = $id;
-		$this->name = stripslashes(str_replace("\\r\\n", "", $name));
+    function __construct($id, $parent, $name, $sticky, $lockThread, $views)
+    {
+        $this->id = $id;
+        $this->name = stripslashes(str_replace("\\r\\n", "", $name));
 
-		$this->element_name = "threads";
-		$this->prefix = "t";
+        $this->element_name = "threads";
+        $this->prefix = "t";
 
-		$this->fields["Parent"] = $parent;
-		$this->fields["Sticky"] = $sticky;
-		$this->fields["LockThread"] = $lockThread;
-		$this->fields["Views"] = $views;
-	}
+        $this->fields["Parent"] = $parent;
+        $this->fields["Sticky"] = $sticky;
+        $this->fields["LockThread"] = $lockThread;
+        $this->fields["Views"] = $views;
+    }
 
-	public static function setUp($con)
-	{
-		global $table_prefix;
+    public static function setUp($con)
+    {
+        global $table_prefix;
 
-		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}threads (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Sticky varchar(5), LockThread varchar(5), Views int)", $con) or die(mysql_error());
-	}
+        mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}threads (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Sticky varchar(5), LockThread varchar(5), Views int)", $con) or die(mysql_error());
+    }
 
-	public static function getByID($id)
-	{
-		global $table_prefix;
+    public static function getByID($id)
+    {
+        global $table_prefix;
 
-		$result = mysql_query("SELECT * FROM {$table_prefix}threads
+        $result = mysql_query("SELECT * FROM {$table_prefix}threads
 		WHERE ID={$id} LIMIT 1");
 
-		$row = mysql_fetch_array($result);
+        $row = mysql_fetch_array($result);
 
-		if ($row["ID"] <= 0)
-		{
-			return null;
-		}
-		else
-		{
-			return new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Sticky"], $row["LockThread"], $row["Views"]);
-		}
-	}
+        if ($row["ID"] <= 0)
+        {
+            return null;
+        }
+        else
+        {
+            return new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Sticky"], $row["LockThread"], $row["Views"]);
+        }
+    }
 
-	public function getChildren()
-	{
-		global $table_prefix;
+    public function getChildren()
+    {
+        global $table_prefix;
 
-		$returnArray = array();
+        $returnArray = array();
 
-		$result = mysql_query("SELECT * FROM {$table_prefix}posts WHERE Parent={$this->id}");
+        $result = mysql_query("SELECT * FROM {$table_prefix}posts WHERE Parent={$this->id}");
 
-		while ($row = mysql_fetch_array($result))
-		{
-			$returnArray[] = new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"], $row["User"], $row["Time"], $row["LastEditTime"], $row["LastEditUser"]);
-		}
+        while ($row = mysql_fetch_array($result))
+        {
+            $returnArray[] = new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"], $row["User"], $row["Time"], $row["LastEditTime"], $row["LastEditUser"]);
+        }
 
-		uasort($returnArray, function($a, $b)
-			{
-				return $a->fields["Time"] > $b->fields["Time"];
-			});
+        uasort($returnArray, function($a, $b)
+                {
+                    return $a->fields["Time"] > $b->fields["Time"];
+                });
 
-		return $returnArray;
-	}
+        return $returnArray;
+    }
 
-	public function createPost($content, $userID, $time)
-	{	
-		if($this->fields["LockThread"] != "yes")
-		{
-			return new Post(-1, $this->id, $this->name, $content, $userID, $time, $time, $userID);
-		}
-		
-		return null;
-	}
+    public function createPost($content, $userID, $time)
+    {
+        if ($this->fields["LockThread"] != "yes")
+        {
+            return new Post(-1, $this->id, $this->name, $content, $userID, $time, $time, $userID);
+        }
 
-	public function getFirstPost()
-	{
-		$threads = $this->getChildren();
+        return null;
+    }
 
-		if (count($threads) > 0)
-		{
-			$earliestThread = $threads[0];
+    public function getFirstPost()
+    {
+        $threads = $this->getChildren();
 
-			foreach ($threads as $thread)
-			{
-				if ($thread->fields["Time"] < $earliestThread->fields["Time"])
-				{
-					$earliestThread = $thread;
-				}
-			}
+        if (count($threads) > 0)
+        {
+            $earliestThread = $threads[0];
 
-			return $earliestThread;
-		}
+            foreach ($threads as $thread)
+            {
+                if ($thread->fields["Time"] < $earliestThread->fields["Time"])
+                {
+                    $earliestThread = $thread;
+                }
+            }
 
-		return null;
-	}
+            return $earliestThread;
+        }
 
-	public function getLatestPost()
-	{
-		$posts = $this->getChildren();
+        return null;
+    }
 
-		if (count($posts) > 0)
-		{
-			$latestThread = $posts[0];
+    public function getLatestPost()
+    {
+        $posts = $this->getChildren();
 
-			foreach ($posts as $thread)
-			{
-				if ($thread->fields["Time"] > $latestThread->fields["Time"])
-				{
-					$latestThread = $thread;
-				}
-			}
+        if (count($posts) > 0)
+        {
+            $latestThread = $posts[0];
 
-			return $latestThread;
-		}
+            foreach ($posts as $thread)
+            {
+                if ($thread->fields["Time"] > $latestThread->fields["Time"])
+                {
+                    $latestThread = $thread;
+                }
+            }
 
-		return null;
-	}
+            return $latestThread;
+        }
 
-	public function getTreeAsString()
-	{
-		return Board::getByID(intval($this->fields["Parent"]))->getTreeAsString() . " -> <a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a>";
-	}
+        return null;
+    }
 
-	public function view()
-	{
-		$this->fields["Views"]++;
-	}
+    public function getTreeAsString()
+    {
+        return Board::getByID(intval($this->fields["Parent"]))->getTreeAsString() . " -> <a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a>";
+    }
 
-	public function edit($name, $sticky, $lockThread)
-	{
-		$this->name = $name;
-		$this->fields["Sticky"] = $sticky;
-		$this->fields["LockThread"] = $lockThread;
-	}
+    public function view()
+    {
+        $this->fields["Views"]++;
+    }
+
+    public function edit($name, $sticky, $lockThread)
+    {
+        $this->name = $name;
+        $this->fields["Sticky"] = $sticky;
+        $this->fields["LockThread"] = $lockThread;
+    }
 
 }
 

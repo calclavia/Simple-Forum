@@ -7,204 +7,204 @@
 class Board extends ForumElement
 {
 
-	function __construct($id, $parent, $order, $name, $description, $subBoard)
-	{
-		$this->id = $id;
-		$this->name = $name;
+    function __construct($id, $parent, $order, $name, $description, $subBoard)
+    {
+        $this->id = $id;
+        $this->name = $name;
 
-		$this->element_name = "boards";
-		$this->prefix = "b";
+        $this->element_name = "boards";
+        $this->prefix = "b";
 
-		$this->fields["Parent"] = $parent;
-		$this->fields["ForumOrder"] = $order;
-		$this->fields["Description"] = $description;
-		$this->fields["SubBoard"] = $subBoard;
-	}
+        $this->fields["Parent"] = $parent;
+        $this->fields["ForumOrder"] = $order;
+        $this->fields["Description"] = $description;
+        $this->fields["SubBoard"] = $subBoard;
+    }
 
-	public static function setUp($con)
-	{
-		global $table_prefix;
+    public static function setUp($con)
+    {
+        global $table_prefix;
 
-		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}boards (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, ForumOrder int, Description TEXT, SubBoard varchar(5))", $con) or die(mysql_error());
-	}
+        mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}boards (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, ForumOrder int, Description TEXT, SubBoard varchar(5))", $con) or die(mysql_error());
+    }
 
-	public static function getByID($id)
-	{
-		global $table_prefix;
+    public static function getByID($id)
+    {
+        global $table_prefix;
 
-		$result = mysql_query("SELECT * FROM {$table_prefix}boards
+        $result = mysql_query("SELECT * FROM {$table_prefix}boards
 		WHERE ID={$id} LIMIT 1");
 
-		$row = mysql_fetch_array($result);
+        $row = mysql_fetch_array($result);
 
-		if ($row["ID"] <= 0)
-		{
-			return null;
-		}
-		else
-		{
-			return new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
-		}
-	}
+        if ($row["ID"] <= 0)
+        {
+            return null;
+        }
+        else
+        {
+            return new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
+        }
+    }
 
-	public function getChildren()
-	{
-		global $table_prefix;
+    public function getChildren()
+    {
+        global $table_prefix;
 
-		$threads = array();
+        $threads = array();
 
-		$result = mysql_query("SELECT * FROM {$table_prefix}threads WHERE Parent={$this->id}");
+        $result = mysql_query("SELECT * FROM {$table_prefix}threads WHERE Parent={$this->id}");
 
-		while ($row = mysql_fetch_array($result))
-		{
-			$threads[] = new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Sticky"], $row["LockThread"], $row["Views"]);
-		}
-		
-		usort($threads, function($a, $b)
-		{
-			if ($a->fields["Sticky"] == "yes" && $b->fields["Sticky"] == "no")
-			{
-				return -1;
-			}
-			else if ($a->fields["Sticky"] == "no" && $b->fields["Sticky"] == "yes")
-			{
-				return 1;
-			}
+        while ($row = mysql_fetch_array($result))
+        {
+            $threads[] = new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Sticky"], $row["LockThread"], $row["Views"]);
+        }
 
-			return $a->getLatestPost()->fields["Time"] < $b->getLatestPost()->fields["Time"];
-		});
+        usort($threads, function($a, $b)
+                {
+                    if ($a->fields["Sticky"] == "yes" && $b->fields["Sticky"] == "no")
+                    {
+                        return -1;
+                    }
+                    else if ($a->fields["Sticky"] == "no" && $b->fields["Sticky"] == "yes")
+                    {
+                        return 1;
+                    }
 
-		$result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='yes'");
+                    return $a->getLatestPost()->fields["Time"] < $b->getLatestPost()->fields["Time"];
+                });
 
-		$boards = array();
+        $result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='yes'");
 
-		while ($row = mysql_fetch_array($result))
-		{
-			$boards[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
-		}
+        $boards = array();
 
-		return array_merge($boards, $threads);
-	}
+        while ($row = mysql_fetch_array($result))
+        {
+            $boards[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
+        }
 
-	public function createThread($user, $name, $content, $time = -1, $con = false)
-	{
-		global $create_threads;
+        return array_merge($boards, $threads);
+    }
 
-		if ($user != null)
-		{
-			if ($user->hasPermission($create_threads))
-			{
-				if ($time > 0 && $con && !empty($content))
-				{
-					$thread = $this->createThread($user, $name);
-					$thread->save($con);
+    public function createThread($user, $name, $content, $time = -1, $con = false)
+    {
+        global $create_threads;
 
-					$post = $thread->createPost($content, $user->id, $time);
-					$post->save($con);
-				}
-				else
-				{
-					return new Thread(-1, $this->id, $name, "no", "no", 1);
-				}
-			}
-		}
-	}
+        if ($user != null)
+        {
+            if ($user->hasPermission($create_threads))
+            {
+                if ($time > 0 && $con && !empty($content))
+                {
+                    $thread = $this->createThread($user, $name);
+                    $thread->save($con);
 
-	public function createBoard($user, $name, $description)
-	{
-		global $create_boards;
+                    $post = $thread->createPost($content, $user->id, $time);
+                    $post->save($con);
+                }
+                else
+                {
+                    return new Thread(-1, $this->id, $name, "no", "no", 1);
+                }
+            }
+        }
+    }
 
-		if ($user->hasPermission($create_boards))
-		{
-			return new Board(-1, $this->id, -1, $name, $description, "yes");
-		}
-		return null;
-	}
+    public function createBoard($user, $name, $description)
+    {
+        global $create_boards;
 
-	public function getPosts()
-	{
-		$posts = array();
+        if ($user->hasPermission($create_boards))
+        {
+            return new Board(-1, $this->id, -1, $name, $description, "yes");
+        }
+        return null;
+    }
 
-		$threads = $this->getChildren();
+    public function getPosts()
+    {
+        $posts = array();
 
-		foreach ($threads as $thread)
-		{
-			$posts = array_merge($posts, $thread->getChildren());
-		}
+        $threads = $this->getChildren();
 
-		return $posts;
-	}
+        foreach ($threads as $thread)
+        {
+            $posts = array_merge($posts, $thread->getChildren());
+        }
 
-	public function getViews()
-	{
-		$views = 0;
+        return $posts;
+    }
 
-		foreach ($this->getChildren() as $child)
-		{
-			if ($child instanceof Thread)
-			{
-				$views += intval($child->fields["Views"]);
-			}
-			else if ($child instanceof Board)
-			{
-				$views += $child->getViews();
-			}
-		}
+    public function getViews()
+    {
+        $views = 0;
 
-		return intval($views);
-	}
+        foreach ($this->getChildren() as $child)
+        {
+            if ($child instanceof Thread)
+            {
+                $views += intval($child->fields["Views"]);
+            }
+            else if ($child instanceof Board)
+            {
+                $views += $child->getViews();
+            }
+        }
 
-	public function getLatestPost()
-	{
-		$threads = $this->getChildren();
+        return intval($views);
+    }
 
-		if (count($threads) > 0)
-		{
-			$latestThread = $threads[0];
+    public function getLatestPost()
+    {
+        $threads = $this->getChildren();
 
-			foreach ($threads as $thread)
-			{
-				if ($thread->getLatestPost()->fields["Time"] > $latestThread->getLatestPost()->fields["Time"])
-				{
-					$latestThread = $thread;
-				}
-			}
+        if (count($threads) > 0)
+        {
+            $latestThread = $threads[0];
 
-			return $latestThread->getLatestPost();
-		}
+            foreach ($threads as $thread)
+            {
+                if ($thread->getLatestPost()->fields["Time"] > $latestThread->getLatestPost()->fields["Time"])
+                {
+                    $latestThread = $thread;
+                }
+            }
 
-		return null;
-	}
+            return $latestThread->getLatestPost();
+        }
 
-	public function getTreeAsString()
-	{
-		$tree = "";
+        return null;
+    }
 
-		$board = $this;
+    public function getTreeAsString()
+    {
+        $tree = "";
 
-		while ($board != null && $board instanceof Board)
-		{
-			$tree = " -> <a href='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}'>{$board->name}</a>" . $tree;
+        $board = $this;
 
-			if ($board->fields["SubBoard"] == "yes")
-			{
-				$board = Board::getByID(intval($board->fields["Parent"]));
-			}
-			else
-			{
-				$board = null;
-			}
-		}
+        while ($board != null && $board instanceof Board)
+        {
+            $tree = " -> <a href='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}'>{$board->name}</a>" . $tree;
 
-		$tree = "<a href='{$_SERVER['PHP_SELF']}'>Main</a>" . $tree;
-		return $tree;
-	}
+            if ($board->fields["SubBoard"] == "yes")
+            {
+                $board = Board::getByID(intval($board->fields["Parent"]));
+            }
+            else
+            {
+                $board = null;
+            }
+        }
 
-	public function edit($name, $description)
-	{
-		$this->name = $name;
-		$this->fields["Description"] = $description;
-	}
+        $tree = "<a href='{$_SERVER['PHP_SELF']}'>Main</a>" . $tree;
+        return $tree;
+    }
+
+    public function edit($name, $description)
+    {
+        $this->name = $name;
+        $this->fields["Description"] = $description;
+    }
 
 }
 

@@ -3,19 +3,20 @@
 class Permission
 {
 
-	public static $permissions = array();
-	public $id;
-	public $name;
-	public $description;
-	public $default;
+    public static $permissions = array();
+    public $id;
+    public $name;
+    public $description;
+    public $default;
 
-	function __construct($id, $name, $description, $default = false)
-	{
-		$this->name = $name;
-		$this->description = $description;
-		$this->default = $default;
-		self::$permissions[$id] = $this;
-	}
+    function __construct($id, $name, $description, $default = false)
+    {
+        $this->name = $name;
+        $this->description = $description;
+        $this->default = $default;
+        self::$permissions[$id] = $this;
+    }
+
 }
 
 $topic_sticky = new Permission(0, "Sticky", "Allows the user to make topics sticky.");
@@ -41,6 +42,4 @@ $edit_news = new Permission(14, "Edit News", "Allows the user to edit the New Se
 
 $view_Board_admin = new Permission(15, "View admin board", "Allows the user to see and post in the admin catergory.");
 $view_board_dev = new Permission(16, "View dev only board", "Allows the user to see and view the dev only category.");
-
-
 ?>

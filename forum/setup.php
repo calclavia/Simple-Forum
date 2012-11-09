@@ -11,7 +11,7 @@ $con = mysql_connect($mysql_host, $mysql_username, $mysql_password);
 
 if (!$con)
 {
-	die('Could not connect: ' . mysql_error());
+    die('Could not connect: ' . mysql_error());
 }
 
 mysql_select_db($db_name, $con);
