@@ -347,6 +347,8 @@ function getBoard($user, $board)
                         $latestPost = "Last post <a href='{$_SERVER['PHP_SELF']}?p=t{$thread->getLatestPost()->fields["Parent"]}'>\"" . $thread->getLatestPost()->name . "\" by " . $userdetails["display_name"] . " on " . $thread->getLatestPost()->getDate();
                     }
                     
+                    $extraText = "";
+                    
                     if($thread->isUnread($user))
                     {
                     	$extraText = "!!";

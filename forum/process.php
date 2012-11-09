@@ -133,42 +133,51 @@ if (!empty($_GET["e"]))
 
 if (!empty($_GET["d"]))
 {
-	if (strstr($_GET["d"], "c") && $currentUser->hasPermission($delete_categories))
+	if (strstr($_GET["d"], "c"))
 	{
 		$category = Category::getByID(intval(str_replace("c", "", $_GET["d"])));
 
 		if ($category != null)
 		{
-			$category->delete($con);
-			$successes[] = "Removed category: " . $category->name;
+			if($currentUser->hasPermission($delete_categories, $category))
+			{
+				$category->delete($con);
+				$successes[] = "Removed category: " . $category->name;
+			}
 		}
 	}
-	else if (strstr($_GET["d"], "b") && $currentUser->hasPermission($delete_boards))
+	else if (strstr($_GET["d"], "b"))
 	{
 		$board = Board::getByID(intval(str_replace("b", "", $_GET["d"])));
 
 		if ($board != null)
 		{
-			$board->delete($con);
-			$successes[] = "Removed board: " . $board->name;
+			if($currentUser->hasPermission($delete_boards, $board))
+			{
+				$board->delete($con);
+				$successes[] = "Removed board: " . $board->name;
+			}
 		}
 	}
-	else if (strstr($_GET["d"], "p") && $currentUser->hasPermission($delete_posts))
+	else if (strstr($_GET["d"], "p"))
 	{
 		$post = Post::getByID(intval(str_replace("p", "", $_GET["d"])));
 
 		if ($post != null)
 		{
-			if ($post->getID() == Thread::getByID($post->fields["Parent"])->getFirstPost()->getID())
+			if($currentUser->hasPermission($delete_posts, $post))
 			{
-				$thread = Thread::getByID($post->fields["Parent"]);
-				$thread->delete($con);
-				$successes[] = "Removed thread: " . $thread->name;
-			}
-			else
-			{
-				$successes[] = "Removed post from thread: " . $post->name;
-				$post->delete($con);
+				if ($post->getID() == Thread::getByID($post->fields["Parent"])->getFirstPost()->getID())
+				{
+					$thread = Thread::getByID($post->fields["Parent"]);
+					$thread->delete($con);
+					$successes[] = "Removed thread: " . $thread->name;
+				}
+				else
+				{
+					$successes[] = "Removed post from thread: " . $post->name;
+					$post->delete($con);
+				}
 			}
 		}
 	}

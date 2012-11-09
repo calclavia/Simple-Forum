@@ -124,7 +124,7 @@ class ForumUser
 
 		if ($element != null)
 		{
-			if (in_array($element->prefix . $element->getID(), $moderate))
+			if (in_array($element->prefix.$element->getID(), $this->moderate))
 			{
 				return true;
 			}
@@ -143,7 +143,7 @@ class ForumUser
 				}
 			}
 		}
-
+		
 		return $permission->default || hasPermission($permission, $element);
 	}
 
