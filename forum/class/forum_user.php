@@ -17,7 +17,7 @@ class ForumUser
 	 * @string The email of the user.
 	 */
 	public $email;
-	
+
 	/**
 	 * @String - The title of this user for display.
 	 */
@@ -38,7 +38,7 @@ class ForumUser
 	*/
 	public $unreadPosts = array();
 
-	public $signature = "I am a new memeber of this forum.";
+	public $signature = "I am a new member of this forum.";
 
 	/**
 	 * @param int $id
@@ -57,26 +57,26 @@ class ForumUser
 		{
 			$result = mysql_query("SELECT * FROM {$table_prefix}users WHERE ID={$this->id} LIMIT 1", $con);
 			$row = mysql_fetch_array($result);
-				
+
 			if ($row["ID"] > 0)
 			{
 				$this->posts = intval($row["Posts"]);
 				$this->moderate = unserialize($row["Moderate"]);
 				$this->unreadPosts = unserialize($row["Unread"]);
-				
+
 				if(!is_array($this->moderate))
 				{
 					$this->moderate = array();
 				}
-				
+
 				if(!is_array($this->unreadPosts))
 				{
 					$this->unreadPosts = array();
 				}
-				
+
 				$this->signature = stripslashes(str_replace("\\r\\n", "", $row["Signature"]));
 			}
-				
+
 			$this->save($con);
 		}
 	}
@@ -96,11 +96,11 @@ class ForumUser
 		{
 			$result = mysql_query("SELECT * FROM {$table_prefix}users WHERE ID={$this->id} LIMIT 1", $con);
 			$row = mysql_fetch_array($result);
-				
+
 			if ($row["ID"] <= 0 || empty($row))
 			{
 				$query = "INSERT INTO {$table_prefix}users (ID, Moderate, Unread, Posts, Signature) VALUES ({$this->id}, '".mysql_real_escape_string(serialize($this->moderate))."', '".mysql_real_escape_string(serialize($this->unreadPosts))."', {$this->posts}, '{$this->signature}')";
-				mysql_query($query, $con) or die("Failed to create user data: " . mysql_error() . ", Q = " . $query);				
+				mysql_query($query, $con) or die("Failed to create user data: " . mysql_error() . ", Q = " . $query);
 				return true;
 			}
 			else
@@ -156,7 +156,17 @@ class ForumUser
 
 		return true;
 	}
-	
+
+	public function unmoderate($post)
+	{
+		if(in_array("p".$post->getID(), $this->moderate))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	/**
 	 * Reads a post.
 	 * @param unknown $post - The post to read.
@@ -166,28 +176,50 @@ class ForumUser
 	{
 		$this->unreadPosts = array_diff($this->unreadPosts, array($post->getID()));
 		$this->save($con);
-		
+
 		return true;
 	}
-	
-	public function createPost($post, $con)
+
+	public function onCreatePost($post, $con)
 	{
+		global $table_prefix;
+
 		$this->moderate[] = "p".$post->getID();
 		$this->posts ++;
 		$this->save($con);
-		
+
+		/**
+		 * Make all other user have this post set as unread.
+		 */
+		$result = mysql_query("SELECT * FROM {$table_prefix}users", $con);
+
+		while($row = mysql_fetch_array($result))
+		{
+			$unread = unserialize($row["Unread"]);
+			
+			if(!is_array($unread))
+			{
+				$unread = array();
+			}
+			
+			$unread[] = $post->getID();
+							
+			$query = "UPDATE {$table_prefix}users SET Unread='".serialize($unread)."' WHERE ID={$row["ID"]} LIMIT 1";
+			mysql_query($query, $con) or die("Failed to save other user data: " . mysql_error() . ", Q = " . $query);
+		}
+
 		return true;
 	}
-	
+
 	public function editSignature($newSig, $con)
-	{		
+	{
 		if(strlen($newSig) < 500)
 		{
 			$this->signature = $newSig;
 			$this->save($con);
 			return true;
 		}
-		
+
 		return false;
 	}
 }

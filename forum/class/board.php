@@ -244,6 +244,18 @@ class Board extends ForumElement
     	}
     }
 
+    public function isUnread($user)
+    {
+    	foreach($this->getChildren() as $child)
+    	{
+    		if($child->isUnread($user))
+    		{
+    			return true;
+    		}
+    	}
+    	
+    	return false;
+    }
 }
 
 ?>

@@ -174,12 +174,21 @@ function getSingleBoard($user, $board)
         		ondrop=\"move(event, 'b{$board->getID()}')\" ondragover='allowDrop(event)'
         	";
         }
+        
+        if($board->isUnread($user))
+        {
+        	$boardImage = "<img src='forum/img/on.png'/>";
+        }
+        else
+        {
+        	$boardImage = "<img src='forum/img/off.png'/>";
+        }
 
         $printContent .= "
 		<tr class='forum_element'>
 			<td class='read_status'>
 				<span {$dropData}>
-					<img src='forum/img/off.png'/>
+					$boardImage
 					<span class='dragText'>Drag</span>
 				</span>
 			</td>
@@ -443,7 +452,7 @@ function getThread($user, $thread)
 				<br />
            		{$tempUser->title}
            		<br />
-           		{$tempUser->posts} Posts
+           		{$tempUser->posts} Post(s)
 				</br>";
 
                 if ($user->hasPermission($edit_posts, $post))
@@ -458,7 +467,7 @@ function getThread($user, $thread)
 				
                 if($user->hasPermission($edit_signature, $post))
                 {
-                	$editSignature = "class='editSignature' contenteditable='true'";
+                	$editSignature = "class='editSignature' contenteditable='true' name='{$tempUser->id}'";
                 }
                 
                 $printContent .= "

@@ -71,6 +71,10 @@ class Post extends ForumElement
     	}
     }
 
+    public function isUnread($user)
+    {
+    	return !$user->isRead($this);
+    }
 }
 
 ?>

@@ -73,7 +73,8 @@ class Thread extends ForumElement
 		if ($this->fields["LockThread"] != "yes")
 		{
 			$post = new Post(-1, $this->id, $this->name, $content, $user->id, $time, $time, $userID);
-			$user->createPost($post, $con);
+			$post->save($con);
+			$user->onCreatePost($post, $con);
 			return $post;
 		}
 
@@ -131,7 +132,10 @@ class Thread extends ForumElement
 
 	public function view($user, $con)
 	{
-		$user->read($this, $con);
+		foreach($this->getChildren() as $post)
+		{
+			$user->read($post, $con);
+		}
 		 
 		$this->fields["Views"]++;
 		$this->save($con);
@@ -147,6 +151,19 @@ class Thread extends ForumElement
 			$this->fields["Sticky"] = $sticky;
 			$this->fields["LockThread"] = $lockThread;
 		}
+	}
+	
+	public function isUnread($user)
+	{
+		foreach($this->getChildren() as $child)
+		{
+			if($child->isUnread($user))
+			{
+				return true;
+			}
+		}
+		 
+		return false;
 	}
 
 }

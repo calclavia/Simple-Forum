@@ -49,8 +49,7 @@ if (!empty($_GET["p"]))
         {
             if ($_GET["a"] == "new" && $_POST["editableContent"])
             {
-                $post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);
-                $post->save($con);
+                $post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);                
             }
 
             $printContent .= getNewPostForm($thread);
@@ -169,7 +168,7 @@ $head = "<link href=\"forum/style.css\" rel=\"stylesheet\" type=\"text/css\" />
 						
 						$('.editSignature').dblclick(function()
 						{
-							window.location = 'forum.php?p={$_GET["p"]}&e=u{$currentUser->id}&signature='+$(this).html();
+							window.location = 'forum.php?p={$_GET["p"]}&e=u'+$(this).attr('name')+'&signature='+$(this).html();
 						});
 
 						$('.inlineEdit').dblclick(function()
