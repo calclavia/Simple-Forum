@@ -68,11 +68,13 @@ class Thread extends ForumElement
         return $returnArray;
     }
 
-    public function createPost($content, $userID, $time)
+    public function createPost($content, $user, $time, $con)
     {
         if ($this->fields["LockThread"] != "yes")
         {
-            return new Post(-1, $this->id, $this->name, $content, $userID, $time, $time, $userID);
+        	$post = new Post(-1, $this->id, $this->name, $content, $user->id, $time, $time, $userID);
+        	$user->createPost($post, $con);
+            return $post;
         }
 
         return null;
@@ -127,9 +129,12 @@ class Thread extends ForumElement
         return Board::getByID(intval($this->fields["Parent"]))->getTreeAsString() . " -> <a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a>";
     }
 
-    public function view()
+    public function view($user, $con)
     {
+    	$user->read($this, $con);
+    	
         $this->fields["Views"]++;
+        $this->save($con);
     }
 
     public function edit($name, $sticky, $lockThread)

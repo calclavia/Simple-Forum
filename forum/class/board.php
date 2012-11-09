@@ -101,7 +101,7 @@ class Board extends ForumElement
         return array_merge($boards, $threads);
     }
 
-    public function createThread($user, $name, $content, $time = -1, $con = false)
+    public function createThread($user, $name, $content = "", $time = -1, $con = false)
     {
         global $create_threads;
 
@@ -114,7 +114,7 @@ class Board extends ForumElement
                     $thread = $this->createThread($user, $name);
                     $thread->save($con);
 
-                    $post = $thread->createPost($content, $user->id, $time);
+                    $post = $thread->createPost($content, $user, $time, $con);
                     $post->save($con);
                 }
                 else

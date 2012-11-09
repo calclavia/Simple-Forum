@@ -18,40 +18,8 @@ abstract class ForumElement
         return $this->id;
     }
 
-    //abstract protected function getParent();
-
     public function isModerator($userID)
     {
-        return false;
-    }
-
-    /**
-     * @moderator - A moderator to be added.
-     */
-    public function addModerator($moderator)
-    {
-        $this->moderators[] = $moderator;
-    }
-
-    /**
-     * @moderators - An array of all moderators to be added.
-     */
-    public function addModerators($moderators)
-    {
-        $this->moderators[] = array_merge($this->moderators, $moderators);
-    }
-
-    public function removeModerator($userID)
-    {
-        for ($i = 0; $i < count($this->moderators); $i++)
-        {
-            if ($this->moderators[$i] == $userID)
-            {
-                unset($this->moderators[$i]);
-                return true;
-            }
-        }
-
         return false;
     }
 

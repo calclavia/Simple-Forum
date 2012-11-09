@@ -23,11 +23,11 @@ function hasPermission($permission, $element)
 
 if (!isUserLoggedIn())
 {
-    $currentUser = new ForumUser(-1, "Annoynomous", "No email");
+    $currentUser = new ForumUser(-1, "Annoynomous", "No email", $con);
 }
 else
 {
-    $currentUser = new ForumUser($loggedInUser->user_id, $loggedInUser->username, $loggedInUser->email);
+    $currentUser = new ForumUser($loggedInUser->user_id, $loggedInUser->username, $loggedInUser->email, $con);
 }
 
 $printContent = "";
@@ -213,15 +213,14 @@ if (!empty($_GET["p"]))
 
             if ($_GET["a"] == "new" && $_POST["editableContent"])
             {
-                $post = $thread->createPost(clean($_POST["editableContent"]), $loggedInUser->user_id, time());
+                $post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);
                 $post->save($con);
             }
 
             $printContent .= getNewPostForm($thread);
             $printContent .= getThread($currentUser, $thread);
 
-            $thread->view();
-            $thread->save($con);
+            $thread->view($currentUser, $con);
         }
     }
     else if (strstr($_GET["p"], "c"))

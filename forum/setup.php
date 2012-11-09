@@ -21,6 +21,7 @@ Category::setUp($con);
 Board::setUp($con);
 Thread::setUp($con);
 Post::setUp($con);
+ForumUser::setUp($con);
 
 mysql_close($con);
 
