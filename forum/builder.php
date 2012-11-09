@@ -346,11 +346,16 @@ function getBoard($user, $board)
                         $userdetails = fetchUserDetails(null, null, $thread->getLatestPost()->fields["User"]);
                         $latestPost = "Last post <a href='{$_SERVER['PHP_SELF']}?p=t{$thread->getLatestPost()->fields["Parent"]}'>\"" . $thread->getLatestPost()->name . "\" by " . $userdetails["display_name"] . " on " . $thread->getLatestPost()->getDate();
                     }
+                    
+                    if($thread->isUnread($user))
+                    {
+                    	$extraText = "!!";
+                    }
 
                     $printContent .= "
 					<tr class='forum_element'>
 						<td class='element_content'>
-							<a href='{$_SERVER['PHP_SELF']}?p=t{$thread->getID()}'>{$thread->name}</a>
+							<a href='{$_SERVER['PHP_SELF']}?p=t{$thread->getID()}'>$extraText {$thread->name}</a>
 							<br/>
 							Started by $threadOwner</td>
 						<td class='element_stats'>
