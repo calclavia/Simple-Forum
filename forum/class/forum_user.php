@@ -17,6 +17,11 @@ class ForumUser
 	 * @string The email of the user.
 	 */
 	public $email;
+	
+	/**
+	 * @String - The title of this user for display.
+	 */
+	public $title;
 
 	/**
 	 * @int Posts posted.
@@ -33,7 +38,7 @@ class ForumUser
 	*/
 	public $unreadPosts = array();
 
-	public $signature = "";
+	public $signature = "I am a new memeber of this forum.";
 
 	/**
 	 * @param int $id
@@ -55,7 +60,7 @@ class ForumUser
 				
 			if ($row["ID"] > 0)
 			{
-				$this->posts = $row["Posts"];
+				$this->posts = intval($row["Posts"]);
 				$this->moderate = unserialize($row["Moderate"]);
 				$this->unreadPosts = unserialize($row["Unread"]);
 				
@@ -69,7 +74,7 @@ class ForumUser
 					$this->unreadPosts = array();
 				}
 				
-				$this->signature = $row["Signature"];
+				$this->signature = stripslashes(str_replace("\\r\\n", "", $row["Signature"]));
 			}
 				
 			$this->save($con);
@@ -79,8 +84,8 @@ class ForumUser
 	public static function setUp($con)
 	{
 		global $table_prefix;
-
 		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}users (ID int NOT NULL, Moderate varchar(255), Unread varchar(255), Posts int, Signature TEXT)", $con) or die(mysql_error());
+		return true;
 	}
 
 	public function save($con)
@@ -161,12 +166,29 @@ class ForumUser
 	{
 		$this->unreadPosts = array_diff($this->unreadPosts, array($post->getID()));
 		$this->save($con);
+		
+		return true;
 	}
 	
 	public function createPost($post, $con)
 	{
-		$this->moderate[] = $post->getID();
+		$this->moderate[] = "p".$post->getID();
+		$this->posts ++;
 		$this->save($con);
+		
+		return true;
+	}
+	
+	public function editSignature($newSig, $con)
+	{		
+		if(strlen($newSig) < 500)
+		{
+			$this->signature = $newSig;
+			$this->save($con);
+			return true;
+		}
+		
+		return false;
 	}
 }
 

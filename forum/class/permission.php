@@ -31,6 +31,7 @@ $edit_boards = new Permission(6, "Edit Boards", "Allows the user to edit boards.
 $delete_boards = new Permission(7, "Delete Boards", "Allows the user to delete boards.");
 
 $create_threads = new Permission(8, "Create Threads", "Allows the user to create threads.", true);
+$edit_threads = new Permission(8, "Edit Threads", "Allows the user to edit threads.");
 
 $create_posts = new Permission(9, "Create Posts", "Allows the user to create posts.", true);
 $edit_posts = new Permission(10, "Edit Posts", "Allows the user to create posts.");
@@ -38,7 +39,7 @@ $edit_posts_any = new Permission(11, "Edit anyones Posts", "Allows the user to e
 $delete_posts = new Permission(12, "Delete Posts", "Allows the user to delete posts.");
 $delete_posts_any = new Permission(13, "Delete anyones Posts", "Allows the user to delete posts. of any user Excluding Admin posts ");
 
-$edit_news = new Permission(14, "Edit News", "Allows the user to edit the New Section.");
+$edit_siganture = new Permission(14, "Edit Signature", "Allows the user to edit their signature.");
 
 $view_Board_admin = new Permission(15, "View admin board", "Allows the user to see and post in the admin catergory.");
 $view_board_dev = new Permission(16, "View dev only board", "Allows the user to see and view the dev only category.");

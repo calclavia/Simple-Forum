@@ -78,6 +78,11 @@
 	display:none;
 }
 
+.inlineEdit input
+{
+	display:none;
+}
+
 .black_overlay
 {
     display: none;

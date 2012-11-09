@@ -59,11 +59,16 @@ class Post extends ForumElement
         return null;
     }
 
-    public function edit($newContent, $userID, $time)
+    public function edit($newContent, $user, $time)
     {
-        $this->fields["Content"] = $newContent;
-        $this->fields["LastEditUser"] = $userID;
-        $this->fields["LastEditTime"] = $time;
+    	global $edit_posts;
+    	
+    	if($user->hasPermission($edit_posts, $this))
+    	{
+    		$this->fields["Content"] = $newContent;
+    		$this->fields["LastEditUser"] = $user->id;
+    		$this->fields["LastEditTime"] = $time;
+    	}
     }
 
 }

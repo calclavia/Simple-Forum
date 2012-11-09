@@ -3,189 +3,27 @@
 require_once("models/config.php");
 require_once("forum/config.php");
 
-/**
- * A global function required to determine if a permission is granted for this user using the forum.
- * @param Permission $permission
- * @param ForumElement $element
- * @return boolean True if permission is granted.
- */
-function hasPermission($permission, $element)
-{
-    global $loggedInUser;
-
-    if (!isUserLoggedIn())
-    {
-        return false;
-    }
-
-    return $loggedInUser->checkPermission(array(2, 4));
-}
-
-if (!isUserLoggedIn())
-{
-    $currentUser = new ForumUser(-1, "Annoynomous", "No email", $con);
-}
-else
-{
-    $currentUser = new ForumUser($loggedInUser->user_id, $loggedInUser->username, $loggedInUser->email, $con);
-}
-
 $printContent = "";
 
 $title = "Forum";
-
-/**
- * Process different GET submitted actions.
- * a = Adding
- * e = Editing
- * d = Deleting
- * o = Reordering
- * m = Moving
- */
-
-if (!empty($_GET["o"]))
-{
-	if (strstr($_GET["p"], "c") && strstr($_GET["o"], "c"))
-    {
-        $category = Category::getByID(intval(str_replace("c", "", $_GET["p"])));
-
-        if ($category != null)
-        {
-            $category->move($currentUser, str_replace("c", "", $_GET["o"]), $con);
-        }
-    }
-    else if (strstr($_GET["p"], "b") && strstr($_GET["o"], "b"))
-    {
-        $board = Board::getByID(intval(str_replace("b", "", $_GET["p"])));
-
-        if ($board != null)
-        {
-            $board->move($currentUser, str_replace("b", "", $_GET["o"]), $con);
-        }
-    }
-
-    header("Location: forum.php");
-    die();
-}
-
-if (!empty($_GET["e"]) && !empty($_POST))
-{
-    if (strstr($_GET["e"], "c") && $_POST["title"])
-    {
-        $category = Category::getByID(intval(str_replace("c", "", $_GET["e"])));
-
-        if ($category != null)
-        {
-            $category->edit(clean($_POST["title"]), $con);
-        }
-    }
-    else if (strstr($_GET["e"], "b") && $_POST["title"])
-    {
-        $board = Board::getByID(intval(str_replace("b", "", $_GET["e"])));
-
-        if ($board != null)
-        {
-            $board->edit(clean($_POST["title"]), clean($_POST["editableContent"], true));
-            $board->save($con);
-        }
-    }
-    else if (strstr($_GET["e"], "p") && $_POST["editableContent"])
-    {
-        $post = Post::getByID(intval(str_replace("p", "", $_GET["e"])));
-
-        if ($post != null)
-        {
-            if ($post->getID() == Thread::getByID($post->fields["Parent"])->getFirstPost()->getID())
-            {
-                $thread = Thread::getByID($post->fields["Parent"]);
-
-                if ($_POST["sticky"])
-                {
-                    $sticky = "yes";
-                }
-                else
-                {
-                    $sticky = "no";
-                }
-
-                if ($_POST["lockTopic"])
-                {
-                    $lockTopic = "yes";
-                }
-                else
-                {
-                    $lockTopic = "no";
-                }
-
-                $thread->edit($_POST["title"], $sticky, $lockTopic);
-                $thread->save($con);
-            }
-
-            $post->edit(clean($_POST["editableContent"]), $currentUser->id, time());
-            $post->save($con);
-        }
-    }
-}
-
-if (!empty($_GET["d"]))
-{
-    if (strstr($_GET["d"], "c") && $currentUser->hasPermission($delete_categories))
-    {
-        $category = Category::getByID(intval(str_replace("c", "", $_GET["d"])));
-
-        if ($category != null)
-        {
-            $category->delete($con);
-            $successes[] = "Removed category: " . $category->name;
-        }
-    }
-    else if (strstr($_GET["d"], "b") && $currentUser->hasPermission($delete_boards))
-    {
-        $board = Board::getByID(intval(str_replace("b", "", $_GET["d"])));
-
-        if ($board != null)
-        {
-            $board->delete($con);
-            $successes[] = "Removed board: " . $board->name;
-        }
-    }
-    else if (strstr($_GET["d"], "p") && $currentUser->hasPermission($delete_posts))
-    {
-        $post = Post::getByID(intval(str_replace("p", "", $_GET["d"])));
-
-        if ($post != null)
-        {
-            if ($post->getID() == Thread::getByID($post->fields["Parent"])->getFirstPost()->getID())
-            {
-                $thread = Thread::getByID($post->fields["Parent"]);
-                $thread->delete($con);
-                $successes[] = "Removed thread: " . $thread->name;
-            }
-            else
-            {
-                $successes[] = "Removed post from thread: " . $post->name;
-                $post->delete($con);
-            }
-        }
-    }
-}
 
 /**
  * Check if the user wants to go to a specified page.
  */
 if (!empty($_GET["p"]))
 {
-    /**
-     * If it is a specific board.
-     */
+    if(strstr($_GET["p"], "p"))
+    {
+    	$post = Post::getByID(intval(str_replace("p", "", $_GET["p"])));
+    	$_GET["p"] = "t".$post->fields["Parent"];
+    }
+    
     if (strstr($_GET["p"], "b"))
     {
         $board = Board::getByID(intval(str_replace("b", "", $_GET["p"])));
 
         if ($board != null)
         {
-            $title .= " - " . $board->name;
-
             if ($_GET["a"] == "new")
             {
                 if (!empty($_POST["title"]) && !empty($_POST["editableContent"]))
@@ -209,8 +47,6 @@ if (!empty($_GET["p"]))
 
         if ($thread != null)
         {
-            $title .= " - " . $thread->name;
-
             if ($_GET["a"] == "new" && $_POST["editableContent"])
             {
                 $post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);
@@ -229,8 +65,6 @@ if (!empty($_GET["p"]))
 
         if ($category != null)
         {
-            $title .= " - " . $category->name;
-
             if ($_GET["a"] == "new" && !empty($_POST["title"]))
             {
                 if (empty($_POST["editableContent"]))
@@ -325,11 +159,22 @@ $head = "<link href=\"forum/style.css\" rel=\"stylesheet\" type=\"text/css\" />
                     }
 		
 					$(document).ready(function() {
+						
 						$('.draggable').hover(function(){
 							$(this).find('.dragText').stop(true, true).fadeIn('slow');
 						},
 						function(){
 							$(this).find('.dragText').stop(true, true).fadeOut('slow');
+						});
+						
+						$('.editSignature').dblclick(function()
+						{
+							window.location = 'forum.php?p={$_GET["p"]}&e=u{$currentUser->id}&signature='+$(this).html();
+						});
+
+						$('.inlineEdit').dblclick(function()
+						{
+							window.location = 'forum.php?e='+$(this).attr('name')+'&data='+$(this).html();
 						});
 					});
             </script>
@@ -339,13 +184,4 @@ $head = "<link href=\"forum/style.css\" rel=\"stylesheet\" type=\"text/css\" />
  * Echo the variable $head in your head and $content in the place where you have your main body.
  */
 require_once("template.php");
-
-/*
-  $postUser = new loggedInUser();
-  $postUser->email = $userdetails["email"];
-  $postUser->user_id = $userdetails["id"];
-  $postUser->hash_pw = $userdetails["password"];
-  $postUser->title = $userdetails["title"];
-  $postUser->displayname = $userdetails["display_name"];
-  $postUser->username = $userdetails["user_name"]; */
 ?>

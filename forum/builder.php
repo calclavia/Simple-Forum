@@ -403,11 +403,18 @@ function getNewThreadForm($board)
 
 function getThread($user, $thread)
 {
-    global $create_posts, $delete_posts, $edit_posts;
+    global $create_posts, $delete_posts, $edit_posts, $edit_threads, $edit_signature;
 
     if ($thread != null)
     {
+    	
+    	if ($user->hasPermission($edit_threads, $thread))
+    	{
+    		$threadAtrr = "class='inlineEdit' name='t{$thread->getID()}' contenteditable='true'";
+    	}
+    	
         $printContent .= "
+        <h2 $threadAtrr>{$thread->name}</h2>
 		<span>" . $thread->getTreeAsString() . "</span>
 		<span class=\"forum_menu\">";
 
@@ -424,35 +431,46 @@ function getThread($user, $thread)
         {
             foreach ($thread->getChildren() as $post)
             {
-                $userdetails = fetchUserDetails(null, null, $post->fields["User"]);
+                $tempUser = getUserByID($post->fields["User"]);
 
                 $printContent .= "
 				<tr><td class='post_profile'>
 				<a href='http://www.gravatar.com/' target='_blank'>
-					<img src='http://www.gravatar.com/avatar/" . md5($userdetails["email"]) . "?d=mm&s=160'/>
+					<img src='http://www.gravatar.com/avatar/" . md5($tempUser->email) . "?d=mm&s=160'/>
 				</a>
 				<br/>
-				<b><a rel='t{$post->getID()}'>{$userdetails["display_name"]}</a></b>
+				<b><a rel='t{$post->getID()}'>{$tempUser->username}</a></b>
 				<br />
-				{$userdetails["title"]}
+           		{$tempUser->title}
+           		<br />
+           		{$tempUser->posts} Posts
 				</br>";
 
                 if ($user->hasPermission($edit_posts, $post))
                 {
-                    $printContent .= "<a href = \"javascript:void(0)\" onclick = \"lightBox('editPost{$post->getID()}')\">Edit Post</a> |";
+                	$editPost = "class='inlineEdit' name='p{$post->getID()}' contenteditable='true'";
                 }
 
                 if ($user->hasPermission($delete_posts, $post))
                 {
                     $printContent .= "<a href='{$_SERVER['PHP_SELF']}?p=t{$post->fields["Parent"]}&d=p{$post->getID()}'>Remove Post</a>";
                 }
-
+				
+                if($user->hasPermission($edit_signature, $post))
+                {
+                	$editSignature = "class='editSignature' contenteditable='true'";
+                }
+                
                 $printContent .= "
 				<br />
 				<small>Posted on {$post->getDate()}</small></td>
-				<td class='forum_content'>{$post->fields["Content"]}</td></tr>";
-
-                $printContent .= getEditPostForm($post);
+				
+				<td class='forum_content'>
+					<div $editPost>{$post->fields["Content"]}</div>
+					<hr />
+                	<div $editSignature style='height:50px; width:100%'>{$tempUser->signature}</div>
+                </td>
+                </tr>";
             }
         }
         else
@@ -477,65 +495,6 @@ function getNewPostForm($thread)
 				CKEDITOR.replace('editableContentNewPost', {height:'200'});
 			</script>
 			<input type='submit' value='Post'/>					
-		</form>
-	</div>";
-}
-
-function getEditPostForm($post)
-{
-    global $currentUser;
-
-    /**
-     * Check if it is the first post. If so, allow the editing of the title.
-     */
-    $thread = Thread::getByID($post->fields["Parent"]);
-
-    if ($thread != null)
-    {
-        if ($thread->getFirstPost() != null)
-        {
-            if ($thread->getFirstPost()->getID() == $post->getID())
-            {
-                $isChecked = "";
-
-                if ($thread->fields["LockThread"] == "yes")
-                {
-                    $isChecked = "checked='checked'";
-                }
-
-                $additionalForm = "
-				<b>Title:</b> <input type='text' name='title' size='80' maxlength='80' value='" . $thread->name . "'/>
-				<br />
-				<input type='checkbox' name='lockTopic' value='Lock Topic' {$isChecked}> Lock Topic
-				<br />";
-
-                if ($currentUser->hasPermission($topic_sticky, $post))
-                {
-                    $isChecked = "";
-
-                    if ($thread->fields["Sticky"] == "yes")
-                    {
-                        $isChecked = "checked='checked'";
-                    }
-
-                    $additionalForm .= "
-					<input type='checkbox' name='sticky' value='Stick Topic' {$isChecked}> Stick Topic
-					<br />
-					";
-                }
-            }
-        }
-    }
-    return "
-	<div id='editPost{$post->getID()}' class='white_content'>
-		<h1>Edit Post</h1>
-		<form action='{$_SERVER['PHP_SELF']}?p=t{$post->fields["Parent"]}&e=p{$post->getID()}' method='post'>
-			{$additionalForm}
-			<textarea id='editableContentEditPost{$post->getID()}' name='editableContent' wrap=\"virtual\">{$post->fields["Content"]}</textarea>
-			<script type='text/javascript'>
-				CKEDITOR.replace('editableContentEditPost{$post->getID()}', {height:'200'});
-			</script>
-			<input type='submit' value='Edit'/>					
 		</form>
 	</div>";
 }
