@@ -166,9 +166,14 @@ $head = "<link href=\"forum/style.css\" rel=\"stylesheet\" type=\"text/css\" />
 							$(this).find('.dragText').stop(true, true).fadeOut('slow');
 						});
 
-						$('.inlineEdit').focus(function()
+						$('.inlineEdit').bind('focus, mouseover', function()
 						{
 							$(this).parent().find('.inline_form').fadeIn('slow');
+						});
+		
+						$('.inlineEdit').blur(function()
+						{
+							$(this).parent().find('.inline_form').fadeOut('slow');
 						});
 					});
             </script>

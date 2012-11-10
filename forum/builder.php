@@ -31,7 +31,7 @@ function getAllCategories($user)
     if ($user->hasPermission($create_categories))
     {
         $printContent .= "
-			<div class='forum_menu'>
+			<div class='forum_menu' style='margin-bottom: 20px;'>
 				<form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
 					<input type='text' name='title'>
 					<input type='submit' value='Add Category'>
@@ -41,16 +41,9 @@ function getAllCategories($user)
 
     $categories = Category::getAll();
 
-    foreach ($categories as $category)
+    for ($i = 0; $i < count($categories); $i++)
     {
-        $printContent .= getCategory($user, $category);
-        
-        if($user->hasPermission($edit_categories, $category))
-        {
-        	$dropData = "ondrop=\"drop(event, 'c{$category->getID()}')\" ondragover='allowDrop(event)'";
-    	}
-    	
-    	$printContent .= "<div style='height:60px; width: 100%;' {$dropData}></div>";
+        $printContent .= getCategory($user, $categories[$i], $i);
     }
     
     return $printContent;
@@ -60,9 +53,11 @@ function getAllCategories($user)
  * @param Category $category - The Category Class.
  * @return string - The HTML content.
  */
-function getCategory($user, $category)
+function getCategory($user, $category, $i)
 {
     global $edit_categories, $delete_categories, $create_boards;
+    
+    $categories = Category::getAll();
 
     if ($category != null)
     {
@@ -71,23 +66,39 @@ function getCategory($user, $category)
         	if ($user->hasPermission($edit_categories, $category))
         	{
         		$categoryTitle = "
-        		<span>
+        		<div>
 	        		<h2 class='inlineEdit' style='display:inline; margin-right:5px;' contenteditable='true'>
         				{$category->name}
 	        		</h2>
-	        		<a href='javascript:void(0)' onclick=\"window.location='forum.php?e=c{$category->getID()}&data='+encodeURI($(this).prev('.inlineEdit').html())\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
-	        	</span>";
+	        		<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=c{$category->getID()}&data='+encodeURI($(this).prev('.inlineEdit').html())\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+        			";
+        			
+        			if($categories[$i+1])
+        			{
+        				$categoryTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$category->getID()}&o=c{$categories[$i+1]->getID()}'\" class='inline_form tsc_awb_small tsc_awb_silver tsc_flat'>&darr;</a>";
+        			}
+        			
+        			if($i > 1)
+        			{
+        				if($categories[$i-2])
+        				{
+        					$categoryTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$category->getID()}&o=c{$categories[$i-2]->getID()}'\" class='inline_form tsc_awb_small tsc_awb_silver tsc_flat'>&uarr;</a>";
+        				}
+        			}
+        			
+        		$categoryTitle .= "</div>";
         	}
         	else
         	{
         		$categoryTitle = "
-		        	<span id='c{$category->getID()}'>
+		        	<div id='c{$category->getID()}'>
 						<h2 id='category{$category->getID()}' style='display:inline'>{$category->name}</h2>
-					</span>
+					</div>
         			";
         	}
         		
             $printContent = "
+            <div style='margin-bottom: 15px;'>
             $categoryTitle
 			<div class='forum_menu'>";
 
@@ -125,7 +136,7 @@ function getCategory($user, $category)
             }
 
 
-            return $printContent;
+            return $printContent."</div>";
         }
     }
 }
@@ -257,52 +268,51 @@ function getNewBoardForm($parent)
     }
 }
 
-function getEditBoardForm($board)
-{
-    return "
-	<div id='editBoard{$board->getID()}' class='white_content'>
-		<h1>Edit Board</h1>
-		<form action='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}&e=b{$board->getID()}' method='post'>
-			<table>
-				<tr><td>
-				<b>Name:</b>
-				</td><td>
-				<input type='text' name='title' size='80' maxlength='80' value='{$board->name}'/>
-				</td></tr>
-			</table>
-			<textarea id='editableContentEditBoard{$board->getID()}' name='editableContent' wrap=\"virtual\"  style=\"width:550px; height:200px\">{$board->fields["Description"]}</textarea>
-			<input type='submit' value='Edit'/>					
-		</form>
-	</div>";
-}
-
 function getBoard($user, $board)
 {
     global $create_boards, $edit_boards, $delete_boards, $create_threads;
 
     if ($board != null)
     {
+    	if ($user->hasPermission($edit_boards, $board))
+    	{
+    		$boardTitle = "
+    		<div>
+	    		<h2 class='inlineEdit' contenteditable='true'>
+	    			{$board->name}
+	    		</h2>
+	    		<a style='float:right' href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=b{$board->getID()}&data='+encodeURI($(this).prev('.inlineEdit').html())+'&content='+encodeURI($(this).next('.inlineEdit').html())\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+	    		<div class='inlineEdit' contenteditable='true'>{$board->fields["Description"]}</div>
+	    	</div>";
+    	}
+    	else
+    	{
+	    	$boardTitle = "
+	    	<div>
+	    		<h2 id='category{$board->getID()}' style='display:inline'>{$board->name}</h2><br />
+	    		<small>{$board->fields["Description"]}</small>
+	    	</div>
+	    	";
+    	}
+    		
         $printContent .= "
+        	$boardTitle
 			<span>" . $board->getTreeAsString() . "</span>
 			<span class=\"forum_menu\">";
 
+        if ($user->hasPermission($create_threads, $board))
+        {
+        	$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Thread </a> ";
+        }
+        
         if ($user->hasPermission($create_boards, $board))
         {
             $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$board->getID()}')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Board</a> ";
         }
-        if ($user->hasPermission($edit_boards, $board))
-        {
-            $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('editBoard{$board->getID()}')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">Edit</a> ";
-        }
 
         if ($user->hasPermission($delete_boards, $board))
         {
-            $printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=b{$board->getID()}' class=\"tsc_awb_small tsc_awb_white tsc_flat\">Delete</a> ";
-        }
-
-        if ($user->hasPermission($create_threads, $board))
-        {
-            $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Thread</a>";
+            $printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=b{$board->getID()}' class=\"tsc_awb_small tsc_awb_white tsc_flat\">Delete</a>";
         }
 
         $printContent .= "</span>";
@@ -374,11 +384,6 @@ function getBoard($user, $board)
             $printContent .= getNewBoardForm($board);
         }
 
-        if ($user->hasPermission($edit_boards))
-        {
-            $printContent .= getEditBoardForm($board);
-        }
-
         return $printContent;
     }
 }
@@ -418,7 +423,7 @@ function getThread($user, $thread)
 	    				<h2 class='inlineEdit' style='display:inline; margin-right:5px;' contenteditable='true'>
 	    					{$thread->name}
 	    				</h2>
-	    				<a href='javascript:void(0)' onclick=\"window.location='forum.php?e=t{$thread->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+	    				<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=t{$thread->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
     				</div>";
     	}
     	else
@@ -460,7 +465,7 @@ function getThread($user, $thread)
 		    				<div class='inlineEdit' style='margin-right:5px;' contenteditable='true'>
               					{$post->fields["Content"]}
 		    				</div>
-		    				<a href='javascript:void(0)' onclick=\"window.location='forum.php?e=p{$post->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+		    				<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=p{$post->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
 	    				</div>
                 		";
                 }
@@ -476,7 +481,7 @@ function getThread($user, $thread)
 		    				<div class='inlineEdit' style='height:80px; width:100%' contenteditable='true'>
                 				{$tempUser->signature}
 		    				</div>
-		    				<a href='javascript:void(0)' onclick=\"window.location='forum.php?p={$_GET["p"]}&e=u{$tempUser->id}&signature='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+		    				<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p={$_GET["p"]}&e=u{$tempUser->id}&signature='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
 	    				</div>";
                 }
                 else
@@ -498,18 +503,18 @@ function getThread($user, $thread)
                 
                 if ($user->hasPermission($delete_posts, $post))
                 {
-                	$removePost = "<a href='{$_SERVER['PHP_SELF']}?p=t{$post->fields["Parent"]}&d=p{$post->getID()}'>Remove Post</a>";
+                	$removePost = "<a href='#' onclick=\"if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$post->fields["Parent"]}&d=p{$post->getID()}';}\" class=\"forum_menu tsc_awb_small tsc_awb_white tsc_flat\">Delete</a>";
                 }
                 
                 $printContent .= "
 				<td class='forum_content'>
 					<article>
+						$removePost
+						<br />
 						$editPost
 						<hr />
 						$editSignature
-	                	<br />
 	                	<small class='post_date'>{$lastEdit} Posted on {$post->getDate()}</small>
-	                	$removePost
                 	</article>
                 </td>
                 </tr>";

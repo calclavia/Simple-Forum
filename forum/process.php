@@ -47,13 +47,16 @@ if (!empty($_GET["e"]))
 			$category->edit($currentUser, $title, $con);
 		}
 	}
-	else if (strstr($_GET["e"], "b") && $_POST["title"])
+	else if (strstr($_GET["e"], "b"))
 	{
+		$title = clean($_GET["data"], true);
+		$content = clean($_GET["content"], true);
+		
 		$board = Board::getByID(intval(str_replace("b", "", $_GET["e"])));
 
-		if ($board != null)
+		if ($board != null && !empty($title))
 		{
-			$board->edit(clean($_POST["title"]), clean($_POST["editableContent"], true));
+			$board->edit($title, $content);
 			$board->save($con);
 		}
 	}
@@ -169,7 +172,9 @@ if (!empty($_GET["d"]))
 		{
 			if($currentUser->hasPermission($delete_posts, $post))
 			{
-				if ($post->getID() == Thread::getByID($post->fields["Parent"])->getFirstPost()->getID())
+				$thread = Thread::getByID($post->fields["Parent"]);
+				
+				if ($post->getID() == $thread->getFirstPost()->getID())
 				{
 					$thread = Thread::getByID($post->fields["Parent"]);
 					$thread->delete($con);
@@ -183,6 +188,9 @@ if (!empty($_GET["d"]))
 			}
 		}
 	}
+	
+	header("Location: ".$_SERVER['PHP_SELF']);
+	die();
 }
 
 ?>
