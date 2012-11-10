@@ -31,12 +31,12 @@ function getAllCategories($user)
     if ($user->hasPermission($create_categories))
     {
         $printContent .= "
-			<div class='forum_menu' style='margin-bottom: 20px;'>
+			<div class='forum_menu'>
 				<form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
 					<input type='text' name='title'>
 					<input type='submit' value='Add Category'>
 				</form>
-			</div>";
+			</div><br />";
     }
 
     $categories = Category::getAll();
@@ -253,15 +253,11 @@ function getNewBoardForm($parent)
 		<div id='newBoard{$parent->getID()}' class='white_content'>
 			<h1>New Board</h1>
 			<form action='{$_SERVER['PHP_SELF']}?p=b{$parent->getID()}&a=new' method='post'>
-				<table>
-					<tr><td>
-					<b>Title:</b>
-					</td><td>
-					<input type='text' name='board_name' size='80' maxlength='80'/>
-					</td></tr>
-				</table>
+				<b>Title:</b<br />
+				<input type='text' name='board_name' size='80' maxlength='80'/>
 				<br />
 				<textarea id='editableContentNewBoard{$parent->getID()}' name='editableContent' wrap=\"virtual\" style=\"width:550px; height:200px\"></textarea>
+				<br/>
 				<input type='submit' value='Post'/>					
 			</form>
 		</div>";
@@ -289,8 +285,8 @@ function getBoard($user, $board)
     	{
 	    	$boardTitle = "
 	    	<div>
-	    		<h2 id='category{$board->getID()}' style='display:inline'>{$board->name}</h2><br />
-	    		<small>{$board->fields["Description"]}</small>
+	    		<h2 id='category{$board->getID()}'>{$board->name}</h2><br />
+	    		<div>{$board->fields["Description"]}</div>
 	    	</div>
 	    	";
     	}
