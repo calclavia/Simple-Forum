@@ -288,21 +288,21 @@ function getBoard($user, $board)
 
         if ($user->hasPermission($create_boards, $board))
         {
-            $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$board->getID()}')\">Add Board</a> | ";
+            $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$board->getID()}')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Board</a> ";
         }
         if ($user->hasPermission($edit_boards, $board))
         {
-            $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('editBoard{$board->getID()}')\">Edit Board</a> | ";
+            $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('editBoard{$board->getID()}')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">Edit</a> ";
         }
 
         if ($user->hasPermission($delete_boards, $board))
         {
-            $printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=b{$board->getID()}'>Delete Board</a> | ";
+            $printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=b{$board->getID()}' class=\"tsc_awb_small tsc_awb_white tsc_flat\">Delete</a> ";
         }
 
         if ($user->hasPermission($create_threads, $board))
         {
-            $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\">Create Thread</a>";
+            $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Thread</a>";
         }
 
         $printContent .= "</span>";
