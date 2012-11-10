@@ -469,34 +469,48 @@ function getThread($user, $thread)
                 {
                 	$editPost = "
 	                	<div>
-		    				<div class='inlineEdit' style='display:inline; margin-right:5px;' contenteditable='true'>
+		    				<div class='inlineEdit' style='margin-right:5px;' contenteditable='true'>
               					{$post->fields["Content"]}
 		    				</div>
-		    				<br />
-		    				<a href='javascript:void(0)' onclick=\"window.location='forum.php?e=p{$thread->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+		    				<a href='javascript:void(0)' onclick=\"window.location='forum.php?e=p{$post->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
 	    				</div>
-                			";
+                		";
                 }
                 else
                 {
                 	$editPost = "<div>{$post->fields["Content"]}</div>";
                 }
-
-                if ($user->hasPermission($delete_posts, $post))
-                {
-                    $printContent .= "<a href='{$_SERVER['PHP_SELF']}?p=t{$post->fields["Parent"]}&d=p{$post->getID()}'>Remove Post</a>";
-                }
-				
+                
                 if($user->hasPermission($edit_signature, $post))
                 {
-                	$editSignature = "class='editSignature' contenteditable='true' name='{$tempUser->id}'";
+                	$editSignature = "
+                		<div>
+		    				<div class='inlineEdit' style='height:80px; width:100%' contenteditable='true'>
+                				{$tempUser->signature}
+		    				</div>
+		    				<a href='javascript:void(0)' onclick=\"window.location='forum.php?p={$_GET["p"]}&e=u{$tempUser->id}&signature='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+	    				</div>";
+                }
+                else
+                {
+                	$editSignature = "<div style='height:80px; width:100%'>{$tempUser->signature}</div>";
                 }
                 
                 $lastEdit = "";
                 
                	if($post->fields["LastEditTime"] > 0 && !empty($post->fields["LastEditUser"]))
                 {
-                	$lastEdit = "Last Edited By ".$post->fields["LastEditUser"]." on ".$post->fields["LastEditTime"];
+                	$editUser = getUserByID($post->fields["LastEditUser"]);
+                	
+                	if($editUser != null)
+                	{
+                		$lastEdit = "Last Edited By ".$editUser->username." on ".date("F j, Y, g:i a", $post->fields["LastEditTime"]);
+                	}
+                }
+                
+                if ($user->hasPermission($delete_posts, $post))
+                {
+                	$removePost = "<a href='{$_SERVER['PHP_SELF']}?p=t{$post->fields["Parent"]}&d=p{$post->getID()}'>Remove Post</a>";
                 }
                 
                 $printContent .= "
@@ -504,8 +518,10 @@ function getThread($user, $thread)
 					<article>
 						$editPost
 						<hr />
-	                	<div $editSignature style='height:50px; width:100%'>{$tempUser->signature}</div>
-	                	<small style='post_date'>{$lastEdit} Posted on {$post->getDate()}</small>
+						$editSignature
+	                	<br />
+	                	<small class='post_date'>{$lastEdit} Posted on {$post->getDate()}</small>
+	                	$removePost
                 	</article>
                 </td>
                 </tr>";

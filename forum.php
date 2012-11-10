@@ -165,11 +165,6 @@ $head = "<link href=\"forum/style.css\" rel=\"stylesheet\" type=\"text/css\" />
 						function(){
 							$(this).find('.dragText').stop(true, true).fadeOut('slow');
 						});
-						
-						$('.editSignature').dblclick(function()
-						{
-							window.location = 'forum.php?p={$_GET["p"]}&e=u'+$(this).attr('name')+'&signature='+$(this).html();
-						});
 
 						$('.inlineEdit').focus(function()
 						{
