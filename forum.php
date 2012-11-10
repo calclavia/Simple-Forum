@@ -52,7 +52,6 @@ if (!empty($_GET["p"]))
                 $post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);                
             }
 
-            $printContent .= getNewPostForm($thread);
             $printContent .= getThread($currentUser, $thread);
 
             $thread->view($currentUser, $con);
@@ -101,6 +100,7 @@ $content = "<span class='forum'>
                 ";
 
 $head = "<link href=\"forum/style.css\" rel=\"stylesheet\" type=\"text/css\" />
+		<link href=\"forum/buttons.css\" rel=\"stylesheet\" type=\"text/css\" />
             <script type='text/javascript'>			
                     function lightBox(targetID)
                     {
@@ -171,9 +171,9 @@ $head = "<link href=\"forum/style.css\" rel=\"stylesheet\" type=\"text/css\" />
 							window.location = 'forum.php?p={$_GET["p"]}&e=u'+$(this).attr('name')+'&signature='+$(this).html();
 						});
 
-						$('.inlineEdit').dblclick(function()
+						$('.inlineEdit').focus(function()
 						{
-							window.location = 'forum.php?e='+$(this).attr('name')+'&data='+$(this).html();
+							$(this).parent().find('.inline_form').fadeIn('slow');
 						});
 					});
             </script>

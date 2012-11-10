@@ -423,20 +423,30 @@ function getThread($user, $thread)
 
     if ($thread != null)
     {
-    	
     	if ($user->hasPermission($edit_threads, $thread))
     	{
-    		$threadAtrr = "class='inlineEdit' name='t{$thread->getID()}' contenteditable='true'";
+    		$threadTitle = "
+    				<div>
+	    				<h2 class='inlineEdit' style='display:inline; margin-right:5px;' contenteditable='true'>
+	    					{$thread->name}
+	    				</h2>
+	    				<a href='javascript:void(0)' onclick=\"window.location='forum.php?e=t{$thread->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+    				</div>";
+    	}
+    	else
+    	{
+    		$threadTitle = "<h2 style='display:inline'>{$thread->name}</h2>";
     	}
     	
         $printContent .= "
-        <h2 $threadAtrr>{$thread->name}</h2>
+        $threadTitle
+        <br />
 		<span>" . $thread->getTreeAsString() . "</span>
 		<span class=\"forum_menu\">";
 
         if ($user->hasPermission($create_posts, $thread) && $thread->fields["LockThread"] != "yes")
         {
-            $printContent .= "<a href = \"javascript:void(0)\" onclick = \"lightBox('newPost')\">Create Post</a>";
+            $printContent .= "<a href = \"javascript:void(0)\" onclick = \"$('html, body').animate({scrollTop:  $(document).height()})\" class='tsc_awb_small tsc_awb_white tsc_flat'>+ Post</a>";
         }
 
         $printContent .= "</span>";
@@ -445,26 +455,31 @@ function getThread($user, $thread)
 
         if (count($thread->getChildren()) > 0)
         {
+        	/**
+        	 * Print out each and every post.
+        	 */
             foreach ($thread->getChildren() as $post)
             {
                 $tempUser = getUserByID($post->fields["User"]);
 
                 $printContent .= "
-				<tr><td class='post_profile'>
-				<a href='http://www.gravatar.com/' target='_blank'>
-					<img src='http://www.gravatar.com/avatar/" . md5($tempUser->email) . "?d=mm&s=160'/>
-				</a>
-				<br/>
-				<b><a rel='t{$post->getID()}'>{$tempUser->username}</a></b>
-				<br />
-           		{$tempUser->title}
-           		<br />
-           		{$tempUser->posts} Post(s)
-				</br>";
+				<tr><td class='post_profile'>".getUserProfile($tempUser)."</td>";
 
                 if ($user->hasPermission($edit_posts, $post))
                 {
-                	$editPost = "class='inlineEdit' name='p{$post->getID()}' contenteditable='true'";
+                	$editPost = "
+	                	<div>
+		    				<div class='inlineEdit' style='display:inline; margin-right:5px;' contenteditable='true'>
+              					{$post->fields["Content"]}
+		    				</div>
+		    				<br />
+		    				<a href='javascript:void(0)' onclick=\"window.location='forum.php?e=p{$thread->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+	    				</div>
+                			";
+                }
+                else
+                {
+                	$editPost = "<div>{$post->fields["Content"]}</div>";
                 }
 
                 if ($user->hasPermission($delete_posts, $post))
@@ -477,16 +492,42 @@ function getThread($user, $thread)
                 	$editSignature = "class='editSignature' contenteditable='true' name='{$tempUser->id}'";
                 }
                 
+                $lastEdit = "";
+                
+               	if($post->fields["LastEditTime"] > 0 && !empty($post->fields["LastEditUser"]))
+                {
+                	$lastEdit = "Last Edited By ".$post->fields["LastEditUser"]." on ".$post->fields["LastEditTime"];
+                }
+                
                 $printContent .= "
-				<br />
-				<small>Posted on {$post->getDate()}</small></td>
-				
 				<td class='forum_content'>
-					<div $editPost>{$post->fields["Content"]}</div>
-					<hr />
-                	<div $editSignature style='height:50px; width:100%'>{$tempUser->signature}</div>
+					<article>
+						$editPost
+						<hr />
+	                	<div $editSignature style='height:50px; width:100%'>{$tempUser->signature}</div>
+	                	<small style='post_date'>{$lastEdit} Posted on {$post->getDate()}</small>
+                	</article>
                 </td>
                 </tr>";
+            }
+            
+            /**
+             * Print out add new post form.
+             */
+            if ($user->hasPermission($create_posts, $thread) && $thread->fields["LockThread"] != "yes")
+            {       
+            	$printContent .= "<tr><td class='post_profile'>".getUserProfile($user)."</td>";
+	            $printContent .= "
+            			<td class='forum_content'>
+            				<form action='{$_SERVER['PHP_SELF']}?p=t{$thread->getID()}&a=new' method='post'>
+								<textarea id='editableContentNewPost' name='editableContent' wrap=\"virtual\"></textarea>
+								<script type='text/javascript'>
+									CKEDITOR.replace('editableContentNewPost', {height:'250', width:'600'});
+								</script>
+								<input type='submit' value='Post'/>					
+							</form>
+            			</td>
+            		</tr>";
             }
         }
         else
@@ -500,19 +541,17 @@ function getThread($user, $thread)
     }
 }
 
-function getNewPostForm($thread)
+function getUserProfile($user)
 {
-    return "
-	<div id='newPost' class='white_content'>
-		<h1>New Post</h1>
-		<form action='{$_SERVER['PHP_SELF']}?p=t{$thread->getID()}&a=new' method='post'>
-			<textarea id='editableContentNewPost' name='editableContent' wrap=\"virtual\"></textarea>
-			<script type='text/javascript'>
-				CKEDITOR.replace('editableContentNewPost', {height:'200'});
-			</script>
-			<input type='submit' value='Post'/>					
-		</form>
-	</div>";
+	return "
+	<a href='http://www.gravatar.com/' target='_blank'>
+		<img src='http://www.gravatar.com/avatar/" . md5($user->email) . "?d=mm&s=160'/>
+	</a>
+	<br/>
+	<b>{$user->username}</b>
+	<br />
+    {$user->title}
+    <br />
+    {$user->posts} Post(s)";
 }
-
 ?>

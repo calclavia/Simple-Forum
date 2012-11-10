@@ -1,6 +1,6 @@
 .forum
 {
-    width:100%;
+    width: 100%;
     padding: 5px;
     margin: 5px;
 }
@@ -45,6 +45,11 @@
     padding: 10px;
 }
 
+.post_data
+{
+	float: right;
+}
+
 .post_profile
 {
     padding: 10px;
@@ -56,6 +61,7 @@
 .forum_menu
 {
     float:right;
+    margin-bottom: 5px;
 }
 
 .forum_element h2
@@ -73,7 +79,7 @@
     width: 60px;
 }
 
-.dragText
+.dragText, .inline_form
 {
 	display:none;
 }
