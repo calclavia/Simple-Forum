@@ -36,13 +36,15 @@ if (!empty($_GET["o"]))
 
 if (!empty($_GET["e"]))
 {
-	if (strstr($_GET["e"], "c") && $_POST["title"])
+	if (strstr($_GET["e"], "c"))
 	{
+		$title = clean($_GET["data"], true);
+		
 		$category = Category::getByID(intval(str_replace("c", "", $_GET["e"])));
 
-		if ($category != null)
+		if ($category != null && !empty($title))
 		{
-			$category->edit(clean($_POST["title"]), $con);
+			$category->edit($currentUser, $title, $con);
 		}
 	}
 	else if (strstr($_GET["e"], "b") && $_POST["title"])

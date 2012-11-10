@@ -68,32 +68,37 @@ function getCategory($user, $category)
     {
         if ($category->fields["Hidden"] != "yes")
         {
-        	if($user->hasPermission($edit_categories, $category))
+        	if ($user->hasPermission($edit_categories, $category))
         	{
-        		$dropData = "class='draggable' draggable='true' ondragstart=\"drag(event, 'c{$category->getID()}')\"";
+        		$categoryTitle = "
+        		<span>
+	        		<h2 class='inlineEdit' style='display:inline; margin-right:5px;' contenteditable='true'>
+        				{$category->name}
+	        		</h2>
+	        		<a href='javascript:void(0)' onclick=\"window.location='forum.php?e=c{$category->getID()}&data='+encodeURI($(this).prev('.inlineEdit').html())\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+	        	</span>";
         	}
-        	
+        	else
+        	{
+        		$categoryTitle = "
+		        	<span id='c{$category->getID()}'>
+						<h2 id='category{$category->getID()}' style='display:inline'>{$category->name}</h2>
+					</span>
+        			";
+        	}
+        		
             $printContent = "
-            <span id='c{$category->getID()}' $dropData>
-				<h2 id='category{$category->getID()}' style='display:inline'>{$category->name}</h2>
-				<span class='dragText'>Drag to Reorder</span>
-			</span>
-			
+            $categoryTitle
 			<div class='forum_menu'>";
 
             if ($user->hasPermission($create_boards, $category))
             {
-                $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$category->getID()}')\">Add Board</a> | ";
-            }
-
-            if ($user->hasPermission($edit_categories, $category))
-            {
-                $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('editCategory{$category->getID()}')\">Edit Category</a> | ";
+                $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$category->getID()}')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Board</a> ";
             }
 
             if ($user->hasPermission($delete_categories, $category))
             {
-                $printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$category->getID()}'>Delete</a>";
+                $printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$category->getID()}' class=\"tsc_awb_small tsc_awb_white tsc_flat\">Delete</a>";
             }
 
             $printContent .= "</div>";
@@ -113,12 +118,6 @@ function getCategory($user, $category)
             }
 
             $printContent .= "</table>";
-            global $create_boards;
-
-            if ($user->hasPermission($edit_categories))
-            {
-                $printContent .= getEditCategoryForm($category);
-            }
 
             if ($user->hasPermission($create_boards))
             {
@@ -215,17 +214,6 @@ function getSingleBoard($user, $board)
     }
 }
 
-function getEditCategoryForm($category)
-{
-    return "
-	<div id='editCategory{$category->getID()}' class='white_content'>
-		<h1>Edit Post</h1>
-		<form action='{$_SERVER['PHP_SELF']}?e=c{$category->getID()}' method='post'>
-			<b>Category Name:</b> <input type='text' name='title' size='80' maxlength='80' value='{$category->name}'/>
-			<input type='submit' value='Edit'/>					
-		</form>
-	</div>";
-}
 
 function getNewBoardForm($parent)
 {
