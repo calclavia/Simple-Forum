@@ -77,9 +77,7 @@ class Post extends ForumElement
     }
     
     public function printPost($user)
-    {
-    	$printContent .= "<tr><td class='post_profile'>".getUserProfile($tempUser)."</td>";
-    	
+    {    	
     	if ($user->hasPermission($edit_posts, $this))
     	{
     		$editPost = "
@@ -101,14 +99,14 @@ class Post extends ForumElement
     			$editSignature = "
     			<div>
     			<div class='inlineEdit' style='height:80px; width:100%' contenteditable='true'>
-    			{$tempUser->signature}
+    			{$user->signature}
     			</div>
-    			<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p={$_GET["p"]}&e=u{$tempUser->id}&signature='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+    			<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p={$_GET["p"]}&e=u{$user->id}&signature='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
     			</div>";
     			}
     			else
     			{
-    			$editSignature = "<div style='height:80px; width:100%'>{$tempUser->signature}</div>";
+    			$editSignature = "<div style='height:80px; width:100%'>{$user->signature}</div>";
     			}
     			 
     			$lastEdit = "";
@@ -128,18 +126,20 @@ class Post extends ForumElement
     			$removePost = "<a href='#' onclick=\"if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$this->fields["Parent"]}&d=p{$this->getID()}';}\" class=\"forum_menu tsc_awb_small tsc_awb_white tsc_flat\">Delete</a>";
     	}
     	
-    	$printContent .= "
+    	return "
+    	<tr><td class='post_profile'>".getUserProfile($user)."</td>
     	<td class='forum_content'>
     		<article>
     		$removePost
     		<br />
-    			$editPost
+    	$editPost
     			<hr />
     			$editSignature
     			<small class='post_date'>{$lastEdit} Posted on {$this->getDate()}</small>
     			</article>
     			</td>
     			</tr>";
+    			
     }
 }
 

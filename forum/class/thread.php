@@ -245,9 +245,9 @@ class Thread extends ForumElement
 				$printContent .= "<a href = \"javascript:void(0)\" onclick = \"$('html, body').animate({scrollTop:  $(document).height()})\" class='tsc_awb_small tsc_awb_white tsc_flat'>+ Post</a>";
 			}
 	
-	        $printContent .= "</span><span>" . $this->getTreeAsString() . "</span>";
+	        $printContent .= "</span><div>" . $this->getTreeAsString() . "</div>";
 	
-			$printContent .= "<table class='forum_table' border='1'>";
+			$printContent .= "<div class='elements_container' style='color:black; padding:10px;'><table class='forum_table'>";
 	
 			if (count($this->getChildren()) > 0)
 			{
@@ -284,7 +284,7 @@ class Thread extends ForumElement
 				$printContent .= "<tr class='forum_element'><td colspan='4'>No posts avaliable.</td></tr>";
 			}
 			
-			$printContent .= "</table><span>" . $this->getTreeAsString() . "</span>";
+			$printContent .= "</table></div><div>" . $this->getTreeAsString() . "</div>";
 				
 			return $printContent;
 		}
