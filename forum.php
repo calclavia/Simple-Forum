@@ -8,7 +8,7 @@ $printContent = "";
 $title = "Forum";
 
 /**
- * Check if the user wants to go to a specified page.
+ * Takes the user to a specific page on the forum.
  */
 if (!empty($_GET["p"]))
 {
@@ -38,7 +38,7 @@ if (!empty($_GET["p"]))
             }
 
             $printContent .= getNewThreadForm($board);
-            $printContent .= getBoard($currentUser, $board);
+            $printContent .= $board->printBoardContent($currentUser);
         }
     }
     else if (strstr($_GET["p"], "t"))
@@ -52,7 +52,7 @@ if (!empty($_GET["p"]))
                 $post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);                
             }
 
-            $printContent .= getThread($currentUser, $thread);
+            $printContent .= $thread->printThreadContent($currentUser);
 
             $thread->view($currentUser, $con);
         }
@@ -92,9 +92,10 @@ else
     $printContent .= getAllCategories($currentUser);
 }
 
-$content = "<span class='forum'>
-                <span style='float:right'>Current Time: " . date("F j, Y, g:i a", time()) . "</span><br />" . $printContent . "
-                </span>			
+$content = "<div class='forum'>
+                <span style='float:right'>Current Time: " . date("F j, Y, g:i a", time()) . "</span><br />" . $printContent . "</span>
+               	<div style='clear'></div>
+           </div>			
                 <br/><br/>
                 <div id='fade' class='black_overlay' onclick=\"closeLightBox()\"></div>		
                 ";

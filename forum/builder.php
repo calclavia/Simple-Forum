@@ -86,7 +86,7 @@ function getCategory($user, $category, $i)
         				}
         			}
         			
-        		$categoryTitle .= "</div>";
+        		$categoryTitle .= "</div><div class='clear'></div>";
         	}
         	else
         	{
@@ -112,23 +112,23 @@ function getCategory($user, $category, $i)
                 $printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$category->getID()}' class=\"tsc_awb_small tsc_awb_white tsc_flat\">Delete</a>";
             }
 
-            $printContent .= "</div>";
+            $printContent .= "</div><div class='clear'></div>";
 
-            $printContent .= "<table class='forum_table'><tr><td>Status</td><td>Board</td><td>Stats</td><td>Last Post</td></tr>";
+            $printContent .= "<div class='elements_container'>";
 
             if (count($category->getChildren()) > 0)
             {
                 foreach ($category->getChildren() as $board)
                 {
-                    $printContent .= getSingleBoard($user, $board);
+                    $printContent .= $board->printBoard($user);
                 }
             }
             else
             {
-                $printContent .= "<tr class='forum_element'><td colspan='4'>No boards avaliable.</td></tr>";
+                $printContent .= "No boards avaliable.";
             }
 
-            $printContent .= "</table>";
+            $printContent .= "</div>";
 
             if ($user->hasPermission($create_boards))
             {
@@ -140,91 +140,6 @@ function getCategory($user, $category, $i)
         }
     }
 }
-
-function getSingleBoard($user, $board)
-{
-	global $edit_boards;
-	
-    if ($board != null)
-    {
-        $stats = count($board->getPosts()) . " posts<br />" . $board->getViews() . " views";
-
-        $latestPost = "No posts.";
-
-        if ($board->getLatestPost()->fields["User"] != null)
-        {
-            $userdetails = fetchUserDetails(null, null, $board->getLatestPost()->fields["User"]);
-            $latestPost = "Last post <a href='{$_SERVER['PHP_SELF']}?p=t{$board->getLatestPost()->fields["Parent"]}'>\"" . $board->getLatestPost()->name . "\"</a> by " . $userdetails["display_name"] . " on " . $board->getLatestPost()->getDate();
-        }
-
-        $subBoards = "";
-
-        foreach ($board->getChildren() as $child)
-        {
-            if ($child instanceof Board)
-            {
-                $subBoards .= "<a href='{$_SERVER['PHP_SELF']}?p=b{$child->getID()}'>{$child->name}</a> ";
-            }
-        }
-
-        if (!empty($subBoards))
-        {
-            $subBoards = "Sub-Boards: " . $subBoards;
-        }
-        
-        if($user->hasPermission($edit_boards, $board))
-        {
-        	$dropData = "
-        		class='draggable' draggable='true' ondragstart=\"drag(event, 'b{$board->getID()}')\"
-        		ondrop=\"drop(event, 'b{$board->getID()}')\" ondragover='allowDrop(event)'
-        	";
-        	
-        	$dropData2 = "
-        		class='draggable' draggable='true' ondragstart=\"drag(event, 'b{$board->getID()}')\"
-        		ondrop=\"move(event, 'b{$board->getID()}')\" ondragover='allowDrop(event)'
-        	";
-        }
-        
-        if($board->isUnread($user))
-        {
-        	$boardImage = "<img src='forum/img/on.png'/>";
-        }
-        else
-        {
-        	$boardImage = "<img src='forum/img/off.png'/>";
-        }
-
-        $printContent .= "
-		<tr class='forum_element'>
-			<td class='read_status'>
-				<span {$dropData}>
-					$boardImage
-					<span class='dragText'>Drag</span>
-				</span>
-			</td>
-			<td class='element_content'>
-				<span {$dropData2}>
-					<h2><a href='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}'>{$board->name}</a></h2>
-					<br/>
-					{$board->fields["Description"]}
-					<br />
-					<span style='font:9'>
-						{$subBoards}
-					</span>
-				</span>
-			</td>
-			<td class='element_stats'>
-				$stats
-			</td>
-			<td>
-				$latestPost
-			</td>
-		</tr>";
-
-        return $printContent;
-    }
-}
-
 
 function getNewBoardForm($parent)
 {
@@ -264,126 +179,6 @@ function getNewBoardForm($parent)
     }
 }
 
-function getBoard($user, $board)
-{
-    global $create_boards, $edit_boards, $delete_boards, $create_threads;
-
-    if ($board != null)
-    {
-    	if ($user->hasPermission($edit_boards, $board))
-    	{
-    		$boardTitle = "
-    		<div>
-	    		<h2 class='inlineEdit' contenteditable='true'>
-	    			{$board->name}
-	    		</h2>
-	    		<a style='float:right' href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=b{$board->getID()}&data='+encodeURI($(this).prev('.inlineEdit').html())+'&content='+encodeURI($(this).next('.inlineEdit').html())\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
-	    		<div class='inlineEdit' contenteditable='true'>{$board->fields["Description"]}</div>
-	    	</div>";
-    	}
-    	else
-    	{
-	    	$boardTitle = "
-	    	<div>
-	    		<h2 id='category{$board->getID()}'>{$board->name}</h2><br />
-	    		<div>{$board->fields["Description"]}</div>
-	    	</div>
-	    	";
-    	}
-    		
-        $printContent .= "
-        	$boardTitle
-			<span>" . $board->getTreeAsString() . "</span>
-			<span class=\"forum_menu\">";
-
-        if ($user->hasPermission($create_threads, $board))
-        {
-        	$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Thread </a> ";
-        }
-        
-        if ($user->hasPermission($create_boards, $board))
-        {
-            $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$board->getID()}')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Board</a> ";
-        }
-
-        if ($user->hasPermission($delete_boards, $board))
-        {
-            $printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=b{$board->getID()}' class=\"tsc_awb_small tsc_awb_white tsc_flat\">Delete</a>";
-        }
-
-        $printContent .= "</span>";
-
-        $printContent .= "<table class='forum_table'><tr><td>Thread</td><td>Stats</td><td>Last Post</td></tr>";
-
-        if (count($board->getChildren()) > 0)
-        {
-            foreach ($board->getChildren() as $child)
-            {
-                if ($child instanceof Thread)
-                {
-                    $thread = $child;
-
-                    $stats = count($thread->getChildren()) . " posts<br />" . $thread->fields["Views"] . " views";
-
-                    $threadOwner = "Annoymous";
-
-                    if ($thread->getFirstPost()->fields["User"] != null)
-                    {
-                        $userdetails = fetchUserDetails(null, null, $thread->getFirstPost()->fields["User"]);
-                        $threadOwner = $userdetails["display_name"];
-                    }
-
-                    $latestPost = "No posts.";
-
-                    if ($thread->getLatestPost()->fields["User"] != null)
-                    {
-                        $userdetails = fetchUserDetails(null, null, $thread->getLatestPost()->fields["User"]);
-                        $latestPost = "Last post <a href='{$_SERVER['PHP_SELF']}?p=t{$thread->getLatestPost()->fields["Parent"]}'>\"" . $thread->getLatestPost()->name . "\" by " . $userdetails["display_name"] . " on " . $thread->getLatestPost()->getDate();
-                    }
-                    
-                    $extraText = "";
-                    
-                    if($thread->isUnread($user))
-                    {
-                    	$extraText = "!!";
-                    }
-
-                    $printContent .= "
-					<tr class='forum_element'>
-						<td class='element_content'>
-							<a href='{$_SERVER['PHP_SELF']}?p=t{$thread->getID()}'>$extraText {$thread->name}</a>
-							<br/>
-							Started by $threadOwner</td>
-						<td class='element_stats'>
-							$stats
-						</td>
-						<td>
-							$latestPost
-						</td>
-					</tr>";
-                }
-                else if ($child instanceof Board)
-                {
-                    $printContent .= getSingleBoard($user, $child);
-                }
-            }
-        }
-        else
-        {
-            $printContent .= "<tr class='forum_element'><td colspan='4'>No threads avaliable.</td></tr>";
-        }
-
-        $printContent .= "</table>";
-
-        if ($user->hasPermission($create_boards))
-        {
-            $printContent .= getNewBoardForm($board);
-        }
-
-        return $printContent;
-    }
-}
-
 function getNewThreadForm($board)
 {
     return "
@@ -404,146 +199,6 @@ function getNewThreadForm($board)
 			<input type='submit' value='Post'/>					
 		</form>
 	</div>";
-}
-
-function getThread($user, $thread)
-{
-    global $create_posts, $delete_posts, $edit_posts, $edit_threads, $edit_signature;
-
-    if ($thread != null)
-    {
-    	if ($user->hasPermission($edit_threads, $thread))
-    	{
-    		$threadTitle = "
-    				<div>
-	    				<h2 class='inlineEdit' style='display:inline; margin-right:5px;' contenteditable='true'>
-	    					{$thread->name}
-	    				</h2>
-	    				<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=t{$thread->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
-    				</div>";
-    	}
-    	else
-    	{
-    		$threadTitle = "<h2 style='display:inline'>{$thread->name}</h2>";
-    	}
-    	
-        $printContent .= "
-        $threadTitle
-        <br />
-		<span>" . $thread->getTreeAsString() . "</span>
-		<span class=\"forum_menu\">";
-
-        if ($user->hasPermission($create_posts, $thread) && $thread->fields["LockThread"] != "yes")
-        {
-            $printContent .= "<a href = \"javascript:void(0)\" onclick = \"$('html, body').animate({scrollTop:  $(document).height()})\" class='tsc_awb_small tsc_awb_white tsc_flat'>+ Post</a>";
-        }
-
-        $printContent .= "</span>";
-
-        $printContent .= "<table class='forum_table' border='1'>";
-
-        if (count($thread->getChildren()) > 0)
-        {
-        	/**
-        	 * Print out each and every post.
-        	 */
-            foreach ($thread->getChildren() as $post)
-            {
-                $tempUser = getUserByID($post->fields["User"]);
-
-                $printContent .= "
-				<tr><td class='post_profile'>".getUserProfile($tempUser)."</td>";
-
-                if ($user->hasPermission($edit_posts, $post))
-                {
-                	$editPost = "
-	                	<div>
-		    				<div class='inlineEdit' style='margin-right:5px;' contenteditable='true'>
-              					{$post->fields["Content"]}
-		    				</div>
-		    				<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=p{$post->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
-	    				</div>
-                		";
-                }
-                else
-                {
-                	$editPost = "<div>{$post->fields["Content"]}</div>";
-                }
-                
-                if($user->hasPermission($edit_signature, $post))
-                {
-                	$editSignature = "
-                		<div>
-		    				<div class='inlineEdit' style='height:80px; width:100%' contenteditable='true'>
-                				{$tempUser->signature}
-		    				</div>
-		    				<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p={$_GET["p"]}&e=u{$tempUser->id}&signature='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
-	    				</div>";
-                }
-                else
-                {
-                	$editSignature = "<div style='height:80px; width:100%'>{$tempUser->signature}</div>";
-                }
-                
-                $lastEdit = "";
-                
-               	if($post->fields["LastEditTime"] > 0 && !empty($post->fields["LastEditUser"]))
-                {
-                	$editUser = getUserByID($post->fields["LastEditUser"]);
-                	
-                	if($editUser != null)
-                	{
-                		$lastEdit = "Last Edited By ".$editUser->username." on ".date("F j, Y, g:i a", $post->fields["LastEditTime"]);
-                	}
-                }
-                
-                if ($user->hasPermission($delete_posts, $post))
-                {
-                	$removePost = "<a href='#' onclick=\"if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$post->fields["Parent"]}&d=p{$post->getID()}';}\" class=\"forum_menu tsc_awb_small tsc_awb_white tsc_flat\">Delete</a>";
-                }
-                
-                $printContent .= "
-				<td class='forum_content'>
-					<article>
-						$removePost
-						<br />
-						$editPost
-						<hr />
-						$editSignature
-	                	<small class='post_date'>{$lastEdit} Posted on {$post->getDate()}</small>
-                	</article>
-                </td>
-                </tr>";
-            }
-            
-            /**
-             * Print out add new post form.
-             */
-            if ($user->hasPermission($create_posts, $thread) && $thread->fields["LockThread"] != "yes")
-            {       
-            	$printContent .= "<tr><td class='post_profile'>".getUserProfile($user)."</td>";
-	            $printContent .= "
-            			<td class='forum_content'>
-            				<form action='{$_SERVER['PHP_SELF']}?p=t{$thread->getID()}&a=new' method='post'>
-								<textarea id='editableContentNewPost' name='editableContent' wrap=\"virtual\"></textarea>
-								<script type='text/javascript'>
-									CKEDITOR.replace('editableContentNewPost', {height:'250', width:'600'});
-								</script>
-								<input type='submit' value='Post'/>					
-							</form>
-            			</td>
-            		</tr>";
-            }
-        }
-        else
-        {
-            $printContent .= "<tr class='forum_element'><td colspan='4'>No posts avaliable.</td></tr>";
-        }
-
-        $printContent .= "</table>";
-
-        return $printContent;
-    }
 }
 
 function getUserProfile($user)

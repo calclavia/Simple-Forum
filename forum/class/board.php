@@ -10,7 +10,7 @@ class Board extends ForumElement
     function __construct($id, $parent, $order, $name, $description, $subBoard)
     {
         $this->id = $id;
-        $this->name = $name;
+        $this->name = stripslashes(str_replace("\\r\\n", "", $name));
 
         $this->element_name = "boards";
         $this->prefix = "b";
@@ -191,15 +191,20 @@ class Board extends ForumElement
         return null;
     }
 
+    /**
+     * @return string - A unordered list as a breadcrum of the tree of this board.
+     */
     public function getTreeAsString()
     {
         $tree = "";
 
+    	$elements = array();
+    	
         $board = $this;
 
         while ($board != null && $board instanceof Board)
         {
-            $tree = " -> <a href='{$_SERVER['PHP_SELF']}?p=b{$board->getID()}'>{$board->name}</a>" . $tree;
+        	$elements[] = $board;
 
             if ($board->fields["SubBoard"] == "yes")
             {
@@ -210,8 +215,22 @@ class Board extends ForumElement
                 $board = null;
             }
         }
+        
+        for($i = 0; $i < count($elements); $i ++)
+        {
+        	$element = $elements[$i];
+        	
+        	if($i == count($elements))
+        	{
+        		$tree = "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$element->getID()}' class='current'>{$element->name}</a></li>" . $tree;
+        	}
+        	else
+        	{
+        		$tree = "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$element->getID()}'>{$element->name}</a></li>" . $tree;
+        	}
+        }
 
-        $tree = "<a href='{$_SERVER['PHP_SELF']}'>Main</a>" . $tree;
+        $tree = "<ul class='breadcrumb'><li><a href='{$_SERVER['PHP_SELF']}'>Main</a></li>" . $tree."</ul>";
         return $tree;
     }
 
@@ -256,6 +275,161 @@ class Board extends ForumElement
     	
     	return false;
     }
+    
+    /**
+     * Prints out the board as a forum block.
+     * @param ForumUser $user - The current user.
+     * @return string To be printed.
+     */
+    public function printBoard($user)
+    {
+    	global $edit_boards;
+    	
+    	/**
+		 * Display the stats.
+    	 */
+    	$stats = count($this->getPosts()) . " post(s) " . $this->getViews() . " view(s)";
+    
+    	$printLatestPost = "No posts.";
+    	
+    	$latestPost = $this->getLatestPost();
+    	
+    	if ($latestPost->fields["User"] != null)
+    	{
+    		$latestPostUser = getUserByID($latestPost->fields["User"]);
+    		$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t{$latestPost->fields["Parent"]}'>"
+    						. (strlen($latestPost->name) > 25 ? substr($latestPost->name, 0, 20)."..." : $latestPost->name) .
+    						"</a><br /> By: <b>" . $latestPostUser->username . "</b>, " . $latestPost->getDate().".";
+    	}
+    
+    	$subBoards = "";
+    
+    	foreach ($this->getChildren() as $child)
+    	{
+    		if ($child instanceof Board)
+    		{
+    			$subBoards .= "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$child->getID()}'>{$child->name}</a></li>";
+    		}
+    	}
+    
+    	if (!empty($subBoards))
+    	{
+    		$subBoards = "<ul>Sub-Boards: " . $subBoards. "</ul>";
+    	}
+    
+    	if($user->hasPermission($edit_boards, $this))
+    	{
+    		$dropData = "
+    			class='draggable' draggable='true' ondragstart=\"drag(event, 'b{$this->getID()}')\"
+    			ondrop=\"drop(event, 'b{$this->getID()}')\" ondragover='allowDrop(event)'
+    			";
+    			 
+    		$dropData2 = "
+    			class='draggable' draggable='true' ondragstart=\"drag(event, 'b{$this->getID()}')\"
+    			ondrop=\"move(event, 'b{$this->getID()}')\" ondragover='allowDrop(event)'
+    			";
+    	}
+    	    
+    	return "
+	    	<div class='forum_element drop-shadow'>
+	    		<div class='two_third'>
+	    			<span class='". ($this->isUnread($user) ? "icon_on" : "icon_off") ."'></span>
+	    			<div class='board_content'>
+	    				<h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=b{$this->getID()}'>{$this->name}</a></h3>
+	    				<div class='element_text'>
+	    					<p>{$this->fields["Description"]}</p>
+	    					<div class='forum_element_info'>$stats</div>
+	    				</div>
+	    			</div>
+	    		</div>
+	    		<div class='forum_element_info one_third column-last'>
+	    			<p>$printLatestPost</p>
+	    			<div class='sub_boards'>
+	    				$subBoards
+	    			</div>
+	    		</div>
+	    	</div>
+	    	<div class='clear'></div>
+	    	<div class='hrline_silver'></div>
+	    	";
+    }
+    
+    public function printBoardContent($user)
+    {
+    	global $create_boards, $edit_boards, $delete_boards, $create_threads;
+    
+    	if ($user->hasPermission($edit_boards, $this))
+    	{
+    		$thisTitle = "
+    		<div>
+    			<h2 class='inlineEdit' contenteditable='true'>
+    				{$this->name}
+    			</h2>
+    			<a style='float:right' href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=b{$this->getID()}&data='+encodeURI($(this).prev('.inlineEdit').html())+'&content='+encodeURI($(this).next('.inlineEdit').html())\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+    			<div class='inlineEdit' contenteditable='true' style='width:70%'>{$this->fields["Description"]}</div>
+    		</div>
+    		<div class='clear'></div>";
+    	}
+    	else
+    	{
+    		$thisTitle = "
+    		<div>
+    			<h2 id='category{$this->getID()}'>{$this->name}</h2><br />
+    			<div style='width:70%'>{$this->fields["Description"]}</div>
+    		</div>
+    		";
+    	}
+    
+    	$printContent .= $thisTitle."<span class=\"forum_menu\">";
+    
+    	if ($user->hasPermission($create_threads, $this))
+    	{
+    		$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Thread </a> ";
+        }
+    
+        if ($user->hasPermission($create_boards, $this))
+        {
+    		$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Board</a> ";
+    	}
+    
+    	if ($user->hasPermission($delete_boards, $this))
+    	{
+    		$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=b{$this->getID()}' class=\"tsc_awb_small tsc_awb_white tsc_flat\">Delete</a>";
+    	}
+    
+    	$printContent .= "</span><div>" . $this->getTreeAsString() . "</div>";
+    
+    	$printContent .= "<div class='elements_container'>";
+    
+    	if (count($this->getChildren()) > 0)
+        {
+        	foreach ($this->getChildren() as $child)
+        	{
+        		if ($child instanceof Board)
+        		{
+        			$printContent .= $child->printBoard($user);
+        		}
+        	}
+        	
+        	$printContent .= "</div><div class='elements_container'>";
+        	
+            foreach ($this->getChildren() as $child)
+    		{
+    			if ($child instanceof Thread)
+    			{
+    				$printContent .= $child->printThread($user);
+    			}
+    		}
+        }
+        
+        $printContent .= "</div><div>".$this->getTreeAsString()."</div>";
+        
+        if ($user->hasPermission($create_boards))
+        {
+        	$printContent .= getNewBoardForm($this);
+        }
+        
+        return $printContent;
+    }
 }
-
 ?>
