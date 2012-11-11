@@ -193,4 +193,12 @@ if (!empty($_GET["d"]))
 	die();
 }
 
+/**
+ * If this is an Ajax request, then print out the results.
+ */
+if($_POST["ajax"])
+{
+	die(json_encode($successes));
+}
+
 ?>
