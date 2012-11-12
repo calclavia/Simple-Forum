@@ -199,7 +199,7 @@ class Thread extends ForumElement
 					<div class='two_third'>
 						<div class='thread_content'>
 							<h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a></h3>
-						    <div class='element_text'>
+						    <div class='element_info'>
 						    	$thisOwner, {$this->getFirstPost()->getDate()}
 						    </div>
 						</div>
@@ -247,7 +247,7 @@ class Thread extends ForumElement
 	
 	        $printContent .= "</span><div>" . $this->getTreeAsString() . "</div>";
 	
-			$printContent .= "<div class='elements_container' style='color:black; padding:10px;'><table class='forum_table'>";
+			$printContent .= "<div class='elements_container'>";
 	
 			if (count($this->getChildren()) > 0)
 			{
@@ -265,30 +265,41 @@ class Thread extends ForumElement
 				
 				if ($user->hasPermission($create_posts, $this) && $this->fields["LockThread"] != "yes")
 				{
-					$printContent .= "<tr><td class='post_profile'>".getUserProfile($user)."</td>";
-					$printContent .= "
-					<td class='forum_content'>
-					<form action='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&a=new' method='post'>
-					<textarea id='editableContentNewPost' name='editableContent' wrap=\"virtual\"></textarea>
-					<script type='text/javascript'>
-					CKEDITOR.replace('editableContentNewPost', {height:'250', width:'600'});
-					</script>
-					<input type='submit' value='Post'/>
-					</form>
-					</td>
-					</tr>";
+					$printContent .= $this->printNewPostForm($user);
 				}
 			}
 			else
 			{
-				$printContent .= "<tr class='forum_element'><td colspan='4'>No posts avaliable.</td></tr>";
+				$printContent .= "No posts avaliable.";
 			}
 			
-			$printContent .= "</table></div><div>" . $this->getTreeAsString() . "</div>";
+			$printContent .= "<div>" . $this->getTreeAsString() . "</div>";
 				
 			return $printContent;
 		}
-	}				 			
+	}
+
+	public function printNewPostForm($user)
+    {
+    	return "
+		<div class='post'>
+			<a rel='new'></a>
+			".$user->printProfile()."
+			<div class='comment_box'>
+				<div class='comment_inner'>
+					<form action='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&a=new' method='post'>
+						<textarea id='editableContentNewPost' name='editableContent' wrap=\"virtual\"></textarea><br />
+						<input type='submit' value='Post'/>
+					</form>
+				</div>
+			</div>
+			<div class='clear'></div>
+		</div>
+		<script type='text/javascript'>
+			CKEDITOR.replace('editableContentNewPost', {height:'250', width: '548'});
+		</script>
+    	";    				 
+    }	
 }
 
 ?>

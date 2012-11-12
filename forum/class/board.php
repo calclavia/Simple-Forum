@@ -179,10 +179,13 @@ class Board extends ForumElement
 
             foreach ($threads as $thread)
             {
-                if ($thread->getLatestPost()->fields["Time"] > $latestThread->getLatestPost()->fields["Time"])
-                {
-                    $latestThread = $thread;
-                }
+            	if($thread->getLatestPost() != null && $latestThread->getLatestPost() != null)
+            	{
+	                if ($thread->getLatestPost()->fields["Time"] > $latestThread->getLatestPost()->fields["Time"])
+	                {
+	                    $latestThread = $thread;
+	                }
+            	}
             }
 
             return $latestThread->getLatestPost();
@@ -337,7 +340,7 @@ class Board extends ForumElement
 	    			<div class='board_content'>
 	    				<h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=b{$this->getID()}'>{$this->name}</a></h3>
 	    				<div class='element_text'>
-	    					<p>{$this->fields["Description"]}</p>
+	    					<span>{$this->fields["Description"]}</span>
 	    					<div class='forum_element_info'>$stats</div>
 	    				</div>
 	    			</div>
@@ -426,7 +429,7 @@ class Board extends ForumElement
         
         if ($user->hasPermission($create_boards))
         {
-        	$printContent .= getNewBoardForm($this);
+        	$printContent .= $this->printNewBoardForm();
         }
         
         return $printContent;

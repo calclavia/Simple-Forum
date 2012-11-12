@@ -227,14 +227,14 @@ class ForumUser
 	{
 		return "
 		<div class='forum_profile'>
-			<a href='http://www.gravatar.com/' target='_blank'>
-				<img src='http://www.gravatar.com/avatar/" . md5($this->email) . "?d=mm&s=160' alt='Avatar' class='avatar'/>
-			</a>
-			<p class='username'>{$this->username}</p>
-			<p class='element_info'>
-				{$this->title}<br />
-				{$this->posts} Post(s)
-			</p>
+			<img src='http://www.gravatar.com/avatar/" . md5($this->email) . "?d=mm&s=160' alt='Avatar' class='avatar'/>
+			<div class='profile_info'>
+				<p class='username'>{$this->username}</p>
+				<p class='element_info'>
+					{$this->title}<br />
+					{$this->posts} Post(s)
+				</p>
+			</div>
 		</div>";
 	}
 }

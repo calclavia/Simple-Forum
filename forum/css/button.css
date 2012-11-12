@@ -1,0 +1,68 @@
+button,
+.btn_flat,
+.btn_flat:visited { background:#222; display:inline-block; padding:5px 10px 6px; color:#fff; text-decoration:none; border-radius:5px; 
+	-moz-border-radius:5px; -webkit-border-radius:5px; -moz-box-shadow:0 1px 3px rgba(0, 0, 0, 0.5); -webkit-box-shadow:0 1px 3px rgba(0, 0, 0, 0.5); text-shadow:0 -1px 1px rgba(0, 0, 0, 0.1); border-bottom:1px solid rgba(0, 0, 0, 0.25); position:relative; cursor:pointer;
+	box-shadow:0 1px 1px rgba(0, 0, 0, 0.2);
+	
+	}
+	
+.btn_flat:hover { background-color:#3B3B3B; color:#fff;}
+.btn_flat:active { top:1px;}
+.btn_small.btn_flat,
+.btn_small.btn_flat:visited { font-size:11px; padding:;}
+.btn_flat,
+.btn_flat:visited,
+.btn_medium.btn_flat,
+.btn_medium.btn_flat:visited { font-size:13px; font-weight:bold; line-height:1; text-shadow:0 -1px 1px rgba(0, 0, 0, 0.1);}
+
+.btn_large.btn_flat,
+.btn_large.btn_flat:visited { font-size:16px; padding:8px 14px 9px;}
+
+.btn_green.btn_flat,
+.btn_green.btn_flat:visited { background-color:#91bd09;}
+.btn_green.btn_flat:hover { background-color:#749a02;}
+
+.btn_teal.btn_flat,
+.btn_teal.btn_flat:visited { background-color:#2daebf;}
+.btn_teal.btn_flat:hover { background-color:#007d9a;}
+
+.btn_blue.btn_flat,
+.btn_blue.btn_flat:visited { background-color:#0066CC;}
+.btn_blue.btn_flat:hover { background-color:#004B97;}
+
+.btn_gray.btn_flat,
+.btn_gray.btn_flat:visited { background-color:#999;}
+.btn_gray.btn_flat:hover { background-color:#666;}
+
+.btn_silver.btn_flat,
+.btn_silver.btn_flat:visited { background-color:#eee; color:#333;}
+.btn_silver.btn_flat:hover { background-color:#ddd;}
+
+.btn_white.btn_flat,
+.btn_white.btn_flat:visited { background-color:#fff; color:#333; border:1px solid #ddd;}
+.btn_white.btn_flat:hover { background-color:#f2f2f2;}
+
+
+.btn_purple.btn_flat,
+.btn_purple.btn_flat:visited { background-color:#6666CC; }
+.btn_purple.btn_flat:hover { background-color:#5B48AA;}
+
+.btn_pink.btn_flat,
+.btn_pink.btn_flat:visited { background-color:#CC66CC; }
+.btn_pink.btn_flat:hover { background-color:#BB3EBB;}
+
+.btn_red.btn_flat,
+.btn_red.btn_flat:visited { background-color:#CC3300;}
+.btn_red.btn_flat:hover { background-color:#872300;}
+
+.btn_magenta.btn_flat,
+.btn_magenta.btn_flat:visited { background-color:#a9014b;}
+.btn_magenta.btn_flat:hover { background-color:#630030;}
+
+.btn_orange.btn_flat,
+.btn_orange.btn_flat:visited { background-color:#ff5c00;}
+.btn_orange.btn_flat:hover { background-color:#d45500;}
+
+.btn_yellow.btn_flat,
+.btn_yellow.btn_flat:visited { background-color:#FFCC33; color:#333;}
+.btn_yellow.btn_flat:hover { background-color:#FBBC00;}

@@ -81,30 +81,30 @@ class Post extends ForumElement
     	if ($user->hasPermission($edit_posts, $this))
     	{
     		$editPost = "
-    		<p class='comment_paragraph inlineEdit' style='margin-right:5px;' contenteditable='true'>
+    		<div class='inlineEdit' style='margin-right:5px;' contenteditable='true'>
 				{$this->fields["Content"]}
-    		</p>
-    		<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=p{$this->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
-    		";
+    		</div>
+    		<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=p{$this->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form btn_small btn_white btn_flat'>Edit</a>
+    		<div class='clear'></div>";
     	}
     	else
     	{
-    		$editPost = "<p class='comment_paragraph'>{$this->fields["Content"]}</p>";
+    		$editPost = "<div>{$this->fields["Content"]}</div>";
     	}
     	 
     	if($user->hasPermission($edit_signature, $this))
     	{
 			$editSignature = "
 			<div>
-				<p class='inlineEdit' style='height:80px; width:100%' contenteditable='true'>
-				{$user->signature}
-				</p>
+				<div class='forum_signature inlineEdit' contenteditable='true'>
+					{$user->signature}
+				</div>
 				<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p={$_GET["p"]}&e=u{$user->id}&signature='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
 			</div>";
 		}
 		else
 		{
-			$editSignature = "<div style='height:80px; width:100%'>{$user->signature}</div>";
+			$editSignature = "<div>{$user->signature}</div>";
 		}
 		 
 		$lastEdit = "";
@@ -115,7 +115,7 @@ class Post extends ForumElement
 
 			if($editUser != null)
 			{
-				$lastEdit = "Last Edited By ".$editUser->username." on ".date("F j, Y, g:i a", $this->fields["LastEditTime"]);
+				$lastEdit = "Last edit: <b>".$editUser->username."</b>, ".date("F j, Y, g:i a", $this->fields["LastEditTime"]);
 			}
     	}
     		
@@ -125,22 +125,25 @@ class Post extends ForumElement
     	}
     	
     	return "
-		 <div class='post'>
+		<div class='post'>
 			<a rel='".$this->getID()."'></a>
 			".$user->printProfile()."
-			<div class='omment_box fr'>
-				$removePost
-				<div>$editPost</div>
-				<div class='hrline_silver'></div>
-				<div class='signature'>$editSignature</div>
-				<span class='last_edit'>$lastEdit</span>
-				<span class='date'>{$this->getDate()}</span>
+			<div class='comment_box'>
+				<div class='comment_inner'>
+					$removePost
+					$editPost
+					<div class='hrline_silver'></div>
+					$editSignature
+					<span class='last_edit'>$lastEdit</span>
+					<span class='date'>{$this->getDate()}</span>
+				</div>
 			</div>
 			<div class='clear'></div>
 		</div>
     	";
     			
     }
+
 }
 
 ?>

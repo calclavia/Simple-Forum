@@ -231,7 +231,7 @@ class Category extends ForumElement
 
 				if ($user->hasPermission($create_boards))
 				{
-					$printContent .= getNewBoardForm($this);
+					$printContent .= $this->printNewBoardForm();
 				}
 
 

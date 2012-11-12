@@ -53,6 +53,17 @@ function move(ev, targetID)
 		}
 }
 
+function ()
+{
+	$.ajax({
+	  type: "POST",
+	  url: "forum/process.php",
+	  data: { name: "John", location: "Boston" }
+	}).done(function( msg ) {
+	  alert( "Data Saved: " + msg );
+	});
+}
+
 $(document).ready(function() {
 	
 	$('.draggable').hover(function(){

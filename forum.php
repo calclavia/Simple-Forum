@@ -1,20 +1,4 @@
 <?php
-
- /*
-  * A simple function to clean a string to be SQL safe.
-  */
-function clean($string, $veryClean = false)
-{
-    if ($veryClean)
-    {
-        return mysql_real_escape_string(htmlspecialchars(strip_tags(trim($string))));
-    }
-    else
-    {
-        return mysql_real_escape_string(trim($string));
-    }
-}
-
 require_once("models/config.php");
 require_once("forum/config.php");
 
@@ -111,12 +95,17 @@ $content = "<div class='forum'>
                 <span style='float:right'>Current Time: " . date("F j, Y, g:i a", time()) . "</span><br />" . $printContent . "</span>
                	<div style='clear'></div>
            </div>			
-                <br/><br/>
-                <div id='fade' class='black_overlay' onclick=\"closeLightBox()\"></div>		
-                ";
+           <br/><br/>
+           <div id='fade' class='black_overlay' onclick=\"closeLightBox()\"></div>";
 
-$head = "<link href=\"forum/css/forum.css\" rel=\"stylesheet\" type=\"text/css\" />
-		<link href=\"forum/css/buttons.css\" rel=\"stylesheet\" type=\"text/css\" />
+/**
+ * Include this in your header.
+ */
+$head = "
+		<link href=\"forum/css/button.css\" rel=\"stylesheet\" type=\"text/css\" />
+		<link href=\"forum/css/breadcrum.css\" rel=\"stylesheet\" type=\"text/css\" />
+		<link href=\"forum/css/pagination.css\" rel=\"stylesheet\" type=\"text/css\" />
+		<link href=\"forum/css/forum.css\" rel=\"stylesheet\" type=\"text/css\" />
 		<script type='text/javascript' src='forum/js/forum.js'></script>";
 
 /**
