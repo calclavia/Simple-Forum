@@ -53,18 +53,51 @@ function move(ev, targetID)
 		}
 }
 
-function ()
+function resultBlock(data)
 {
-	$.ajax({
-	  type: "POST",
-	  url: "forum/process.php",
-	  data: { name: "John", location: "Boston" }
-	}).done(function( msg ) {
-	  alert( "Data Saved: " + msg );
-	});
+	$("#forum_notifications").empty();
+	$("#forum_notifications").fadeIn('fast');
+
+	var appendString = '<ul>';
+	
+	for (var i = 0; i < data.length; i++)
+	{
+		appendString += '<li>'+data[i]+'</li>';
+	}
+	
+	appendString += '</ul>';
+	
+	$("#forum_notifications").append(appendString);
+	
+	$("#forum_notifications").fadeOut(10000);
 }
 
 $(document).ready(function() {
+	
+	$('.process_edit').click(function(){
+		$.ajax({
+			  type: "POST",
+			  url: "forum/process.php",
+			  dataType: 'json',
+			  data: { ajax: $(this).data('type'), e: $(this).attr('name'), data: $(this).parent().find('.process_data').html() }
+			}).done(function( msg ) {
+				resultBlock(msg);
+		});
+	});
+	
+	$('.quick_edit').blur(function(){
+		if($(this).html() != "")
+		{
+			$.ajax({
+				  type: "POST",
+				  url: "forum/process.php",
+				  dataType: 'json',
+				  data: { ajax: $(this).data('type'), e: $(this).attr('name'), data: $(this).html() }
+				}).done(function( msg ) {
+					resultBlock(msg);
+			});
+		}
+	});
 	
 	$('.draggable').hover(function(){
 		$(this).find('.dragText').stop(true, true).fadeIn('slow');

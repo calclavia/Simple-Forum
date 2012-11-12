@@ -225,11 +225,11 @@ class Board extends ForumElement
         	
         	if($i == count($elements))
         	{
-        		$tree = "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$element->getID()}' class='current'>{$element->name}</a></li>" . $tree;
+        		$tree = "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$element->getID()}' class='current'>".limitString($element->name, 30)."</a></li>" . $tree;
         	}
         	else
         	{
-        		$tree = "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$element->getID()}'>{$element->name}</a></li>" . $tree;
+        		$tree = "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$element->getID()}'>".limitString($element->name, 30)."</a></li>" . $tree;
         	}
         }
 
@@ -237,11 +237,26 @@ class Board extends ForumElement
         return $tree;
     }
 
-    public function edit($name, $description)
+	public function editTitle($user, $title)
     {
-        $this->name = $name;
-        $this->fields["Description"] = $description;
+    	global $edit_boards;
+        
+    	if($user->hasPermission($edit_boards))
+    	{
+    		$this->name = clean($title, true);
+    	}
     }
+    
+    public function editDescription($user, $description)
+    {
+    	global $edit_boards;
+    	
+    	if($user->hasPermission($edit_boards))
+    	{
+    		$this->fields["Description"] = $description;
+    	}
+    }
+    
     
     public function move($user, $id, $con)
     {
@@ -301,8 +316,8 @@ class Board extends ForumElement
     	{
     		$latestPostUser = getUserByID($latestPost->fields["User"]);
     		$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t{$latestPost->fields["Parent"]}#'".$latestPost->getID().">"
-    						. (strlen($latestPost->name) > 25 ? substr($latestPost->name, 0, 20)."..." : $latestPost->name) .
-    						"</a><br /> By: <b>" . $latestPostUser->username . "</b>, " . $latestPost->getDate().".";
+    						. limitString($latestPost->name) .
+    						"</a><br /> By: <b>" . limitString($latestPostUser->username, 20) . "</b>, " . $latestPost->getDate().".";
     	}
     
     	$subBoards = "";
@@ -365,11 +380,10 @@ class Board extends ForumElement
     	{
     		$thisTitle = "
     		<div>
-    			<h2 class='inlineEdit' contenteditable='true'>
-    				{$this->name}
-    			</h2>
-    			<a style='float:right' href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=b{$this->getID()}&data='+encodeURI($(this).prev('.inlineEdit').html())+'&content='+encodeURI($(this).next('.inlineEdit').html())\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
-    			<div class='inlineEdit' contenteditable='true' style='width:70%'>{$this->fields["Description"]}</div>
+    			<h2 class='quick_edit' name='b{$this->getID()}' data-type='title' contenteditable='true'>
+					{$this->name}
+				</h2>
+    			<div class='quick_edit' name='b{$this->getID()}' data-type='description' contenteditable='true'>{$this->fields["Description"]}</div>
     		</div>
     		<div class='clear'></div>";
     	}
@@ -377,7 +391,7 @@ class Board extends ForumElement
     	{
     		$thisTitle = "
     		<div>
-    			<h2 id='category{$this->getID()}'>{$this->name}</h2><br />
+    			<h2>{$this->name}</h2>
     			<div style='width:70%'>{$this->fields["Description"]}</div>
     		</div>
     		";

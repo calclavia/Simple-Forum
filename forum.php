@@ -4,8 +4,6 @@ require_once("forum/config.php");
 
 $printContent = "";
 
-$title = "Forum";
-
 /**
  * Takes the user to a specific page on the forum.
  */
@@ -92,6 +90,7 @@ else
 }
 
 $content = "<div class='forum'>
+				<div id='forum_notifications' class='notification' style='display:none; max-height: 100px;'></div>
                 <span style='float:right'>Current Time: " . date("F j, Y, g:i a", time()) . "</span><br />" . $printContent . "</span>
                	<div style='clear'></div>
            </div>			

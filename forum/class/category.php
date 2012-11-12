@@ -166,22 +166,20 @@ class Category extends ForumElement
 				{
 					$thisTitle = "
 					<div>
-						<h2 class='inlineEdit' style='display:inline; margin-right:5px;' contenteditable='true'>
+						<h2 class='quick_edit' name='c{$this->getID()}' data-type='ajax' style='display:inline; margin-right:5px;' contenteditable='true'>
 							{$this->name}
-						</h2>
-						<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=c{$this->getID()}&data='+encodeURI($(this).prev('.inlineEdit').html())\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
-						";
-						
+						</h2>";			
+										
 						if($categories[$i+1])
 						{
-							$thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i+1]->getID()}'\" class='inline_form tsc_awb_small tsc_awb_silver tsc_flat'>&darr;</a>";
+							$thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i+1]->getID()}'\" class='tsc_awb_small tsc_awb_silver tsc_flat'>&darr;</a>";
 						}
 						
 						if($i > 1)
 						{
 							if($categories[$i-2])
 							{
-								$thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i-2]->getID()}'\" class='inline_form tsc_awb_small tsc_awb_silver tsc_flat'>&uarr;</a>";
+								$thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i-2]->getID()}'\" class='tsc_awb_small tsc_awb_silver tsc_flat'>&uarr;</a>";
 							}
 						}
 						

@@ -127,7 +127,7 @@ class Thread extends ForumElement
 
 	public function getTreeAsString()
 	{
-		return str_replace("</ul>", "<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}' class='current'>{$this->name}</a></li></ul>", str_replace("class='current'", "", Board::getByID(intval($this->fields["Parent"]))->getTreeAsString()));
+		return str_replace("</ul>", "<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}' class='current'>".limitString($this->name, 30)."</a></li></ul>", str_replace("class='current'", "", Board::getByID(intval($this->fields["Parent"]))->getTreeAsString()));
 	}
 
 	public function view($user, $con)
@@ -256,7 +256,7 @@ class Thread extends ForumElement
 				*/
 				foreach ($this->getChildren() as $post)
 				{
-					$printContent .= $post->printPost(getUserByID($post->fields["User"]));
+					$printContent .= $post->printPost($user, getUserByID($post->fields["User"]));
 				}
 				
 				/**

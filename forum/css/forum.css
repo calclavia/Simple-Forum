@@ -203,7 +203,7 @@
 }
 
 .forum_element_info {
-	font-size: 11px;
+	font-size: 13px;
 	font-weight: lighter;
 	color: #424242;
 	margin-bottom: 10px;
@@ -302,7 +302,6 @@
 	background: #fff;
 	padding: 2px;
 	border: 1px solid #d8d8d8;
-	margin-top: 10px;
 	position: relative;
 }
 
@@ -319,6 +318,7 @@
 	background: #fff;
 	border: 1px solid #d8d8d8;
 	position: relative;
+	width: 75%;
 }
 
 .post .comment_box:before {

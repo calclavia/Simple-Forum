@@ -76,7 +76,13 @@ class Post extends ForumElement
     	return !$user->isRead($this);
     }
     
-    public function printPost($user)
+    /**
+     * 
+     * @param unknown $user - Current User
+     * @param unknown $postUser - Person who posted the post.
+     * @return string
+     */
+    public function printPost($user, $postUser)
     {    	
     	if ($user->hasPermission($edit_posts, $this))
     	{
@@ -84,7 +90,7 @@ class Post extends ForumElement
     		<div class='inlineEdit' style='margin-right:5px;' contenteditable='true'>
 				{$this->fields["Content"]}
     		</div>
-    		<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=p{$this->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form btn_small btn_white btn_flat'>Edit</a>
+    		<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=p{$this->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='btn_small btn_white btn_flat'>Edit</a>
     		<div class='clear'></div>";
     	}
     	else
@@ -97,14 +103,14 @@ class Post extends ForumElement
 			$editSignature = "
 			<div>
 				<div class='forum_signature inlineEdit' contenteditable='true'>
-					{$user->signature}
+					{$postUser->signature}
 				</div>
-				<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p={$_GET["p"]}&e=u{$user->id}&signature='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+				<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p={$_GET["p"]}&e=u{$postUser->id}&signature='+$(this).prev('.inlineEdit').html()\" class='btn_small btn_white btn_flat'>Edit</a>
 			</div>";
 		}
 		else
 		{
-			$editSignature = "<div>{$user->signature}</div>";
+			$editSignature = "<div>{$postUser->signature}</div>";
 		}
 		 
 		$lastEdit = "";
@@ -121,13 +127,13 @@ class Post extends ForumElement
     		
     	if ($user->hasPermission($delete_posts, $this))
     	{
-    		$removePost = "<a href='#' onclick=\"if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$this->fields["Parent"]}&d=p{$this->getID()}';}\" class=\"forum_menu tsc_awb_small tsc_awb_white tsc_flat\">Delete</a>";
+    		$removePost = "<a href='#' onclick=\"if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$this->fields["Parent"]}&d=p{$this->getID()}';}\" class=\"forum_menu btn_small btn_white btn_flat\">Delete</a>";
     	}
     	
     	return "
 		<div class='post'>
 			<a rel='".$this->getID()."'></a>
-			".$user->printProfile()."
+			".$postUser->printProfile()."
 			<div class='comment_box'>
 				<div class='comment_inner'>
 					$removePost
@@ -138,10 +144,8 @@ class Post extends ForumElement
 					<span class='date'>{$this->getDate()}</span>
 				</div>
 			</div>
-			<div class='clear'></div>
 		</div>
-    	";
-    			
+		<div class='clear'></div>";
     }
 
 }

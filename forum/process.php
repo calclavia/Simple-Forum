@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Process different GET and POST submitted actions.
  * a = Adding
@@ -132,8 +131,6 @@ if (!empty($_GET["e"]))
 		}
 	}
 
-	header("Location: forum.php?p=".$_GET["p"]);
-	die();
 }
 
 if (!empty($_GET["d"]))
@@ -196,9 +193,63 @@ if (!empty($_GET["d"]))
 /**
  * If this is an Ajax request, then print out the results.
  */
-if($_POST["ajax"])
+if(!empty($_POST["ajax"]) || !empty($_GET["ajax"]))
 {
-	die(json_encode($successes));
+	
+	require_once("../models/config.php");
+	require_once("config.php");
+	
+	/**
+	 * Data being received from the Ajax request.
+	 */
+	$data = html_entity_decode($_POST["data"]);
+	
+	$edit = $_POST["e"];
+	
+	if (!empty($edit))
+	{
+		if (strstr($edit, "c"))
+		{
+			$title = clean($data, true);
+	
+			$category = Category::getByID(intval(str_replace("c", "", $edit)));
+	
+			if ($category != null && !empty($title))
+			{
+				$category->edit($currentUser, $title, $con);
+				$successes[] = "Changed category name to: ".$title;
+			}
+		}
+		else if (strstr($edit, "b"))
+		{	
+			$board = Board::getByID(intval(str_replace("b", "", $edit)));
+			
+			if ($board != null && !empty($data))
+			{
+				if($_POST["ajax"] == "title")
+				{
+					$board->editTitle($currentUser, $data);
+					$successes[] = "Changed board name to: ".$board->name;
+				}
+				else if($_POST["ajax"] == "description")
+				{
+					$board->editDescription($currentUser, $data);
+					$successes[] = "Changed board description to: ".$board->fields["Description"];
+				}
+
+				$board->save($con);
+			}
+		}
+	}
+	
+	if(count($successes) > 0)
+	{
+		echo json_encode($successes);
+	}
+	else
+	{
+		echo json_encode(array("Invalid ".$_POST["ajax"]." Request: ".$edit.", ".strip_tags($data)));
+	}
 }
 
 ?>
