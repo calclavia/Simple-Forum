@@ -1,5 +1,20 @@
 <?php
 
+ /*
+  * A simple function to clean a string to be SQL safe.
+  */
+function clean($string, $veryClean = false)
+{
+    if ($veryClean)
+    {
+        return mysql_real_escape_string(htmlspecialchars(strip_tags(trim($string))));
+    }
+    else
+    {
+        return mysql_real_escape_string(trim($string));
+    }
+}
+
 require_once("models/config.php");
 require_once("forum/config.php");
 

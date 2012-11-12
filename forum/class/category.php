@@ -149,6 +149,147 @@ class Category extends ForumElement
 		}
 	}
 
+	/**
+	 * @return string - The HTML content.
+	 */
+	public function printCategory($user, $i)
+	{
+		global $edit_categories, $delete_categories, $create_boards;
+		
+		$categories = Category::getAll();
+
+		if ($this != null)
+		{
+			if ($this->fields["Hidden"] != "yes")
+			{
+				if ($user->hasPermission($edit_categories, $this))
+				{
+					$thisTitle = "
+					<div>
+						<h2 class='inlineEdit' style='display:inline; margin-right:5px;' contenteditable='true'>
+							{$this->name}
+						</h2>
+						<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=c{$this->getID()}&data='+encodeURI($(this).prev('.inlineEdit').html())\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
+						";
+						
+						if($categories[$i+1])
+						{
+							$thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i+1]->getID()}'\" class='inline_form tsc_awb_small tsc_awb_silver tsc_flat'>&darr;</a>";
+						}
+						
+						if($i > 1)
+						{
+							if($categories[$i-2])
+							{
+								$thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i-2]->getID()}'\" class='inline_form tsc_awb_small tsc_awb_silver tsc_flat'>&uarr;</a>";
+							}
+						}
+						
+					$thisTitle .= "</div><div class='clear'></div>";
+				}
+				else
+				{
+					$thisTitle = "
+						<div id='c{$this->getID()}'>
+							<h2 id='category{$this->getID()}' style='display:inline'>{$this->name}</h2>
+						</div>
+						";
+				}
+					
+				$printContent = "
+				<div style='margin-bottom: 15px;'>
+				$thisTitle
+				<div class='forum_menu'>";
+
+				if ($user->hasPermission($create_boards, $this))
+				{
+					$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Board</a> ";
+				}
+
+				if ($user->hasPermission($delete_categories, $this))
+				{
+					$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$this->getID()}' class=\"tsc_awb_small tsc_awb_white tsc_flat\">Delete</a>";
+				}
+
+				$printContent .= "</div><div class='clear'></div>";
+
+				$printContent .= "<div class='elements_container'>";
+
+				if (count($this->getChildren()) > 0)
+				{
+					foreach ($this->getChildren() as $board)
+					{
+						$printContent .= $board->printBoard($user);
+					}
+				}
+				else
+				{
+					$printContent .= "No boards avaliable.";
+				}
+
+				$printContent .= "</div>";
+
+				if ($user->hasPermission($create_boards))
+				{
+					$printContent .= getNewBoardForm($this);
+				}
+
+
+				return $printContent."</div>";
+			}
+		}
+	}
+	
+	/**
+	 * Returns all categories
+	 * @return string - The HTML content.
+	 */
+	public static function printAll($user)
+	{
+		global $create_categories;
+
+		$printContent = "";
+
+		if ($user->hasPermission($create_categories))
+		{
+			$printContent .= "
+				<div class='forum_menu'>
+					<form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
+						<input type='text' name='title'>
+						<input type='submit' value='Add Category'>
+					</form>
+				</div><br />";
+		}
+
+		$categories = Category::getAll();
+
+		for ($i = 0; $i < count($categories); $i++)
+		{
+			$printContent .= getCategory($user, $categories[$i], $i);
+		}
+		
+		return $printContent;
+	}
+	
+	public function printNewBoardForm()
+	{
+		return "
+		<div id='newBoard{$this->getID()}' class='white_content'>
+			<h1>New Board</h1>
+			<form action='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&a=new' method='post'>
+				<table>
+					<tr><td>
+					<b>Title:</b>
+					</td><td>
+					<input type='text' name='title' size='80' maxlength='80'/>
+					</td></tr>
+				</table>
+				<textarea id='editableContentNewBoard{$this->getID()}' name='editableContent' wrap=\"virtual\" style=\"width:550px; height:200px\"></textarea>
+				<br />
+				<input type='submit' value='Post'/>					
+			</form>
+		</div>";
+	}
 }
 
 ?>

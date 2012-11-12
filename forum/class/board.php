@@ -431,5 +431,43 @@ class Board extends ForumElement
         
         return $printContent;
     }
+	
+	public function printNewThreadForm()
+	{
+		return "
+		<div id='newThread' class='white_content'>
+			<h1>New Thread</h1>
+			<form action='{$_SERVER['PHP_SELF']}?p=b{$this->getID()}&a=new' method='post'>
+				<table>
+					<tr><td>
+					<b>Title:</b>
+					</td><td>
+					<input type='text' name='title' size='80' maxlength='80'/>
+					</td></tr>
+				</table>
+				<textarea id='editableContentNewThread' name='editableContent' wrap=\"virtual\"></textarea>
+				<script type='text/javascript'>
+					CKEDITOR.replace('editableContentNewThread', {height:'200'});
+				</script>
+				<input type='submit' value='Post'/>					
+			</form>
+		</div>";
+	}
+	
+	public function printNewBoardForm()
+	{
+		return "
+		<div id='newBoard{$this->getID()}' class='white_content'>
+			<h1>New Board</h1>
+			<form action='{$_SERVER['PHP_SELF']}?p=b{$this->getID()}&a=new' method='post'>
+				<b>Title:</b<br />
+				<input type='text' name='board_name' size='80' maxlength='80'/>
+				<br />
+				<textarea id='editableContentNewBoard{$this->getID()}' name='editableContent' wrap=\"virtual\" style=\"width:550px; height:200px\"></textarea>
+				<br/>
+				<input type='submit' value='Post'/>					
+			</form>
+		</div>";
+	}
 }
 ?>
