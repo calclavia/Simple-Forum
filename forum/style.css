@@ -320,17 +320,6 @@ ul.paginationA01 li a:hover,ul.paginationA01 li a.current {
 	font-weight: bold;
 }
 
-.post_date {
-	float: right;
-}
-
-.post_profile {
-	padding: 10px;
-	width: 220px;
-	text-align: center;
-	vertical-align: text-top;
-}
-
 .forum_menu {
 	float: right;
 	margin-bottom: 8px;
@@ -440,7 +429,7 @@ ul.paginationA01 li a:hover,ul.paginationA01 li a.current {
 	width: 400px;
 }
 
-.post .avatar_box {
+.post .forum_profile {
 	float: left;
 	width: 80px;
 }
@@ -496,7 +485,7 @@ ul.paginationA01 li a:hover,ul.paginationA01 li a.current {
 	outline: none;
 }
 
-.post .reply {
+.post .last_edit {
 	font-size: 0.85em;
 	color: #b7b7b7;
 	margin-left: 23px;

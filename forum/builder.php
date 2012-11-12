@@ -200,18 +200,4 @@ function getNewThreadForm($board)
 		</form>
 	</div>";
 }
-
-function getUserProfile($user)
-{
-	return "
-	<a href='http://www.gravatar.com/' target='_blank'>
-		<img src='http://www.gravatar.com/avatar/" . md5($user->email) . "?d=mm&s=160'/>
-	</a>
-	<br/>
-	<b>{$user->username}</b>
-	<br />
-    {$user->title}
-    <br />
-    {$user->posts} Post(s)";
-}
 ?>
