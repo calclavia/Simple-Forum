@@ -265,7 +265,7 @@ class Category extends ForumElement
 
 		for ($i = 0; $i < count($categories); $i++)
 		{
-			$printContent .= getCategory($user, $categories[$i], $i);
+			$printContent .= $categories[$i]->printCategory($user, $i);
 		}
 		
 		return $printContent;

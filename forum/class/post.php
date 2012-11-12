@@ -126,7 +126,8 @@ class Post extends ForumElement
     	
     	return "
 		 <div class='post'>
-			".getUserProfile($user)."
+			<a rel='".$this->getID()."'></a>
+			".$user->printProfile()."
 			<div class='omment_box fr'>
 				$removePost
 				<div>$editPost</div>

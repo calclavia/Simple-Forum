@@ -297,7 +297,7 @@ class Board extends ForumElement
     	if ($latestPost->fields["User"] != null)
     	{
     		$latestPostUser = getUserByID($latestPost->fields["User"]);
-    		$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t{$latestPost->fields["Parent"]}'>"
+    		$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t{$latestPost->fields["Parent"]}#'".$latestPost->getID().">"
     						. (strlen($latestPost->name) > 25 ? substr($latestPost->name, 0, 20)."..." : $latestPost->name) .
     						"</a><br /> By: <b>" . $latestPostUser->username . "</b>, " . $latestPost->getDate().".";
     	}

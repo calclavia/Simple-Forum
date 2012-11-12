@@ -431,7 +431,7 @@ ul.paginationA01 li a:hover,ul.paginationA01 li a.current {
 
 .post .forum_profile {
 	float: left;
-	width: 90px;
+	margin-right: 15px;
 }
 
 .post .avatar {

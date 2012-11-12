@@ -52,7 +52,7 @@ if (!empty($_GET["p"]))
                 }
             }
 
-            $printContent .= getNewThreadForm($board);
+            $printContent .= $board->printNewThreadForm();
             $printContent .= $board->printBoardContent($currentUser);
         }
     }
@@ -86,7 +86,7 @@ if (!empty($_GET["p"]))
                 $category->createBoard($currentUser, clean($_POST["title"], true), clean($_POST["editableContent"], true))->save($con);
             }
 
-            $printContent .= getCategory($currentUser, $category);
+            $printContent .= $category->getCategory($currentUser);
         }
     }
 
@@ -104,7 +104,7 @@ else
         $category->save($con);
     }
 
-    $printContent .= getAllCategories($currentUser);
+    $printContent .= Category::printAll($currentUser);
 }
 
 $content = "<div class='forum'>
