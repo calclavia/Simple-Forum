@@ -426,17 +426,17 @@ ul.paginationA01 li a:hover,ul.paginationA01 li a.current {
  */
 .post {
 	margin-bottom: 16px;
-	width: 400px;
+/*	width: 400px;*/
 }
 
 .post .forum_profile {
 	float: left;
-	width: 80px;
+	width: 90px;
 }
 
 .post .avatar {
 	background: #fff;
-	padding: 4px;
+	padding: 2px;
 	border: 1px solid #d8d8d8;
 	margin-top: 10px;
 	position: relative;
@@ -505,7 +505,7 @@ ul.paginationA01 li a:hover,ul.paginationA01 li a.current {
 }*/
 .post .date {
 	float: right;
-	font-size: 0.85em;
+	font-size: 10px;
 	color: #454545;
 	margin-top: 0;
 	margin-right: 15px;
