@@ -118,18 +118,7 @@ if (!empty($_GET["e"]))
 			}
 		}
 	}
-	else if (strstr($_GET["e"], "u") && !empty($_GET["signature"]))
-	{
-		$user = getUserByID(str_replace("u", "", $_GET["e"]));
-
-		if($user != null && $user instanceof ForumUser)
-		{
-			if($currentUser->hasPermission($edit_siganture))
-			{
-				$user->editSignature(clean($_GET["signature"]), $con);
-			}
-		}
-	}
+	
 
 }
 
@@ -279,6 +268,21 @@ if(!empty($_POST["ajax"]) || !empty($_GET["ajax"]))
 					{
 						$thread->save($con);
 					}
+				}
+			}
+		}
+		else if ($request_type == "signature")
+		{
+			$data = clean($data);
+			
+			$user = getUserByID($edit);
+			
+			if($user != null && $user instanceof ForumUser && !empty($data))
+			{
+				if($currentUser->hasPermission($edit_siganture))
+				{
+					$user->editSignature($data, $con);
+					$successes[] = "Changed signature.";
 				}
 			}
 		}

@@ -83,8 +83,10 @@ class Post extends ForumElement
      * @return string
      */
     public function printPost($user, $postUser)
-    {    	
-    	if ($user->hasPermission($edit_posts, $this))
+    {
+    	global $permission;
+    	
+    	if ($user->hasPermission($permission["post_edit"], $this))
     	{
     		$editPost = "
     		<div class='inlineEdit' style='margin-right:5px;' contenteditable='true'>
@@ -98,19 +100,16 @@ class Post extends ForumElement
     		$editPost = "<div>{$this->fields["Content"]}</div>";
     	}
     	 
-    	if($user->hasPermission($edit_signature, $this))
+    	if($user->hasPermission($permission["signature_edit"], $this))
     	{
 			$editSignature = "
-			<div>
-				<div class='forum_signature inlineEdit' contenteditable='true'>
-					{$postUser->signature}
-				</div>
-				<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p={$_GET["p"]}&e=u{$postUser->id}&signature='+$(this).prev('.inlineEdit').html()\" class='btn_small btn_white btn_flat'>Edit</a>
+			<div class='forum_signature quick_edit' name='{$postUser->id}' data-type='signature' contenteditable='true'>
+				{$postUser->signature}
 			</div>";
 		}
 		else
 		{
-			$editSignature = "<div>{$postUser->signature}</div>";
+			$editSignature = "<div class='forum_signature'>{$postUser->signature}</div>";
 		}
 		 
 		$lastEdit = "";
@@ -125,9 +124,9 @@ class Post extends ForumElement
 			}
     	}
     		
-    	if ($user->hasPermission($delete_posts, $this))
+    	if ($user->hasPermission($permission["post_delete"], $this))
     	{
-    		$removePost = "<a href='#' onclick=\"if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$this->fields["Parent"]}&d=p{$this->getID()}';}\" class=\"forum_menu btn_small btn_white btn_flat\">Delete</a>";
+    		$removePost = "<a href='#' onclick=\"if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$this->fields["Parent"]}&d=p{$this->getID()}';}\" class=\"btn_small btn_white btn_flat\">Delete</a>";
     	}
     	
     	return "
@@ -136,7 +135,9 @@ class Post extends ForumElement
 			".$postUser->printProfile()."
 			<div class='comment_box'>
 				<div class='comment_inner'>
-					$removePost
+					<div class='forum_menu'>
+						$removePost
+					</div>
 					$editPost
 					<div class='hrline_silver'></div>
 					$editSignature
