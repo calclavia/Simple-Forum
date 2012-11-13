@@ -1,4 +1,4 @@
-\<?php
+<?php
 require_once("models/config.php");
 require_once("forum/config.php");
 
