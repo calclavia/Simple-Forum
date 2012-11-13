@@ -445,6 +445,10 @@ class Board extends ForumElement
     			}
     		}
         }
+        else
+        {
+        	$printContent .= "<div class='forum_element'>No threads and boards avaliable.</div>";
+        }
         
         $printContent .= "</div><div>".$this->getTreeAsString()."</div>";
         

@@ -149,15 +149,33 @@ class Thread extends ForumElement
 		$this->save($con);
 	}
 
-	public function edit($user, $name, $sticky, $lockThread)
+	public function editTitle($user, $name)
 	{
-		global $edit_threads;
+		global $permission;
 		 
-		if($user->hasPermission($edit_threads))
+		if($user->hasPermission($permission['thread_edit']))
 		{
 			$this->name = $name;
-			$this->fields["Sticky"] = $sticky;
-			$this->fields["LockThread"] = $lockThread;
+		}
+	}
+	
+	public function stickThread($user, $status)
+	{
+		global $permission;
+			
+		if($user->hasPermission($permission['thread_sticky']))
+		{
+			$this->fields["Sticky"] = ($status ? "yes" : "no");
+		}
+	}
+	
+	public function lockThread($user, $status = true)
+	{
+		global $permission;
+			
+		if($user->hasPermission($permission['thread_lock']))
+		{
+			$this->fields["LockThread"] = ($status ? "yes" : "no");
 		}
 	}
 	
@@ -207,7 +225,7 @@ class Thread extends ForumElement
 					<div class='two_third'>
 						<div class='thread_content'>
 							<h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a></h3>
-						    <div class='element_info'>
+						    <div class='forum_element_info'>
 						    	$thisOwner, {$this->getFirstPost()->getDate()}
 						    </div>
 						</div>
@@ -231,16 +249,13 @@ class Thread extends ForumElement
 			if ($user->hasPermission($edit_threads, $this))
 			{
 				$thisTitle = "
-				<div>
-				<h2 class='inlineEdit' style='display:inline; margin-right:5px;' contenteditable='true'>
-				{$this->name}
-				</h2>
-				<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=t{$this->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='inline_form tsc_awb_small tsc_awb_white tsc_flat'>Edit</a>
-				</div>";
+				<h2 class='quick_edit' name='t{$this->getID()}' data-type='title' contenteditable='true'>
+					{$this->name}
+				</h2>";
 			}
 			else
 			{
-				$thisTitle = "<h2 style='display:inline'>{$this->name}</h2>";
+				$thisTitle = "<h2>{$this->name}</h2>";
 			}
 	
 			$printContent .= "

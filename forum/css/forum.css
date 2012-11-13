@@ -192,6 +192,7 @@
 .elements_container {
 	background-color: #FCFCFF;
 	margin: 10px 0px;
+	color:
 }
 
 /**
@@ -206,7 +207,6 @@
 	font-size: 13px;
 	font-weight: lighter;
 	color: #424242;
-	margin-bottom: 10px;
 }
 
 .forum .element_title {

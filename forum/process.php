@@ -195,6 +195,7 @@ if (!empty($_GET["d"]))
  */
 if(!empty($_POST["ajax"]) || !empty($_GET["ajax"]))
 {
+	$request_type = $_POST["ajax"];
 	
 	require_once("../models/config.php");
 	require_once("config.php");
@@ -203,6 +204,15 @@ if(!empty($_POST["ajax"]) || !empty($_GET["ajax"]))
 	 * Data being received from the Ajax request.
 	 */
 	$data = html_entity_decode($_POST["data"]);
+	
+	if($data == "true")
+	{
+		$data = true;
+	}
+	else if($data == "false")
+	{
+		$data = false;
+	}
 	
 	$edit = $_POST["e"];
 	
@@ -226,18 +236,50 @@ if(!empty($_POST["ajax"]) || !empty($_GET["ajax"]))
 			
 			if ($board != null && !empty($data))
 			{
-				if($_POST["ajax"] == "title")
+				if($request_type == "title")
 				{
 					$board->editTitle($currentUser, $data);
 					$successes[] = "Changed board name to: ".$board->name;
 				}
-				else if($_POST["ajax"] == "description")
+				else if($request_type == "description")
 				{
 					$board->editDescription($currentUser, $data);
 					$successes[] = "Changed board description to: ".$board->fields["Description"];
 				}
 
 				$board->save($con);
+			}
+		}
+		else if (strstr($edit, "t"))
+		{
+			$thread = Thread::getByID(intval(str_replace("t", "", $edit)));
+			$data = clean($data, true);
+			
+			if($thread != null)
+			{
+				if($thread != null)
+				{
+					if($request_type == "title")
+					{
+						$thread->editTitle($currentUser, $data);
+						$successes[] = "Changed thread name to: ".$thread->name;
+					}
+					else if($request_type == "sticky")
+					{
+						$thread->stickThread($currentUser, $data);
+						$successes[] = "Changed thread sticky status.";
+					}
+					else if($request_type == "lock")
+					{
+						$thread->lockThread($currentUser, $data);
+						$successes[] = "Changed thread lock status.";
+					}
+
+					if(count($successes) > 0)
+					{
+						$thread->save($con);
+					}
+				}
 			}
 		}
 	}
@@ -248,7 +290,7 @@ if(!empty($_POST["ajax"]) || !empty($_GET["ajax"]))
 	}
 	else
 	{
-		echo json_encode(array("Invalid ".$_POST["ajax"]." Request: ".$edit.", ".strip_tags($data)));
+		echo json_encode(array("Invalid ".$request_type." Request: ".$edit.", ".strip_tags($data)));
 	}
 }
 
