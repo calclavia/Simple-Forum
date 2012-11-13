@@ -136,15 +136,18 @@ class Board extends ForumElement
         return null;
     }
 
+    /**
+     * @return array Returns all the posts in this board.
+     */
     public function getPosts()
     {
         $posts = array();
 
-        $threads = $this->getChildren();
+        $elements = $this->getChildren();
 
-        foreach ($threads as $thread)
+        foreach ($elements as $element)
         {
-            $posts = array_merge($posts, $thread->getChildren());
+            $posts = array_merge($posts, $element->getPosts());
         }
 
         return $posts;
@@ -169,26 +172,26 @@ class Board extends ForumElement
         return intval($views);
     }
 
+    /**
+     * @return Post|NULL - Returns the most recent post on this board.
+     */
     public function getLatestPost()
     {
-        $threads = $this->getChildren();
-
-        if (count($threads) > 0)
+        $posts = $this->getPosts();
+        
+        if(count($posts) > 0)
         {
-            $latestThread = $threads[0];
-
-            foreach ($threads as $thread)
-            {
-            	if($thread->getLatestPost() != null && $latestThread->getLatestPost() != null)
-            	{
-	                if ($thread->getLatestPost()->fields["Time"] > $latestThread->getLatestPost()->fields["Time"])
-	                {
-	                    $latestThread = $thread;
-	                }
-            	}
-            }
-
-            return $latestThread->getLatestPost();
+	        $latestPost = $posts[0];
+	        
+	        foreach($posts as $post)
+	        {
+	        	if ($post->fields["Time"] > $latestPost->fields["Time"])
+	        	{
+	        		$latestPost = $post;
+	        	}
+	        }
+	        
+	        return $latestPost;
         }
 
         return null;
@@ -312,12 +315,16 @@ class Board extends ForumElement
     	
     	$latestPost = $this->getLatestPost();
     	
-    	if ($latestPost->fields["User"] != null)
+    	if ($latestPost != null)
     	{
     		$latestPostUser = getUserByID($latestPost->fields["User"]);
-    		$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t{$latestPost->fields["Parent"]}#'".$latestPost->getID().">"
+    		
+    		if($latestPostUser != null)
+    		{
+    			$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t{$latestPost->fields["Parent"]}#'".$latestPost->getID().">"
     						. limitString($latestPost->name) .
     						"</a><br /> By: <b>" . limitString($latestPostUser->username, 20) . "</b>, " . $latestPost->getDate().".";
+    		}
     	}
     
     	$subBoards = "";

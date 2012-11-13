@@ -67,6 +67,14 @@ class Thread extends ForumElement
 
 		return $returnArray;
 	}
+	
+	/**
+	 * @return array Returns all the posts in this thread.
+	 */
+	public function getPosts()
+	{
+		return $this->getChildren();
+	}
 
 	public function createPost($content, $user, $time, $con)
 	{
