@@ -131,7 +131,7 @@ class Post extends ForumElement
     	
     	return "
 		<div class='post'>
-			<a rel='".$this->getID()."'></a>
+			<a id='".$this->getID()."'></a>
 			".$postUser->printProfile()."
 			<div class='comment_box'>
 				<div class='comment_inner'>

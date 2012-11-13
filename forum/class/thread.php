@@ -240,10 +240,17 @@ class Thread extends ForumElement
 		";
 	}
 	
-	public function printThreadContent($user)
+	/**
+	 * @param ForumUser $user - The current user
+	 * @param Integer $currentPage - The curent page
+	 * @return string The HTML content.
+	 */
+	public function printThreadContent($user, $currentPage = 1)
 	{
-		global $create_posts, $delete_posts, $edit_posts, $edit_threads, $edit_signature;
-	
+		global $permission, $create_posts, $delete_posts, $edit_posts, $edit_threads, $edit_signature;
+		
+		if($currentPage <= 0) $currentPage = 1;
+		
 		if ($this != null)
 		{
 			if ($user->hasPermission($edit_threads, $this))
@@ -271,21 +278,52 @@ class Thread extends ForumElement
 	        $printContent .= "</span><div>" . $this->getTreeAsString() . "</div>";
 	
 			$printContent .= "<div class='elements_container'>";
+			
 	
 			if (count($this->getChildren()) > 0)
 			{
-				/**
-				 * Print out each and every post.
-				*/
-				foreach ($this->getChildren() as $post)
+				$posts = $this->getChildren();
+				
+				//Each page will contain 10 posts.
+				$pages = array_chunk($posts, 8);
+				
+				$i = 1;
+				
+				$pagination = "
+						<ul class='pagination'>
+						<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=1' class='first'>First</a></li>
+						<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=".max($currentPage-1, 1)."' class='previous'>Previous</a></li>";
+				
+				foreach($pages as $page)
 				{
-					$printContent .= $post->printPost($user, getUserByID($post->fields["User"]));
+					if($i == $currentPage)
+					{
+						/**
+						 * Print out each and every post.
+						 */
+						foreach ($page as $post)
+						{
+							$printContent .= $post->printPost($user, getUserByID($post->fields["User"]));
+						}
+						
+						$pagination .= "<li><a href='#' class='current'>".$i."</a></li>";
+					}
+					else if($currentPage < $i && $currentPage > $i-3 || $currentPage > $i && $currentPage < $i+3)
+					{
+						$pagination .= "<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=$i'>".$i."</a></li>";
+					}
+					
+					$i ++;
 				}
+				
+				$pagination .= "
+						<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=".max(min($currentPage+1, $i-1), 1)."' class='next'>Next</a></li>
+						<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=".($i-1)."' class='last'>Last</a></li>
+						</ul>";
 				
 				/**
 				 * Print out add new post form.
 				 */
-				
 				if ($user->hasPermission($create_posts, $this) && $this->fields["LockThread"] != "yes")
 				{
 					$printContent .= $this->printNewPostForm($user);
@@ -296,8 +334,8 @@ class Thread extends ForumElement
 				$printContent .= "No posts avaliable.";
 			}
 			
-			$printContent .= "<div>" . $this->getTreeAsString() . "</div>";
-				
+			$printContent .= "<div class='page_numbers'>".$pagination."</div></div><div>" . $this->getTreeAsString() . "</div>";
+							
 			return $printContent;
 		}
 	}

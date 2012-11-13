@@ -282,7 +282,7 @@ if(!empty($_POST["ajax"]) || !empty($_GET["ajax"]))
 				if($currentUser->hasPermission($edit_siganture))
 				{
 					$user->editSignature($data, $con);
-					$successes[] = "Changed signature.";
+					$successes[] = "Changed signature to: ".$data;
 				}
 			}
 		}

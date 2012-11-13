@@ -321,7 +321,7 @@ class Board extends ForumElement
     		
     		if($latestPostUser != null)
     		{
-    			$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t{$latestPost->fields["Parent"]}#'".$latestPost->getID().">"
+    			$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t{$latestPost->fields["Parent"]}#".$latestPost->getID()."'>"
     						. limitString($latestPost->name) .
     						"</a><br /> By: <b>" . limitString($latestPostUser->username, 20) . "</b>, " . $latestPost->getDate().".";
     		}

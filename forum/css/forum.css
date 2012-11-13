@@ -131,7 +131,7 @@
 	z-index: 2001;
 	-moz-opacity: 0.8;
 	opacity: .80;
-	filter: alpha(opacity =                                           80);
+	filter: alpha(opacity =                                               80);
 }
 
 .white_content {
@@ -192,7 +192,6 @@
 .elements_container {
 	background-color: #FCFCFF;
 	margin: 10px 0px;
-	color:
 }
 
 /**
@@ -247,6 +246,12 @@
 
 .forum .forum_element .board_content {
 	margin: 0px 0px 0px 56px;
+}
+
+.forum .page_numbers {
+	padding: 10px;
+	margin: 0px auto;
+	width: 400;
 }
 
 /**
@@ -350,19 +355,18 @@
 .post .last_edit {
 	font-size: 11px;
 	color: #b7b7b7;
-	margin-left: 23px;
 	text-decoration: none;
 	margin-top: 8px;
 	position: relative;
-	padding-bottom: 10px;
+	float: left;
 }
 
 .post .date {
 	font-size: 11px;
 	color: #b7b7b7;
+	margin-top: 8px;
 	text-decoration: none;
-	margin-top: 0;
-	margin-right: 15px;
+	float: right;
 }
 
 .post .forum_signature {
