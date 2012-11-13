@@ -404,26 +404,26 @@ class Board extends ForumElement
     		";
     	}
     
-    	$printContent .= $thisTitle."<span class=\"forum_menu\">";
+    	$printContent .= $thisTitle."<div class=\"forum_menu\">";
     
     	if ($user->hasPermission($create_threads, $this))
     	{
-    		$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Thread </a> ";
+    		$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\" class=\"btn_small btn_white btn_flat\">+ Thread </a> ";
         }
     
         if ($user->hasPermission($create_boards, $this))
         {
-    		$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Board</a> ";
+    		$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"btn_small btn_white btn_flat\">+ Board</a> ";
     	}
     
     	if ($user->hasPermission($delete_boards, $this))
     	{
-    		$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=b{$this->getID()}' class=\"tsc_awb_small tsc_awb_white tsc_flat\">Delete</a>";
+    		$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=b{$this->getID()}' class=\"btn_small btn_white btn_flat\">Delete</a>";
     	}
     
-    	$printContent .= "</span><div>" . $this->getTreeAsString() . "</div>";
+    	$printContent .= "</div><div class='clear'></div>";
     
-    	$printContent .= "<div class='elements_container'>";
+    	$printContent .= "<div class='elements_container'>" . $this->getTreeAsString();
     
     	if (count($this->getChildren()) > 0)
         {
@@ -450,7 +450,7 @@ class Board extends ForumElement
         	$printContent .= "<div class='forum_element'>No threads and boards avaliable.</div>";
         }
         
-        $printContent .= "</div><div>".$this->getTreeAsString()."</div>";
+        $printContent .= $this->getTreeAsString() . "</div>";
         
         if ($user->hasPermission($create_boards))
         {

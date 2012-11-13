@@ -268,16 +268,14 @@ class Thread extends ForumElement
 			$printContent .= "
 				$thisTitle
 				<br />
-				<span class=\"forum_menu\">";
+				<div class=\"forum_menu\">";
 	
 			if ($user->hasPermission($create_posts, $this) && $this->fields["LockThread"] != "yes")
 			{
 				$printContent .= "<a href = \"javascript:void(0)\" onclick = \"$('html, body').animate({scrollTop:  $(document).height()})\" class='tsc_awb_small tsc_awb_white tsc_flat'>+ Post</a>";
 			}
-	
-	        $printContent .= "</span><div>" . $this->getTreeAsString() . "</div>";
-	
-			$printContent .= "<div class='elements_container'>";
+		
+			$printContent .= "</div><div class='clear'></div><div class='elements_container'>" . $this->getTreeAsString() ;
 			
 	
 			if (count($this->getChildren()) > 0)
@@ -334,7 +332,7 @@ class Thread extends ForumElement
 				$printContent .= "No posts avaliable.";
 			}
 			
-			$printContent .= "<div class='page_numbers'>".$pagination."</div></div><div>" . $this->getTreeAsString() . "</div>";
+			$printContent .= "<div class='page_numbers'>".$pagination."</div>" . $this->getTreeAsString() . "</div>";
 							
 			return $printContent;
 		}
