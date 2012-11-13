@@ -3,7 +3,6 @@
 class Permission
 {
 
-    public static $permissions = array();
     public $id;
     public $name;
     public $description;
@@ -11,36 +10,39 @@ class Permission
 
     function __construct($id, $name, $description, $default = false)
     {
+    	$this->$id = $id;
         $this->name = $name;
         $this->description = $description;
         $this->default = $default;
-        self::$permissions[$id] = $this;
     }
 
 }
 
-$topic_sticky = new Permission(0, "Sticky", "Allows the user to make topics sticky.");
-$topic_promote = new Permission(1, "Promote", "Allows the user to make promote topics.");
+$permission = array();
 
-$create_categories = new Permission(2, "Create Categories", "Allows the user to create categories.");
-$edit_categories = new Permission(3, "Edit Categories", "Allows the user to edit categories.");
-$delete_categories = new Permission(4, "Delete Categories", "Allows the user to delete categories.");
+//Category Permissions
+$permission["category_create"] = $create_categories = new Permission(0, "Create Categories", "Allows the user to create categories.");
+$permission["category_edit"] = $edit_categories = new Permission(1, "Edit Categories", "Allows the user to edit categories.");
+$permission["delete_delete"] = $delete_categories = new Permission(2, "Delete Categories", "Allows the user to delete categories.");
 
-$create_boards = new Permission(5, "Create Boards", "Allows the user to create boards.");
-$edit_boards = new Permission(6, "Edit Boards", "Allows the user to edit boards.");
-$delete_boards = new Permission(7, "Delete Boards", "Allows the user to delete boards.");
+//Board Permissions
+$permission["board_create"] = $create_boards = new Permission(3, "Create Boards", "Allows the user to create boards.");
+$permission["board_edit"] = $edit_boards = new Permission(4, "Edit Boards", "Allows the user to edit boards.");
+$permission["board_delete"] = $delete_boards = new Permission(5, "Delete Boards", "Allows the user to delete boards.");
 
-$create_threads = new Permission(8, "Create Threads", "Allows the user to create threads.", true);
-$edit_threads = new Permission(8, "Edit Threads", "Allows the user to edit threads.");
+//Thread Permissions
+$permission["thread_create"] = $create_threads = new Permission(6, "Create Threads", "Allows the user to create threads.", true);
+$permission["thread_edit"] = $edit_threads = new Permission(7, "Edit Threads", "Allows the user to edit threads.");
+$permission["thread_sticky"] = $topic_sticky = new Permission(8, "Sticky", "Allows the user to make threads sticky.");
+$permission["thread_lock"] = new Permission(9, "Lock", "Allows the user to lock threads.");
 
-$create_posts = new Permission(9, "Create Posts", "Allows the user to create posts.", true);
-$edit_posts = new Permission(10, "Edit Posts", "Allows the user to create posts.");
-$edit_posts_any = new Permission(11, "Edit anyones Posts", "Allows the user to edit anyones posts. Excluding Admin posts");
-$delete_posts = new Permission(12, "Delete Posts", "Allows the user to delete posts.");
-$delete_posts_any = new Permission(13, "Delete anyones Posts", "Allows the user to delete posts. of any user Excluding Admin posts ");
+//Post Permissions
+$permission["post_create"] = $create_posts = new Permission(10, "Create Posts", "Allows the user to posts.", true);
+$permission["post_edit"] = $edit_posts = new Permission(11, "Edit Posts", "Allows the user to edit all posts.");
+$permission["post_delete"] = $delete_posts = new Permission(12, "Delete Posts", "Allows the user to delete posts.");
 
-$edit_siganture = new Permission(14, "Edit Signature", "Allows the user to edit their signature.");
+//Miscs
+$permission["signature_edit"] = $edit_siganture = new Permission(13, "Edit Signature", "Allows the user to edit their signature.");
+$permission["board_hide"] = new Permission(14, "View Hidden Board", "Allows the user to access hidden boards.");
 
-$view_Board_admin = new Permission(15, "View admin board", "Allows the user to see and post in the admin catergory.");
-$view_board_dev = new Permission(16, "View dev only board", "Allows the user to see and view the dev only category.");
 ?>

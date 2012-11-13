@@ -144,7 +144,7 @@ class ForumUser
 			}
 		}
 		
-		return $permission->default || hasPermission($permission, $element);
+		return $permission->default || hasPermission($user, $permission, $element);
 	}
 
 	public function isRead($post)
