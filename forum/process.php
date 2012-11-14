@@ -269,7 +269,7 @@ if(!empty($_POST["ajax"]) || !empty($_GET["ajax"]))
 			
 			if($user != null && $user instanceof ForumUser && !empty($data))
 			{
-				if($currentUser->hasPermission($edit_siganture))
+				if($currentUser->hasPermission($permission["signature_edit"]) || $currentUser->id == $user->id)
 				{
 					$user->editSignature($data, $con);
 					$successes[] = "Changed signature to: ".$data;

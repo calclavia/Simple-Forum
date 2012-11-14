@@ -324,7 +324,7 @@ class Thread extends ForumElement
 				 */
 				if ($user->hasPermission($permission["post_create"], $this) && $this->fields["LockThread"] != "yes")
 				{
-					$printContent .= $this->printNewPostForm($user);
+					$printContent .= $this->printNewPostForm($user, $currentPage);
 				}
 			}
 			else
@@ -338,7 +338,7 @@ class Thread extends ForumElement
 		}
 	}
 
-	public function printNewPostForm($user)
+	public function printNewPostForm($user, $currentPage = 1)
     {
     	return "
 		<div class='post'>
@@ -346,7 +346,7 @@ class Thread extends ForumElement
 			".$user->printProfile()."
 			<div class='comment_box'>
 				<div class='comment_inner'>
-					<form action='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&a=new' method='post'>
+					<form action='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page={$currentPage}&a=new' method='post'>
 						<textarea id='editableContentNewPost' name='editableContent' wrap=\"virtual\"></textarea><br />
 						<input type='submit' value='Post'/>
 					</form>

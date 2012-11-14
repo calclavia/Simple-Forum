@@ -68,7 +68,7 @@ if (!empty($_GET["p"]))
                 $category->createBoard($currentUser, clean($_POST["title"], true), clean($_POST["editableContent"], true))->save($con);
             }
 
-            $printContent .= $category->getCategory($currentUser);
+            $printContent .= $category->printCategory($currentUser);
         }
     }
 

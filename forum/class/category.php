@@ -123,9 +123,9 @@ class Category extends ForumElement
 
 	public function createBoard($user, $name, $description)
 	{
-		global $create_boards;
+		global $permission;
 
-		if ($user->hasPermission($create_boards))
+		if ($user->hasPermission($permission["board_create"]))
 		{
 			return new Board(-1, $this->id, -1, $name, $description, "no");
 		}
@@ -154,7 +154,7 @@ class Category extends ForumElement
 	 */
 	public function printCategory($user, $i)
 	{
-		global $edit_categories, $delete_categories, $create_boards;
+		global $permission, $edit_categories, $delete_categories, $create_boards;
 		
 		$categories = Category::getAll();
 
@@ -199,7 +199,7 @@ class Category extends ForumElement
 				$thisTitle
 				<div class='forum_menu'>";
 
-				if ($user->hasPermission($create_boards, $this))
+				if ($user->hasPermission($permission["board_create"], $this))
 				{
 					$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"btn_small btn_silver btn_flat\">+ Board</a> ";
 				}

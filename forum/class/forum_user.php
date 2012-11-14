@@ -99,13 +99,13 @@ class ForumUser
 
 			if ($row["ID"] <= 0 || empty($row))
 			{
-				$query = "INSERT INTO {$table_prefix}users (ID, Moderate, Unread, Posts, Signature) VALUES ({$this->id}, '".mysql_real_escape_string(serialize($this->moderate))."', '".mysql_real_escape_string(serialize($this->unreadPosts))."', {$this->posts}, '{$this->signature}')";
+				$query = "INSERT INTO {$table_prefix}users (ID, Moderate, Unread, Posts, Signature) VALUES ({$this->id}, '".mysql_real_escape_string(serialize($this->moderate))."', '".mysql_real_escape_string(serialize($this->unreadPosts))."', {$this->posts}, '".mysql_real_escape_string($this->signature)."')";
 				mysql_query($query, $con) or die("Failed to create user data: " . mysql_error() . ", Q = " . $query);
 				return true;
 			}
 			else
 			{
-				$query = "UPDATE {$table_prefix}users SET Moderate='".serialize($this->moderate)."', Unread='".serialize($this->unreadPosts)."', Posts={$this->posts}, Signature='{$this->signature}' WHERE ID={$this->id} LIMIT 1";
+				$query = "UPDATE {$table_prefix}users SET Moderate='".serialize($this->moderate)."', Unread='".serialize($this->unreadPosts)."', Posts={$this->posts}, Signature='".mysql_real_escape_string($this->signature)."' WHERE ID={$this->id} LIMIT 1";
 				mysql_query($query, $con) or die("Failed to save forum element: " . mysql_error() . ", Q = " . $query);
 				return true;
 			}
