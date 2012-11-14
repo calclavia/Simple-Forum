@@ -247,13 +247,13 @@ class Thread extends ForumElement
 	 */
 	public function printThreadContent($user, $currentPage = 1)
 	{
-		global $permission, $create_posts, $delete_posts, $edit_posts, $edit_threads, $edit_signature;
+		global $permission, $posts_per_page;
 		
 		if($currentPage <= 0) $currentPage = 1;
 		
 		if ($this != null)
 		{
-			if ($user->hasPermission($edit_threads, $this))
+			if ($user->hasPermission($permission["thread_edit"], $this))
 			{
 				$thisTitle = "
 				<h2 class='quick_edit' name='t{$this->getID()}' data-type='title' contenteditable='true'>
@@ -270,9 +270,9 @@ class Thread extends ForumElement
 				<br />
 				<div class=\"forum_menu\">";
 	
-			if ($user->hasPermission($create_posts, $this) && $this->fields["LockThread"] != "yes")
+			if ($user->hasPermission($permission["post_create"], $this) && $this->fields["LockThread"] != "yes")
 			{
-				$printContent .= "<a href = \"javascript:void(0)\" onclick = \"$('html, body').animate({scrollTop:  $(document).height()})\" class='tsc_awb_small tsc_awb_white tsc_flat'>+ Post</a>";
+				$printContent .= "<a href = \"javascript:void(0)\" onclick = \"$('html, body').animate({scrollTop:  $(document).height()})\" class='btn_small btn_silver btn_flat'>+ Post</a>";
 			}
 		
 			$printContent .= "</div><div class='clear'></div><div class='elements_container'>" . $this->getTreeAsString() ;
@@ -283,7 +283,7 @@ class Thread extends ForumElement
 				$posts = $this->getChildren();
 				
 				//Each page will contain 10 posts.
-				$pages = array_chunk($posts, 8);
+				$pages = array_chunk($posts, $posts_per_page);
 				
 				$i = 1;
 				
@@ -322,7 +322,7 @@ class Thread extends ForumElement
 				/**
 				 * Print out add new post form.
 				 */
-				if ($user->hasPermission($create_posts, $this) && $this->fields["LockThread"] != "yes")
+				if ($user->hasPermission($permission["post_create"], $this) && $this->fields["LockThread"] != "yes")
 				{
 					$printContent .= $this->printNewPostForm($user);
 				}

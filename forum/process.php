@@ -97,28 +97,6 @@ if (!empty($_GET["e"]))
 			}
 		}
 	}
-	else if (strstr($_GET["e"], "p"))
-	{
-		$post = Post::getByID(intval(str_replace("p", "", $_GET["e"])));
-		$content = clean($_GET["data"]);
-
-		if ($post != null)
-		{
-			$thread = Thread::getByID($post->fields["Parent"]);
-
-			if(!empty($content))
-			{
-				$post->edit($content, $currentUser, time());
-				$post->save($con);
-			}
-
-			if($thread != null)
-			{
-				$_GET["p"] = "t".$thread->getID();
-			}
-		}
-	}
-	
 
 }
 
@@ -269,6 +247,18 @@ if(!empty($_POST["ajax"]) || !empty($_GET["ajax"]))
 						$thread->save($con);
 					}
 				}
+			}
+		}
+		else if ($request_type == "post_edit")
+		{
+			$post = Post::getByID(intval($edit));
+			$data = clean($data);
+				
+			if ($post != null && !empty($data))
+			{		
+				$post->edit($data, $currentUser, time());
+				$post->save($con);
+				$successes[] = "Edited Post!";
 			}
 		}
 		else if ($request_type == "signature")

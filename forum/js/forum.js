@@ -72,6 +72,8 @@ function resultBlock(data)
 	$("#forum_notifications").fadeOut(10000);
 }
 
+var lastPostEditor;
+
 $(document).ready(function() {
 	
 	$('.process_edit').click(function(){
@@ -98,6 +100,37 @@ $(document).ready(function() {
 			});
 		}
 	});
+	
+	$('.post_edit').click(function(){
+		
+		if(lastPostEditor != null)
+		{
+			lastPostEditor.destroy();
+		}
+		
+		if($(this).hasClass('editing'))
+		{
+			$.ajax({
+				  type: "POST",
+				  url: "forum/process.php",
+				  dataType: 'json',
+				  data: { ajax: 'post_edit', e: $(this).data('forum-target'), data: $('#post_content_'+$(this).data('forum-target')).html() }
+				}).done(function( msg ) {
+					resultBlock(msg);
+			});
+			
+			$(this).html('Edit');
+			$(this).removeClass('editing');
+		}
+		else
+		{
+			lastPostEditor = CKEDITOR.replace('post_content_'+$(this).data('forum-target'), {height:'250', width: '548'});
+			$(this).html("Save");
+			$(this).addClass('editing');
+		}
+	});
+	
+	$('.post_edit_active')
 	
 	$('.draggable').hover(function(){
 		$(this).find('.dragText').stop(true, true).fadeIn('slow');

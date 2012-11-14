@@ -85,20 +85,6 @@ class Post extends ForumElement
     public function printPost($user, $postUser)
     {
     	global $permission;
-    	
-    	if ($user->hasPermission($permission["post_edit"], $this))
-    	{
-    		$editPost = "
-    		<div class='inlineEdit' style='margin-right:5px;' contenteditable='true'>
-				{$this->fields["Content"]}
-    		</div>
-    		<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?e=p{$this->getID()}&data='+$(this).prev('.inlineEdit').html()\" class='btn_small btn_white btn_flat'>Edit</a>
-    		<div class='clear'></div>";
-    	}
-    	else
-    	{
-    		$editPost = "<div>{$this->fields["Content"]}</div>";
-    	}
     	 
     	if($user->hasPermission($permission["signature_edit"], $this))
     	{
@@ -123,10 +109,15 @@ class Post extends ForumElement
 				$lastEdit = "Last edit: <b>".$editUser->username."</b>, ".date("F j, Y, g:i a", $this->fields["LastEditTime"]);
 			}
     	}
+    	
+    	if ($user->hasPermission($permission["post_edit"], $this))
+    	{
+    		$editPost = "<a href=\"javascript:void(0);\" data-forum-target=\"".$this->getID()."\" class=\"post_edit btn_small btn_white btn_flat\">Edit</a>";
+    	}
     		
     	if ($user->hasPermission($permission["post_delete"], $this))
     	{
-    		$removePost = "<a href='#' onclick=\"if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$this->fields["Parent"]}&d=p{$this->getID()}';}\" class=\"btn_small btn_white btn_flat\">Delete</a>";
+    		$removePost = "<a href=\"javascript:if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$this->fields["Parent"]}&d=p{$this->getID()}';}\" class=\"btn_small btn_white btn_flat\">Delete</a>";
     	}
     	
     	return "
@@ -136,9 +127,11 @@ class Post extends ForumElement
 			<div class='comment_box'>
 				<div class='comment_inner'>
 					<div class='forum_menu'>
+						$editPost
 						$removePost
 					</div>
-					$editPost
+					<div class='clear'></div>
+					<div id='post_content_".$this->getID()."'>{$this->fields["Content"]}</div>
 					<div class='hrline_silver'></div>
 					$editSignature
 					<span class='last_edit'>$lastEdit</span>

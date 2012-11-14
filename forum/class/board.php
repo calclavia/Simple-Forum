@@ -304,7 +304,7 @@ class Board extends ForumElement
      */
     public function printBoard($user)
     {
-    	global $edit_boards;
+    	global $posts_per_page, $permission;
     	
     	/**
 		 * Display the stats.
@@ -318,10 +318,11 @@ class Board extends ForumElement
     	if ($latestPost != null)
     	{
     		$latestPostUser = getUserByID($latestPost->fields["User"]);
+    		$thread = Thread::getByID($latestPost->fields["Parent"]);
     		
-    		if($latestPostUser != null)
+    		if($latestPostUser != null && $thread != null)
     		{
-    			$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t{$latestPost->fields["Parent"]}#".$latestPost->getID()."'>"
+    			$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t".$thread->getID()."&page=".ceil(count($thread->getPosts())/$posts_per_page)."#".$latestPost->getID()."'>"
     						. limitString($latestPost->name) .
     						"</a><br /> By: <b>" . limitString($latestPostUser->username, 20) . "</b>, " . $latestPost->getDate().".";
     		}
@@ -342,7 +343,7 @@ class Board extends ForumElement
     		$subBoards = "<ul>Sub-Boards: " . $subBoards. "</ul>";
     	}
     
-    	if($user->hasPermission($edit_boards, $this))
+    	if($user->hasPermission($permission['board_edit'], $this))
     	{
     		$dropData = "
     			class='draggable' draggable='true' ondragstart=\"drag(event, 'b{$this->getID()}')\"
@@ -381,9 +382,9 @@ class Board extends ForumElement
     
     public function printBoardContent($user)
     {
-    	global $create_boards, $edit_boards, $delete_boards, $create_threads;
+    	global $permission;
     
-    	if ($user->hasPermission($edit_boards, $this))
+    	if ($user->hasPermission($permission["board_edit"], $this))
     	{
     		$thisTitle = "
     		<div>
@@ -406,17 +407,17 @@ class Board extends ForumElement
     
     	$printContent .= $thisTitle."<div class=\"forum_menu\">";
     
-    	if ($user->hasPermission($create_threads, $this))
+    	if ($user->hasPermission($permission["thread_create"], $this))
     	{
     		$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newThread')\" class=\"btn_small btn_white btn_flat\">+ Thread </a> ";
         }
     
-        if ($user->hasPermission($create_boards, $this))
+        if ($user->hasPermission($permission["board_create"], $this))
         {
     		$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"btn_small btn_white btn_flat\">+ Board</a> ";
     	}
     
-    	if ($user->hasPermission($delete_boards, $this))
+    	if ($user->hasPermission($permission["board_delete"], $this))
     	{
     		$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=b{$this->getID()}' class=\"btn_small btn_white btn_flat\">Delete</a>";
     	}

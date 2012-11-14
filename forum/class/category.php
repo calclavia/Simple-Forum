@@ -172,14 +172,14 @@ class Category extends ForumElement
 										
 						if($categories[$i+1])
 						{
-							$thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i+1]->getID()}'\" class='tsc_awb_small tsc_awb_silver tsc_flat'>&darr;</a>";
+							$thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i+1]->getID()}'\" class='btn_small btn_silver btn_flat'>&darr;</a>";
 						}
 						
 						if($i > 1)
 						{
 							if($categories[$i-2])
 							{
-								$thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i-2]->getID()}'\" class='tsc_awb_small tsc_awb_silver tsc_flat'>&uarr;</a>";
+								$thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i-2]->getID()}'\" class='btn_small btn_silver btn_flat'>&uarr;</a>";
 							}
 						}
 						
@@ -201,12 +201,12 @@ class Category extends ForumElement
 
 				if ($user->hasPermission($create_boards, $this))
 				{
-					$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"tsc_awb_small tsc_awb_white tsc_flat\">+ Board</a> ";
+					$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"btn_small btn_silver btn_flat\">+ Board</a> ";
 				}
 
 				if ($user->hasPermission($delete_categories, $this))
 				{
-					$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$this->getID()}' class=\"tsc_awb_small tsc_awb_white tsc_flat\">Delete</a>";
+					$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$this->getID()}' class=\"btn_small btn_silver btn_flat\">Delete</a>";
 				}
 
 				$printContent .= "</div><div class='clear'></div>";
