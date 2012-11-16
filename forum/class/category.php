@@ -7,271 +7,271 @@
 class Category extends ForumElement
 {
 
-	function __construct($id, $name, $order, $hidden)
-	{
-		$this->id = $id;
-		$this->name = $name;
+    function __construct($id, $name, $order, $hidden)
+    {
+        $this->id = $id;
+        $this->name = $name;
 
-		$this->element_name = "categories";
-		$this->prefix = "c";
+        $this->element_name = "categories";
+        $this->prefix = "c";
 
-		$this->fields["ForumOrder"] = $order;
-		$this->fields["Hidden"] = $hidden;
-	}
+        $this->fields["ForumOrder"] = $order;
+        $this->fields["Hidden"] = $hidden;
+    }
 
-	public static function setUp($con)
-	{
-		global $table_prefix;
+    public static function setUp($con)
+    {
+        global $table_prefix;
 
-		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}categories (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), ForumOrder int, Hidden varchar(5))", $con) or die(mysql_error());
-	}
+        mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}categories (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), ForumOrder int, Hidden varchar(5))", $con) or die(mysql_error());
+    }
 
-	public static function getByID($id)
-	{
-		global $table_prefix;
+    public static function getByID($id)
+    {
+        global $table_prefix;
 
-		$result = mysql_query("SELECT * FROM {$table_prefix}categories WHERE ID={$id} LIMIT 1");
+        $result = mysql_query("SELECT * FROM {$table_prefix}categories WHERE ID={$id} LIMIT 1");
 
-		$row = mysql_fetch_array($result);
+        $row = mysql_fetch_array($result);
 
-		if ($row["ID"] <= 0)
-		{
-			return null;
-		}
-		else
-		{
-			return new Category($row["ID"], $row["Name"], $row["ForumOrder"], $row["Hidden"]);
-		}
-	}
+        if ($row["ID"] <= 0)
+        {
+            return null;
+        }
+        else
+        {
+            return new Category($row["ID"], $row["Name"], $row["ForumOrder"], $row["Hidden"]);
+        }
+    }
 
-	public static function getAll()
-	{
-		global $table_prefix;
+    public static function getAll()
+    {
+        global $table_prefix;
 
-		$returnArray = array();
+        $returnArray = array();
 
-		$result = mysql_query("SELECT * FROM {$table_prefix}categories");
+        $result = mysql_query("SELECT * FROM {$table_prefix}categories");
 
-		while ($row = mysql_fetch_array($result))
-		{
-			$returnArray[] = new Category($row["ID"], $row["Name"], $row["ForumOrder"], $row["Hidden"]);
-		}
+        while ($row = mysql_fetch_array($result))
+        {
+            $returnArray[] = new Category($row["ID"], $row["Name"], $row["ForumOrder"], $row["Hidden"]);
+        }
 
-		usort($returnArray, function($a, $b)
-		{
-			if ($a->fields["ForumOrder"] == $b->fields["ForumOrder"] || $a->fields["ForumOrder"] == -1)
-			{
-				return -1;
-			}
+        usort($returnArray, function($a, $b)
+                {
+                    if ($a->fields["ForumOrder"] == $b->fields["ForumOrder"] || $a->fields["ForumOrder"] == -1)
+                    {
+                        return -1;
+                    }
 
-			if ($b->fields["ForumOrder"] == $a->getID())
-			{
-				return -1;
-			}
+                    if ($b->fields["ForumOrder"] == $a->getID())
+                    {
+                        return -1;
+                    }
 
-			return 1;
-		});
+                    return 1;
+                });
 
-		return $returnArray;
-	}
+        return $returnArray;
+    }
 
-	public function getChildren()
-	{
-		global $table_prefix;
+    public function getChildren()
+    {
+        global $table_prefix;
 
-		$returnArray = array();
+        $returnArray = array();
 
-		$result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='no'");
+        $result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='no'");
 
-		while ($row = mysql_fetch_array($result))
-		{
-			$returnArray[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
-		}
-		
-		usort($returnArray, function($a, $b)
-		{
-			if ($a->fields["ForumOrder"] == $b->fields["ForumOrder"] || $a->fields["ForumOrder"] == -1)
-			{
-				return -1;
-			}
-		
-			if ($b->fields["ForumOrder"] == $a->getID())
-			{
-				return -1;
-			}
-		
-			return 1;
-		});
+        while ($row = mysql_fetch_array($result))
+        {
+            $returnArray[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
+        }
 
-		return $returnArray;
-	}
+        usort($returnArray, function($a, $b)
+                {
+                    if ($a->fields["ForumOrder"] == $b->fields["ForumOrder"] || $a->fields["ForumOrder"] == -1)
+                    {
+                        return -1;
+                    }
 
-	public function edit($user, $title, $con = null)
-	{
-		global $edit_categories;
+                    if ($b->fields["ForumOrder"] == $a->getID())
+                    {
+                        return -1;
+                    }
 
-		if ($user->hasPermission($edit_categories))
-		{
-			$this->name = $title;
-		}
+                    return 1;
+                });
 
-		if($con != null)
-		{
-			$this->save($con);
-		}
-	}
+        return $returnArray;
+    }
 
-	public function createBoard($user, $name, $description)
-	{
-		global $permission;
+    public function edit($user, $title, $con = null)
+    {
+        global $edit_categories;
 
-		if ($user->hasPermission($permission["board_create"]))
-		{
-			return new Board(-1, $this->id, -1, $name, $description, "no");
-		}
+        if ($user->hasPermission($edit_categories))
+        {
+            $this->name = $title;
+        }
 
-		return null;
-	}
+        if ($con != null)
+        {
+            $this->save($con);
+        }
+    }
 
-	public function move($user, $id, $con)
-	{
-		global $edit_categories;
+    public function createBoard($user, $name, $description)
+    {
+        global $permission;
 
-		if($user->hasPermission($edit_categories, $this))
-		{
-			if ($id == $this->id)
-			{
-				$id = -1;
-			}
+        if ($user->hasPermission($permission["board_create"]))
+        {
+            return new Board(-1, $this->id, -1, $name, $description, "no");
+        }
 
-			$this->fields["ForumOrder"] = $id;
-			$this->save($con);
-		}
-	}
+        return null;
+    }
 
-	/**
-	 * @return string - The HTML content.
-	 */
-	public function printCategory($user, $i)
-	{
-		global $permission, $edit_categories, $delete_categories, $create_boards;
-		
-		$categories = Category::getAll();
+    public function move($user, $id, $con)
+    {
+        global $edit_categories;
 
-		if ($this != null)
-		{
-			if ($this->fields["Hidden"] != "yes")
-			{
-				if ($user->hasPermission($edit_categories, $this))
-				{
-					$thisTitle = "
+        if ($user->hasPermission($edit_categories, $this))
+        {
+            if ($id == $this->id)
+            {
+                $id = -1;
+            }
+
+            $this->fields["ForumOrder"] = $id;
+            $this->save($con);
+        }
+    }
+
+    /**
+     * @return string - The HTML content.
+     */
+    public function printCategory($user, $i)
+    {
+        global $permission, $edit_categories, $delete_categories, $create_boards;
+
+        $categories = Category::getAll();
+
+        if ($this != null)
+        {
+            if ($this->fields["Hidden"] != "yes")
+            {
+                if ($user->hasPermission($edit_categories, $this))
+                {
+                    $thisTitle = "
 					<div>
 						<h2 class='quick_edit' name='c{$this->getID()}' data-type='ajax' style='display:inline; margin-right:5px;' contenteditable='true'>
 							{$this->name}
-						</h2>";			
-										
-						if($categories[$i+1])
-						{
-							$thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i+1]->getID()}'\" class='btn_small btn_silver btn_flat'>&darr;</a>";
-						}
-						
-						if($i > 1)
-						{
-							if($categories[$i-2])
-							{
-								$thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i-2]->getID()}'\" class='btn_small btn_silver btn_flat'>&uarr;</a>";
-							}
-						}
-						
-					$thisTitle .= "</div><div class='clear'></div>";
-				}
-				else
-				{
-					$thisTitle = "
+						</h2>";
+
+                    if ($categories[$i + 1])
+                    {
+                        $thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i + 1]->getID()}'\" class='btn_small btn_silver btn_flat'>&darr;</a>";
+                    }
+
+                    if ($i > 1)
+                    {
+                        if ($categories[$i - 2])
+                        {
+                            $thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i - 2]->getID()}'\" class='btn_small btn_silver btn_flat'>&uarr;</a>";
+                        }
+                    }
+
+                    $thisTitle .= "</div><div class='clear'></div>";
+                }
+                else
+                {
+                    $thisTitle = "
 						<div id='c{$this->getID()}'>
 							<h2 id='category{$this->getID()}' style='display:inline'>{$this->name}</h2>
 						</div>
 						";
-				}
-					
-				$printContent = "
+                }
+
+                $printContent = "
 				<div style='margin-bottom: 15px;'>
 				$thisTitle
 				<div class='forum_menu'>";
 
-				if ($user->hasPermission($permission["board_create"], $this))
-				{
-					$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"btn_small btn_silver btn_flat\">+ Board</a> ";
-				}
+                if ($user->hasPermission($permission["board_create"], $this))
+                {
+                    $printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"btn_small btn_silver btn_flat\">+ Board</a> ";
+                }
 
-				if ($user->hasPermission($delete_categories, $this))
-				{
-					$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$this->getID()}' class=\"btn_small btn_silver btn_flat\">Delete</a>";
-				}
+                if ($user->hasPermission($delete_categories, $this))
+                {
+                    $printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$this->getID()}' class=\"btn_small btn_silver btn_flat\">Delete</a>";
+                }
 
-				$printContent .= "</div><div class='clear'></div>";
+                $printContent .= "</div><div class='clear'></div>";
 
-				$printContent .= "<div class='elements_container'>";
+                $printContent .= "<div class='elements_container'>";
 
-				if (count($this->getChildren()) > 0)
-				{
-					foreach ($this->getChildren() as $board)
-					{
-						$printContent .= $board->printBoard($user);
-					}
-				}
-				else
-				{
-					$printContent .= "No boards avaliable.";
-				}
+                if (count($this->getChildren()) > 0)
+                {
+                    foreach ($this->getChildren() as $board)
+                    {
+                        $printContent .= $board->printBoard($user);
+                    }
+                }
+                else
+                {
+                    $printContent .= "No boards avaliable.";
+                }
 
-				$printContent .= "</div>";
+                $printContent .= "</div>";
 
-				if ($user->hasPermission($create_boards))
-				{
-					$printContent .= $this->printNewBoardForm();
-				}
+                if ($user->hasPermission($create_boards))
+                {
+                    $printContent .= $this->printNewBoardForm();
+                }
 
 
-				return $printContent."</div>";
-			}
-		}
-	}
-	
-	/**
-	 * Returns all categories
-	 * @return string - The HTML content.
-	 */
-	public static function printAll($user)
-	{
-		global $create_categories;
+                return $printContent . "</div>";
+            }
+        }
+    }
 
-		$printContent = "";
+    /**
+     * Returns all categories
+     * @return string - The HTML content.
+     */
+    public static function printAll($user)
+    {
+        global $create_categories;
 
-		if ($user->hasPermission($create_categories))
-		{
-			$printContent .= "
+        $printContent = "";
+
+        if ($user->hasPermission($create_categories))
+        {
+            $printContent .= "
 				<div class='forum_menu'>
 					<form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
 						<input type='text' name='title'>
 						<input type='submit' value='Add Category'>
 					</form>
 				</div><br />";
-		}
+        }
 
-		$categories = Category::getAll();
+        $categories = Category::getAll();
 
-		for ($i = 0; $i < count($categories); $i++)
-		{
-			$printContent .= $categories[$i]->printCategory($user, $i);
-		}
-		
-		return $printContent;
-	}
-	
-	public function printNewBoardForm()
-	{
-		return "
+        for ($i = 0; $i < count($categories); $i++)
+        {
+            $printContent .= $categories[$i]->printCategory($user, $i);
+        }
+
+        return $printContent;
+    }
+
+    public function printNewBoardForm()
+    {
+        return "
 		<div id='newBoard{$this->getID()}' class='white_content'>
 			<h1>New Board</h1>
 			<form action='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&a=new' method='post'>
@@ -287,7 +287,8 @@ class Category extends ForumElement
 				<input type='submit' value='Post'/>					
 			</form>
 		</div>";
-	}
+    }
+
 }
 
 ?>

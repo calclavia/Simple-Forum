@@ -106,15 +106,15 @@ abstract class ForumElement
                 $child->delete($con);
             }
         }
-        
-        if($this instanceof Post)
+
+        if ($this instanceof Post)
         {
-        	$user = getUserByID($this->fields["User"]);
-        	
-        	if($user != null)
-        	{
-        		$user->unmoderate($this);
-        	}
+            $user = getUserByID($this->fields["User"]);
+
+            if ($user != null)
+            {
+                $user->unmoderate($this);
+            }
         }
 
         mysql_query("DELETE FROM {$table_prefix}{$this->element_name} WHERE ID={$this->id} LIMIT 1");

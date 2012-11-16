@@ -10,7 +10,7 @@ class Permission
 
     function __construct($id, $name, $description, $default = false)
     {
-    	$this->$id = $id;
+        $this->$id = $id;
         $this->name = $name;
         $this->description = $description;
         $this->default = $default;
@@ -44,5 +44,4 @@ $permission["post_delete"] = $delete_posts = new Permission(12, "Delete Posts", 
 //Miscs
 $permission["signature_edit"] = $edit_siganture = new Permission(13, "Edit Signature", "Allows the user to edit their signature.");
 $permission["board_hide"] = new Permission(14, "View Hidden Board", "Allows the user to access hidden boards.");
-
 ?>

@@ -1,4 +1,5 @@
 <?php
+
 require_once("models/config.php");
 require_once("forum/config.php");
 
@@ -9,12 +10,12 @@ $printContent = "";
  */
 if (!empty($_GET["p"]))
 {
-    if(strstr($_GET["p"], "p"))
+    if (strstr($_GET["p"], "p"))
     {
-    	$post = Post::getByID(intval(str_replace("p", "", $_GET["p"])));
-    	$_GET["p"] = "t".$post->fields["Parent"];
+        $post = Post::getByID(intval(str_replace("p", "", $_GET["p"])));
+        $_GET["p"] = "t" . $post->fields["Parent"];
     }
-    
+
     if (strstr($_GET["p"], "b"))
     {
         $board = Board::getByID(intval(str_replace("b", "", $_GET["p"])));
@@ -46,7 +47,7 @@ if (!empty($_GET["p"]))
         {
             if ($_GET["a"] == "new" && $_POST["editableContent"])
             {
-                $post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);                
+                $post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);
             }
 
             $printContent .= $thread->printThreadContent($currentUser, intval($_GET["page"]));

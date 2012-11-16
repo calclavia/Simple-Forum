@@ -61,21 +61,21 @@ class Post extends ForumElement
 
     public function edit($newContent, $user, $time)
     {
-    	global $edit_posts;
-    	
-    	if($user->hasPermission($edit_posts, $this))
-    	{
-    		$this->fields["Content"] = $newContent;
-    		$this->fields["LastEditUser"] = $user->id;
-    		$this->fields["LastEditTime"] = $time;
-    	}
+        global $edit_posts;
+
+        if ($user->hasPermission($edit_posts, $this))
+        {
+            $this->fields["Content"] = $newContent;
+            $this->fields["LastEditUser"] = $user->id;
+            $this->fields["LastEditTime"] = $time;
+        }
     }
 
     public function isUnread($user)
     {
-    	return !$user->isRead($this);
+        return !$user->isRead($this);
     }
-    
+
     /**
      * 
      * @param unknown $user - Current User
@@ -84,46 +84,46 @@ class Post extends ForumElement
      */
     public function printPost($user, $postUser)
     {
-    	global $permission;
-    	 
-    	if($user->hasPermission($permission["signature_edit"], $this))
-    	{
-			$editSignature = "
+        global $permission;
+
+        if ($user->hasPermission($permission["signature_edit"], $this))
+        {
+            $editSignature = "
 			<div class='forum_signature quick_edit' name='{$postUser->id}' data-type='signature' contenteditable='true'>
 				{$postUser->signature}
 			</div>";
-		}
-		else
-		{
-			$editSignature = "<div class='forum_signature'>{$postUser->signature}</div>";
-		}
-		 
-		$lastEdit = "";
-		 
-		if($this->fields["LastEditTime"] > 0 && !empty($this->fields["LastEditUser"]))
-		{
-			$editUser = getUserByID($this->fields["LastEditUser"]);
+        }
+        else
+        {
+            $editSignature = "<div class='forum_signature'>{$postUser->signature}</div>";
+        }
 
-			if($editUser != null)
-			{
-				$lastEdit = "Last edit: <b>".$editUser->username."</b>, ".date("F j, Y, g:i a", $this->fields["LastEditTime"]);
-			}
-    	}
-    	
-    	if ($user->hasPermission($permission["post_edit"], $this))
-    	{
-    		$editPost = "<a href=\"javascript:void(0);\" data-forum-target=\"".$this->getID()."\" class=\"post_edit btn_small btn_white btn_flat\">Edit</a>";
-    	}
-    		
-    	if ($user->hasPermission($permission["post_delete"], $this))
-    	{
-    		$removePost = "<a href=\"javascript:if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$this->fields["Parent"]}&d=p{$this->getID()}';}\" class=\"btn_small btn_white btn_flat\">Delete</a>";
-    	}
-    	
-    	return "
+        $lastEdit = "";
+
+        if ($this->fields["LastEditTime"] > 0 && !empty($this->fields["LastEditUser"]))
+        {
+            $editUser = getUserByID($this->fields["LastEditUser"]);
+
+            if ($editUser != null)
+            {
+                $lastEdit = "Last edit: <b>" . $editUser->username . "</b>, " . date("F j, Y, g:i a", $this->fields["LastEditTime"]);
+            }
+        }
+
+        if ($user->hasPermission($permission["post_edit"], $this))
+        {
+            $editPost = "<a href=\"javascript:void(0);\" data-forum-target=\"" . $this->getID() . "\" class=\"post_edit btn_small btn_white btn_flat\">Edit</a>";
+        }
+
+        if ($user->hasPermission($permission["post_delete"], $this))
+        {
+            $removePost = "<a href=\"javascript:if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$this->fields["Parent"]}&d=p{$this->getID()}';}\" class=\"btn_small btn_white btn_flat\">Delete</a>";
+        }
+
+        return "
 		<div class='post'>
-			<a id='".$this->getID()."'></a>
-			".$postUser->printProfile()."
+			<a id='" . $this->getID() . "'></a>
+			" . $postUser->printProfile() . "
 			<div class='comment_box'>
 				<div class='comment_inner'>
 					<div class='forum_menu'>
@@ -131,7 +131,7 @@ class Post extends ForumElement
 						$removePost
 					</div>
 					<div class='clear'></div>
-					<div id='post_content_".$this->getID()."'>{$this->fields["Content"]}</div>
+					<div id='post_content_" . $this->getID() . "'>{$this->fields["Content"]}</div>
 					<div class='hrline_silver'></div>
 					$editSignature
 					<span class='last_edit'>$lastEdit</span>

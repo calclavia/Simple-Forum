@@ -1,73 +1,73 @@
 /**
  * Breadcrumbs Navigation
- */
+*/
 .breadcrumb {
-	overflow: hidden;
-	width: 100%;
-	list-style-type: none;
-	padding: 0;
+    overflow: hidden;
+    width: 100%;
+    list-style-type: none;
+    padding: 0;
 }
 
 .breadcrumb ul {
-	list-style-type: none;
-	padding: 0;
-	margin: 0;
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
 }
 
 .breadcrumb li {
-	float: left;
-	margin: 0 .45em 0 1em;
+    float: left;
+    margin: 0 .45em 0 1em;
 }
 
 .breadcrumb a {
-	background: #ddd;
-	padding: .7em 1em;
-	float: left;
-	text-decoration: none;
-	color: #444;
-	text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
-	position: relative;
+    background: #ddd;
+    padding: .7em 1em;
+    float: left;
+    text-decoration: none;
+    color: #444;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .5);
+    position: relative;
 }
 
 .breadcrumb a:hover {
-	background: #99db76;
+    background: #99db76;
 }
 
 .breadcrumb a::before {
-	content: "";
-	position: absolute;
-	top: 50%;
-	margin-top: -1.5em;
-	border-width: 1.5em 0 1.5em 1em;
-	border-style: solid;
-	border-color: #ddd #ddd #ddd transparent;
-	left: -1em;
+    content: "";
+    position: absolute;
+    top: 50%;
+    margin-top: -1.5em;
+    border-width: 1.5em 0 1.5em 1em;
+    border-style: solid;
+    border-color: #ddd #ddd #ddd transparent;
+    left: -1em;
 }
 
 .breadcrumb a:hover::before {
-	border-color: #99db76 #99db76 #99db76 transparent;
+    border-color: #99db76 #99db76 #99db76 transparent;
 }
 
 .breadcrumb a::after {
-	content: "";
-	position: absolute;
-	top: 50%;
-	margin-top: -1.5em;
-	border-top: 1.5em solid transparent;
-	border-bottom: 1.5em solid transparent;
-	border-left: 1em solid #ddd;
-	right: -1em;
+    content: "";
+    position: absolute;
+    top: 50%;
+    margin-top: -1.5em;
+    border-top: 1.5em solid transparent;
+    border-bottom: 1.5em solid transparent;
+    border-left: 1em solid #ddd;
+    right: -1em;
 }
 
 .breadcrumb a:hover::after {
-	border-left-color: #99db76;
+    border-left-color: #99db76;
 }
 
 .breadcrumb .current,.breadcrumb .current:hover {
-	font-weight: bold;
-	background: none;
+    font-weight: bold;
+    background: none;
 }
 
 .breadcrumb .current::after,.breadcrumb .current::before {
-	content: normal;
+    content: normal;
 }
