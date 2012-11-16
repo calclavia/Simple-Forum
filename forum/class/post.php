@@ -17,7 +17,8 @@ class Post extends ForumElement
 
         $this->fields["Parent"] = $parent;
         $this->fields["User"] = $userID;
-        $this->fields["Content"] = stripslashes(str_replace("\\r\\n", "", $content));
+        $this->fields["Content"] = str_replace("\\r\\n", "", $content);
+        //$this->fields["Content"] = stripslashes("Â", "", str_replace(str_replace("\\r\\n", "", $content)));
         $this->fields["Time"] = $time;
         $this->fields["LastEditTime"] = $lastEditTime;
         $this->fields["LastEditUser"] = $lastEditUser;
@@ -120,26 +121,33 @@ class Post extends ForumElement
             $removePost = "<a href=\"javascript:if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$this->fields["Parent"]}&d=p{$this->getID()}';}\" class=\"btn_small btn_white btn_flat\">Delete</a>";
         }
 
+        if ($user->hasPermission($permission["post_create"], $this))
+        {
+            $quotePost = "<a href=\"javascript: postEditor.insertHtml('<blockquote>'+$('#post_content_" . $this->getID() . "').html()+'<cite>Quoted from {$postUser->username}</cite>
+                </blockquote><p></p>');\" class=\"btn_small btn_white btn_flat\">Quote</a>";
+        }
+
         return "
-		<div class='post'>
-			<a id='" . $this->getID() . "'></a>
-			" . $postUser->printProfile() . "
-			<div class='comment_box'>
-				<div class='comment_inner'>
-					<div class='forum_menu'>
-						$editPost
-						$removePost
-					</div>
-					<div class='clear'></div>
-					<div id='post_content_" . $this->getID() . "'>{$this->fields["Content"]}</div>
-					<div class='hrline_silver'></div>
-					$editSignature
-					<span class='last_edit'>$lastEdit</span>
-					<span class='date'>{$this->getDate()}</span>
-				</div>
-			</div>
-		</div>
-		<div class='clear'></div>";
+            <div class='post'>
+                <a id='" . $this->getID() . "'></a>
+                " . $postUser->printProfile() . "
+                <div class='comment_box'>
+                    <div class='comment_inner'>
+                        <div class='forum_menu'>
+                            $quotePost
+                            $editPost
+                            $removePost
+                        </div>
+                        <div class='clear'></div>
+                        <div id='post_content_" . $this->getID() . "'>{$this->fields["Content"]}</div>
+                        <div class='hrline_silver'></div>
+                        $editSignature
+                        <span class='last_edit'>$lastEdit</span>
+                        <span class='date'>{$this->getDate()}</span>
+                    </div>
+                </div>
+            </div>
+            <div class='clear'></div>";
     }
 
 }

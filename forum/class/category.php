@@ -164,40 +164,39 @@ class Category extends ForumElement
             {
                 if ($user->hasPermission($edit_categories, $this))
                 {
-                    $thisTitle = "
-					<div>
-						<h2 class='quick_edit' name='c{$this->getID()}' data-type='ajax' style='display:inline; margin-right:5px;' contenteditable='true'>
-							{$this->name}
-						</h2>";
+                    $title = "
+                        <div class='category_title'>
+                            <h2 class='quick_edit' name='c{$this->getID()}' data-type='ajax' style='display:inline; margin-right:5px;' contenteditable='true'>
+                                    {$this->name}
+                            </h2>";
 
                     if ($categories[$i + 1])
                     {
-                        $thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i + 1]->getID()}'\" class='btn_small btn_silver btn_flat'>&darr;</a>";
+                        $title .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i + 1]->getID()}'\" class='btn_small btn_silver btn_flat'>&darr;</a>";
                     }
 
                     if ($i > 1)
                     {
                         if ($categories[$i - 2])
                         {
-                            $thisTitle .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i - 2]->getID()}'\" class='btn_small btn_silver btn_flat'>&uarr;</a>";
+                            $title .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i - 2]->getID()}'\" class='btn_small btn_silver btn_flat'>&uarr;</a>";
                         }
                     }
 
-                    $thisTitle .= "</div><div class='clear'></div>";
+                    $title .= "</div>";
                 }
                 else
                 {
-                    $thisTitle = "
-						<div id='c{$this->getID()}'>
-							<h2 id='category{$this->getID()}' style='display:inline'>{$this->name}</h2>
-						</div>
-						";
+                    $title = "
+                        <div id='c{$this->getID()}'>
+                                <h2 id='category{$this->getID()}' class='category_title'>{$this->name}</h2>
+                        </div>";
                 }
-
+                
                 $printContent = "
-				<div style='margin-bottom: 15px;'>
-				$thisTitle
-				<div class='forum_menu'>";
+                    <div style='margin-bottom: 15px;'>
+                        <div class='elements_container'>
+                            <span class='forum_menu'>";
 
                 if ($user->hasPermission($permission["board_create"], $this))
                 {
@@ -209,9 +208,7 @@ class Category extends ForumElement
                     $printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$this->getID()}' class=\"btn_small btn_silver btn_flat\">Delete</a>";
                 }
 
-                $printContent .= "</div><div class='clear'></div>";
-
-                $printContent .= "<div class='elements_container'>";
+                $printContent .= "</span>$title<div class='clear'></div>";
 
                 if (count($this->getChildren()) > 0)
                 {
@@ -231,8 +228,7 @@ class Category extends ForumElement
                 {
                     $printContent .= $this->printNewBoardForm();
                 }
-
-
+                
                 return $printContent . "</div>";
             }
         }
@@ -248,17 +244,6 @@ class Category extends ForumElement
 
         $printContent = "";
 
-        if ($user->hasPermission($create_categories))
-        {
-            $printContent .= "
-				<div class='forum_menu'>
-					<form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
-						<input type='text' name='title'>
-						<input type='submit' value='Add Category'>
-					</form>
-				</div><br />";
-        }
-
         $categories = Category::getAll();
 
         for ($i = 0; $i < count($categories); $i++)
@@ -272,21 +257,21 @@ class Category extends ForumElement
     public function printNewBoardForm()
     {
         return "
-		<div id='newBoard{$this->getID()}' class='white_content'>
-			<h1>New Board</h1>
-			<form action='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&a=new' method='post'>
-				<table>
-					<tr><td>
-					<b>Title:</b>
-					</td><td>
-					<input type='text' name='title' size='80' maxlength='80'/>
-					</td></tr>
-				</table>
-				<textarea id='editableContentNewBoard{$this->getID()}' name='editableContent' wrap=\"virtual\" style=\"width:550px; height:200px\"></textarea>
-				<br />
-				<input type='submit' value='Post'/>					
-			</form>
-		</div>";
+            <div id='newBoard{$this->getID()}' class='white_content'>
+                    <h1>New Board</h1>
+                    <form action='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&a=new' method='post'>
+                            <table>
+                                    <tr><td>
+                                    <b>Title:</b>
+                                    </td><td>
+                                    <input type='text' name='title' size='80' maxlength='80'/>
+                                    </td></tr>
+                            </table>
+                            <textarea id='editableContentNewBoard{$this->getID()}' name='editableContent' wrap=\"virtual\" style=\"width:550px; height:200px\"></textarea>
+                            <br />
+                            <input type='submit' value='Post'/>					
+                    </form>
+            </div>";
     }
 
 }

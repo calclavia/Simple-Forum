@@ -373,9 +373,8 @@ class Board extends ForumElement
 	    				$subBoards
 	    			</div>
 	    		</div>
+                        <div class='clear'></div>
 	    	</div>
-	    	<div class='clear'></div>
-	    	<div class='hrline_silver'></div>
 	    	";
     }
 

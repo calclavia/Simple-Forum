@@ -176,6 +176,30 @@
     font-weight: bold;
 }
 
+.forum .notification
+{
+    display:none;
+    max-height: 100px;
+}
+
+.forum blockquote
+{
+    font-size: 14px;
+	background-color: #F3F3F3;
+	margin: 20px 0;
+	padding: 5px 7px 10px 45px;
+	display: inline-block;
+	margin-right: 4%;
+	background-image: url(img/blockquotes.png) !important;
+	background-repeat: no-repeat;
+	background-position: 7px 6px;
+}
+
+.forum blockquote a
+{
+    color:#111 !important;
+}
+
 .forum_menu {
     float: right;
     margin-bottom: 8px;
@@ -197,25 +221,39 @@
 /**
  * Forum Elements
 */
-.forum_element {
+.forum_element
+{
     color: #000000;
 }
 
-.forum_element_info {
+.forum_element_info
+{
     font-size: 13px;
     font-weight: lighter;
     color: #424242;
 }
 
-.forum .element_title {
+.forum .element_title
+{
     font-size: 20px;
     font-weight: bold;
     display: inline;
     padding-top: 8px;
 }
 
-.forum .forum_element .element_text {
+.forum .forum_element .element_text
+{
     font-size: 15px;
+}
+
+/**
+ * Category
+*/
+
+.forum .category_title
+{
+    padding-left: 15px;
+    padding-top: 15px;
 }
 
 /**
@@ -251,22 +289,25 @@
 .forum .page_numbers {
     padding: 10px;
     margin: 0px auto;
-    width: 400;
+    width: 400px;
 }
 
 /**
  * Threads
 */
-.thread_wrapper {
-    margin: 0px;
+.thread_wrapper
+
+margin: 0px;
 }
 
-.thread_wrapper .forum_element {
+.thread_wrapper .forum_element
+{
     padding: 0px 10px;
-    height: 55px;
+    height: 70px;
 }
 
-.thread_wrapper .element_title {
+.thread_wrapper .element_title
+{
     font-size: 18px;
     display: inline;
 }
@@ -279,7 +320,8 @@
     background-color: inherit;
 }
 
-.forum .forum_element .thread_content {
+.forum .forum_element .thread_content
+{
     margin-top: 4%;
     margin-left: 20px;
     margin-bottom: 5px;
@@ -288,35 +330,41 @@
 /**
  * Posts
 */
-.post {
+.post
+{
     margin-bottom: 16px;
     color: black;
     padding: 10px;
 }
 
-.post .forum_profile {
+.post .forum_profile
+{
     float: left;
     text-align: center;
 }
 
-.post .forum_profile .profile_info {
+.post .forum_profile .profile_info
+{
     padding-left: 5px;
 }
 
-.post .avatar {
+.post .avatar
+{
     background: #fff;
     padding: 2px;
     border: 1px solid #d8d8d8;
     position: relative;
 }
 
-.post .username {
+.post .username
+{
     color: #383838;
     font-weight: bold;
     clear: left;
 }
 
-.post .comment_box {
+.post .comment_box
+{
     float: right;
     padding-bottom: 8px;
     height: auto;
@@ -326,7 +374,8 @@
     width: 75%;
 }
 
-.post .comment_box:before {
+.post .comment_box:before
+{
     content: '';
     width: 15px;
     height: 15px;
@@ -343,17 +392,20 @@
     -o-transform: rotate(45deg);
 }
 
-.post .comment_inner {
+.post .comment_inner
+{
     color: #454545;
     line-height: 14px;
     margin: 4px 10px 0 15px;
 }
 
-.post .comment_inner:focus {
+.post .comment_inner:focus
+{
     outline: none;
 }
 
-.post .last_edit {
+.post .last_edit
+{
     font-size: 11px;
     color: #b7b7b7;
     text-decoration: none;
@@ -362,7 +414,8 @@
     float: left;
 }
 
-.post .date {
+.post .date
+{
     font-size: 11px;
     color: #b7b7b7;
     margin-top: 8px;
@@ -370,7 +423,8 @@
     float: right;
 }
 
-.post .forum_signature {
+.post .forum_signature
+{
     max-height: 145;
     overflow: hidden;
 }

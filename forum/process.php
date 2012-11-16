@@ -156,12 +156,13 @@ if (!empty($_GET["d"]))
     die();
 }
 
+$request_type = $_POST["ajax"];
+
 /**
  * If this is an Ajax request, then print out the results.
  */
-if (!empty($_POST["ajax"]) || !empty($_GET["ajax"]))
+if (!empty($request_type))
 {
-    $request_type = $_POST["ajax"];
 
     require_once("../models/config.php");
     require_once("config.php");
@@ -198,6 +199,7 @@ if (!empty($_POST["ajax"]) || !empty($_GET["ajax"]))
         }
         else if (strstr($edit, "b"))
         {
+            $data = clean($data, true);
             $board = Board::getByID(intval(str_replace("b", "", $edit)));
 
             if ($board != null && !empty($data))

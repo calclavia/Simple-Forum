@@ -90,23 +90,37 @@ else
     $printContent .= Category::printAll($currentUser);
 }
 
-$content = "<div class='forum'>
-				<div id='forum_notifications' class='notification' style='display:none; max-height: 100px;'></div>
-                <span style='float:right'>Current Time: " . date("F j, Y, g:i a", time()) . "</span><br />" . $printContent . "</span>
-               	<div style='clear'></div>
-           </div>			
-           <br/><br/>
-           <div id='fade' class='black_overlay' onclick=\"closeLightBox()\"></div>";
+if ($currentUser->hasPermission($create_categories))
+{
+    $newCategory .= "
+        <span class='forum_menu'>
+            <form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
+                    <input type='text' name='title'>
+                    <input type='submit' value='Add Category'>
+            </form>
+        </span>";
+}
+
+$content = "
+        <div class='forum'>
+            <div id='forum_notifications' class='notification'></div>
+            <span>Current Time: " . date("F j, Y, g:i a", time()) . "</span>
+            $newCategory
+            <div style='clear'></div><br />
+            " . $printContent . "
+            </div>			
+        <br/><br/>
+        <div id='fade' class='black_overlay' onclick=\"closeLightBox()\"></div>";
 
 /**
  * Include this in your header.
  */
 $head = "
-		<link href=\"forum/css/button.css\" rel=\"stylesheet\" type=\"text/css\" />
-		<link href=\"forum/css/breadcrum.css\" rel=\"stylesheet\" type=\"text/css\" />
-		<link href=\"forum/css/pagination.css\" rel=\"stylesheet\" type=\"text/css\" />
-		<link href=\"forum/css/forum.css\" rel=\"stylesheet\" type=\"text/css\" />
-		<script type='text/javascript' src='forum/js/forum.js'></script>";
+        <link href=\"forum/css/button.css\" rel=\"stylesheet\" type=\"text/css\" />
+        <link href=\"forum/css/breadcrum.css\" rel=\"stylesheet\" type=\"text/css\" />
+        <link href=\"forum/css/pagination.css\" rel=\"stylesheet\" type=\"text/css\" />
+        <link href=\"forum/css/forum.css\" rel=\"stylesheet\" type=\"text/css\" />
+        <script type='text/javascript' src='forum/js/forum.js'></script>";
 
 /**
  * Echo the variable $head in your head and $content in the place where you have your main body.

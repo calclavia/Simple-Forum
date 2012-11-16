@@ -220,24 +220,23 @@ class Thread extends ForumElement
         }
 
         return "
-			<div class='thread_wrapper " . ($this->isUnread($user) ? "thread_unread" : "thread_normal" ) . "'>
-	    		<div class='forum_element'>
-					<div class='two_third'>
-						<div class='thread_content'>
-							<h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a></h3>
-						    <div class='forum_element_info'>
-						    	$thisOwner, {$this->getFirstPost()->getDate()}
-						    </div>
-						</div>
-					</div>
-					<div class='forum_element_info one_third column-last'>
-						<p>$printLatestPost <br/> $stats</p>
-					</div>
-				</div>
-				<div class='clear'></div>
-			</div>
-			<div class='hrline_silver' style='width: 95%'></div>
-		";
+            <div class='thread_wrapper " . ($this->isUnread($user) ? "thread_unread" : "thread_normal" ) . "'>
+            <div class='forum_element'>
+                    <div class='two_third'>
+                            <div class='thread_content'>
+                                    <h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a></h3>
+                                <div class='forum_element_info'>
+                                    $thisOwner, {$this->getFirstPost()->getDate()}
+                                </div>
+                            </div>
+                    </div>
+                    <div class='forum_element_info one_third column-last'>
+                            <p>$printLatestPost <br/> $stats</p>
+                    </div>
+                    <div class='clear'></div>
+                </div>
+            </div>
+            <div class='hrline_silver' style='width: 95%'></div>";
     }
 
     /**
@@ -257,9 +256,9 @@ class Thread extends ForumElement
             if ($user->hasPermission($permission["thread_edit"], $this))
             {
                 $thisTitle = "
-				<h2 class='quick_edit' name='t{$this->getID()}' data-type='title' contenteditable='true'>
-					{$this->name}
-				</h2>";
+                    <h2 class='quick_edit' name='t{$this->getID()}' data-type='title' contenteditable='true'>
+                            {$this->name}
+                    </h2>";
             }
             else
             {
@@ -267,9 +266,9 @@ class Thread extends ForumElement
             }
 
             $printContent .= "
-				$thisTitle
-				<br />
-				<div class=\"forum_menu\">";
+                $thisTitle
+                <br />
+                <div class=\"forum_menu\">";
 
             if ($user->hasPermission($permission["post_create"], $this) && $this->fields["LockThread"] != "yes")
             {
@@ -289,9 +288,9 @@ class Thread extends ForumElement
                 $i = 1;
 
                 $pagination = "
-						<ul class='pagination'>
-						<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=1' class='first'>First</a></li>
-						<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=" . max($currentPage - 1, 1) . "' class='previous'>Previous</a></li>";
+                    <ul class='pagination'>
+                    <li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=1' class='first'>First</a></li>
+                    <li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=" . max($currentPage - 1, 1) . "' class='previous'>Previous</a></li>";
 
                 foreach ($pages as $page)
                 {
@@ -316,9 +315,9 @@ class Thread extends ForumElement
                 }
 
                 $pagination .= "
-						<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=" . max(min($currentPage + 1, $i - 1), 1) . "' class='next'>Next</a></li>
-						<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=" . ($i - 1) . "' class='last'>Last</a></li>
-						</ul>";
+                    <li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=" . max(min($currentPage + 1, $i - 1), 1) . "' class='next'>Next</a></li>
+                    <li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=" . ($i - 1) . "' class='last'>Last</a></li>
+                    </ul>";
 
                 /**
                  * Print out add new post form.
@@ -356,7 +355,7 @@ class Thread extends ForumElement
 			<div class='clear'></div>
 		</div>
 		<script type='text/javascript'>
-			CKEDITOR.replace('editableContentNewPost', {height:'250', width: '548'});
+			var postEditor = CKEDITOR.replace('editableContentNewPost', {height:'250', width: '548'});
 		</script>
     	";
     }
