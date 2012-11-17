@@ -152,7 +152,7 @@ class ForumUser
 			}
 		}
 
-		return $permission->default || hasPermission($user, $permission, $element);
+		return $permission->default || hasPermission($this, $permission, $element);
 	}
 
 	public function isRead($post)
@@ -165,9 +165,14 @@ class ForumUser
 		return true;
 	}
 
-	public function unmoderate($post)
+	public function moderate($element)
 	{
-		if (in_array("p" . $post->getID(), $this->moderate))
+		$this->moderate[] = $element->prefix . $element->getID();
+	}
+
+	public function unmoderate($element)
+	{
+		if (in_array($element->prefix . $element->getID(), $this->moderate))
 		{
 			return false;
 		}
@@ -192,7 +197,7 @@ class ForumUser
 	{
 		global $table_prefix;
 
-		$this->moderate[] = "p" . $post->getID();
+		$this->moderate($post);
 		$this->posts++;
 		$this->save($con);
 

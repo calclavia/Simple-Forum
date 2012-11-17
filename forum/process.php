@@ -2,27 +2,85 @@
 
 abstract class ProcessRequest
 {
-	public $user;
-	public $type;
-	public $element;
-	public $data;
-	
 	/**
-	 * Proccess a request.
 	 * @param ForumUser $user - The current user doing this request.
-	 * @param int $type - The type of request being done.
-	 * @param ForumElement $element - The element the request is being done to.
-	 * @param Mixed $data - Data to be proccessed.
 	 */
-	function __construct($user, $type, $element, $data)
+	public $user;
+
+	/**
+	 * @param ForumElement $element - The element the request is being done to.
+	 */
+	public $element;
+
+	/**
+	 * @param Array $data - An array of data to be proccessed.
+	 */
+	public $data = array();
+
+	public $con;
+
+	function __construct($user, $element, $data, $con = null)
 	{
 		$this->user = $user;
-		$this->type = $type;
 		$this->element = $element;
 		$this->data = $data;
+		$this->con = $con;
 	}
-	
+
+	/**
+	 * Proccess a request.
+	 */
 	public abstract function doRequest();
+}
+
+class NewBoard extends ProcessRequest
+{
+	function __construct($user, $element, $data, $con)
+	{
+		parent::__construct($user, $element, $data, $con);
+	}
+
+	public function doRequest()
+	{
+		global $permission;
+
+		if ($this->element != null)
+		{
+			$this->data[0] = clean($this->data[0], true);
+			$this->data[1] = clean($this->data[1], true);
+
+			if (!empty($this->data[0]))
+			{
+				$board = $this->element->createBoard($this->user, $this->data[0], $this->data[1]);
+
+				if ($board != null)
+				{
+					$board->save($this->con);
+
+					$this->user->moderate($board);
+					$this->user->save($this->con);
+
+					foreach (explode(",", strtolower($this->data[2]) . ",") as $username)
+					{
+						$user = getUserByUsername(trim($username));
+
+						if ($user != null)
+						{
+							if ($user->id > 0)
+							{
+								$user->moderate($board);
+								$user->save($this->con);
+							}
+						}
+					}
+
+					return "Created new board!";
+				}
+			}
+		}
+
+		return "Failed to create a new board.";
+	}
 }
 
 /**
@@ -211,7 +269,17 @@ if (!empty($request_type))
 
 	$edit = $_POST["e"];
 
-	if (!empty($edit))
+	$element = $_POST["element"];
+
+	if ($request_type == 1)
+	{
+		$successes[] = (new NewBoard($currentUser, Category::getByID(intval($element)), array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->doRequest();
+	}
+	else if ($request_type == 2)
+	{
+		$successes[] = (new NewBoard($currentUser, Board::getByID(intval($element)), array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->doRequest();
+	}
+	else if (!empty($edit))
 	{
 		if (strstr($edit, "c"))
 		{

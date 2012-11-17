@@ -140,12 +140,13 @@ class Board extends ForumElement
 
 	public function createBoard($user, $name, $description)
 	{
-		global $create_boards;
-
-		if ($user->hasPermission($create_boards))
+		global $permission;
+	
+		if ($user->hasPermission($permission["board_create"], $this))
 		{
 			return new Board(-1, $this->id, -1, $name, $description, "yes");
 		}
+	
 		return null;
 	}
 
@@ -257,7 +258,7 @@ class Board extends ForumElement
 	{
 		global $edit_boards;
 
-		if ($user->hasPermission($edit_boards))
+		if ($user->hasPermission($edit_boards, $this))
 		{
 			$this->name = clean($title, true);
 		}
@@ -267,7 +268,7 @@ class Board extends ForumElement
 	{
 		global $edit_boards;
 
-		if ($user->hasPermission($edit_boards))
+		if ($user->hasPermission($edit_boards, $this))
 		{
 			$this->fields["Description"] = $description;
 		}
@@ -277,7 +278,7 @@ class Board extends ForumElement
 	{
 		global $permission;
 
-		if ($user->hasPermission($permission["board_edit"], $this))
+		if ($user->hasPermission($permission["board_edit"], $this->getParent()))
 		{
 			if ($this->fields["SubBoard"] == "yes")
 			{
@@ -327,6 +328,11 @@ class Board extends ForumElement
 
 		return false;
 	}
+	
+	public function getParent()
+	{
+		return ($this->fields["SubBoard"] == "yes" ? Board::getByID($this->fields["Parent"]) : Category::getByID($this->fields["Parent"]));
+	}
 
 	/**
 	 * Prints out the board as a forum block.
@@ -372,7 +378,7 @@ class Board extends ForumElement
 			$subBoards = "<ul>Sub-Boards: " . $subBoards . "</ul>";
 		}
 
-		if ($user->hasPermission($permission['board_edit'], $this))
+		if ($user->hasPermission($permission['board_edit'], $this->getParent()))
 		{
 			$orderHTML = "<a href=\"{$_SERVER['PHP_SELF']}?&o=b{$this->getID()}\" class='btn_small btn_silver btn_flat'>&darr;</a>";
 		}
@@ -395,9 +401,8 @@ class Board extends ForumElement
 	    				$subBoards
 	    			</div>
 	    		</div>
-                        <div class='clear'></div>
-	    	</div>
-	    	";
+                <div class='clear'></div>
+	    	</div>";
 	}
 
 	public function printBoardContent($user)
@@ -434,7 +439,7 @@ class Board extends ForumElement
 
 		if ($user->hasPermission($permission["board_create"], $this))
 		{
-			$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"btn_small btn_white btn_flat\">+ Board</a> ";
+			$printContent .= "<a href=\"javascript: $('#newBoard{$this->getID()}').stop(true, true).slideToggle();\" class=\"btn_small btn_white btn_flat\">+ Board</a> ";
 		}
 
 		if ($user->hasPermission($permission["board_delete"], $this))
@@ -446,6 +451,11 @@ class Board extends ForumElement
 
 		$printContent .= "<div class='elements_container'>" . $this->getTreeAsString();
 
+		if ($user->hasPermission($permission["board_create"], $this))
+		{
+			$printContent .= $this->printNewBoardForm();
+		}
+		
 		if (count($this->getChildren()) > 0)
 		{
 			foreach ($this->getChildren() as $child)
@@ -472,11 +482,6 @@ class Board extends ForumElement
 		}
 
 		$printContent .= $this->getTreeAsString() . "</div>";
-
-		if ($user->hasPermission($create_boards))
-		{
-			$printContent .= $this->printNewBoardForm();
-		}
 
 		return $printContent;
 	}
@@ -506,19 +511,22 @@ class Board extends ForumElement
 	public function printNewBoardForm()
 	{
 		return "
-		<div id='newBoard{$this->getID()}' class='white_content'>
-			<h1>New Board</h1>
-			<form action='{$_SERVER['PHP_SELF']}?p=b{$this->getID()}&a=new' method='post'>
-				<b>Title:</b<br />
-				<input type='text' name='board_name' size='80' maxlength='80'/>
-				<br />
-				<textarea id='editableContentNewBoard{$this->getID()}' name='editableContent' wrap=\"virtual\" style=\"width:550px; height:200px\"></textarea>
-				<br/>
-				<input type='submit' value='Post'/>					
-			</form>
-		</div>";
+		<div id='newBoard{$this->getID()}' style='display:none;' class='forum_element drop-shadow'>
+	    		<div class='two_third'>
+	    			<span class='icon_on'></span>
+	    			<div class='board_content'>
+	    				<h3 class='element_title' id='title_{$this->getID()}' contenteditable='true'>Title</h3>
+	    				<div class='element_text' id='content_{$this->getID()}' contenteditable='true'>Enter your description for the board.</div>
+	    			</div>
+	    		</div>
+	    		<div class='forum_element_info one_third column-last'>
+	    			Moderators (separate by comma):<br />
+	    			<input type='text' id='moderators_{$this->getID()}' value=''><br />
+	    			<a href=\"javascript: void(0);\" data-element='{$this->getID()}' class=\"new_subboard btn_small btn_silver btn_flat\">Confirm</a>
+	    		</div>
+            <div class='clear'></div>
+	   	</div>";
 	}
-
 }
 
 ?>

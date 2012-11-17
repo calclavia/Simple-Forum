@@ -344,16 +344,13 @@ class Thread extends ForumElement
 			<div class='comment_box'>
 				<div class='comment_inner'>
 					<form action='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page={$currentPage}&a=new' method='post'>
-						<textarea id='editableContentNewPost' name='editableContent' wrap=\"virtual\"></textarea><br />
+						<textarea id='editableContentNewPost' name='editableContent' style='width:100%; height: 300px;'></textarea><br />
 						<input type='submit' value='Post'/>
 					</form>
 				</div>
 			</div>
 			<div class='clear'></div>
 		</div>
-		<script type='text/javascript'>
-			var postEditor = CKEDITOR.replace('editableContentNewPost', {height:'250', width: '548'});
-		</script>
     	";
 	}
 

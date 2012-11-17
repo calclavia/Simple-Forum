@@ -91,6 +91,42 @@ $(document).ready(function() {
         });
     });
 	
+    $('.new_board').click(function(){
+        $.ajax({
+            type: "POST",
+            url: "forum/process.php",
+            dataType: 'json',
+            data: {
+                ajax: 1, 
+                element: $(this).data('element'), 
+                data1: $('#title_'+$(this).data('element')).html(),
+                data2: $('#content_'+$(this).data('element')).html(),
+                data3: $('#moderators_'+$(this).data('element')).val()
+            }
+        }).done(function( msg ) {
+            resultBlock(msg);
+            document.location.reload(true);
+        });
+    });
+    
+    $('.new_subboard').click(function(){
+        $.ajax({
+            type: "POST",
+            url: "forum/process.php",
+            dataType: 'json',
+            data: {
+                ajax: 2, 
+                element: $(this).data('element'), 
+                data1: $('#title_'+$(this).data('element')).html(),
+                data2: $('#content_'+$(this).data('element')).html(),
+                data3: $('#moderators_'+$(this).data('element')).val()
+            }
+        }).done(function( msg ) {
+            resultBlock(msg);
+            document.location.reload(true);
+        });
+    });
+    
     $('.quick_edit').blur(function(){
         if($(this).html() != "")
         {
@@ -162,5 +198,23 @@ $(document).ready(function() {
     $('.inlineEdit').blur(function()
     {
         $(this).parent().find('.inline_form').fadeOut('slow');
+    });
+    
+    tinyMCE.init({
+    	theme : "advanced",
+        mode : "textareas",
+        /*theme_advanced_styles : "Code=codeStyle;Quote=quoteStyle",
+        plugins : "bbcode",
+        theme_advanced_buttons1 : "bold,italic,underline,undo,redo,link,unlink,image,forecolor,styleselect,removeformat,cleanup,code",
+        theme_advanced_buttons2 : "",
+        theme_advanced_buttons3 : "",
+        theme_advanced_toolbar_location : "bottom",
+        theme_advanced_toolbar_align : "center",
+        content_css : "css/bbcode.css",
+        add_unload_trigger : false,
+        remove_linebreaks : false,
+        inline_styles : false,
+        convert_fonts_to_spans : false,*/
+        entity_encoding : "raw"
     });
 });
