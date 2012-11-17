@@ -44,7 +44,7 @@ class Category extends ForumElement
 		}
 	}
 
-	public static function getAll()
+	public static function getAll($con)
 	{
 		global $table_prefix;
 
@@ -59,7 +59,7 @@ class Category extends ForumElement
 
 		usort($returnArray, function ($a, $b)
 		{
-			if ($a->fields["ForumOrder"] >= $b->fields["ForumOrder"])
+			if ($a->fields["ForumOrder"] > $b->fields["ForumOrder"])
 			{
 				return 1;
 			}
@@ -81,6 +81,32 @@ class Category extends ForumElement
 
 	public function getChildren()
 	{
+		$returnArray = $this->getChildrenUnsorted();
+
+		usort($returnArray, function ($a, $b)
+		{
+			if ($a->fields["ForumOrder"] > $b->fields["ForumOrder"])
+			{
+				return 1;
+			}
+
+			return -1;
+		});
+
+		$i = 0;
+
+		foreach ($returnArray as $board)
+		{
+			$board->fields["ForumOrder"] = $i;
+			$board->save(null);
+			$i++;
+		}
+
+		return $returnArray;
+	}
+
+	public function getChildrenUnsorted()
+	{
 		global $table_prefix;
 
 		$returnArray = array();
@@ -92,29 +118,14 @@ class Category extends ForumElement
 			$returnArray[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
 		}
 
-		usort($returnArray, function ($a, $b)
-		{
-			if ($a->fields["ForumOrder"] == $b->fields["ForumOrder"] || $a->fields["ForumOrder"] == -1)
-			{
-				return -1;
-			}
-
-			if ($b->fields["ForumOrder"] == $a->getID())
-			{
-				return -1;
-			}
-
-			return 1;
-		});
-
 		return $returnArray;
 	}
 
 	public function edit($user, $title, $con = null)
 	{
-		global $edit_categories;
+		global $permission;
 
-		if ($user->hasPermission($edit_categories))
+		if ($user->hasPermission($permission["category_edit"]))
 		{
 			$this->name = $title;
 		}
@@ -143,7 +154,30 @@ class Category extends ForumElement
 
 		if ($user->hasPermission($permission["category_edit"], $this))
 		{
-			$this->fields["ForumOrder"]++;
+			$categories = Category::getAll($con);
+
+			if ($this->fields["ForumOrder"] >= count($categories) - 1)
+			{
+				$this->fields["ForumOrder"] = -1;
+			}
+			else
+			{
+				foreach ($categories as $category)
+				{
+					if ($category->fields["ForumOrder"] == $this->fields["ForumOrder"] + 1)
+					{
+						$category->fields["ForumOrder"]--;
+						$category->save($con);
+					}
+					else if ($category->fields["ForumOrder"] > $this->fields["ForumOrder"])
+					{
+						$category->fields["ForumOrder"]++;
+						$category->save($con);
+					}
+				}
+
+				$this->fields["ForumOrder"]++;
+			}
 			$this->save($con);
 		}
 	}
@@ -153,15 +187,15 @@ class Category extends ForumElement
 	 */
 	public function printCategory($user, $i)
 	{
-		global $permission, $edit_categories, $delete_categories, $create_boards;
+		global $permission;
 
-		$categories = Category::getAll();
+		$categories = Category::getAll($con);
 
 		if ($this != null)
 		{
 			if ($this->fields["Hidden"] != "yes")
 			{
-				if ($user->hasPermission($edit_categories, $this))
+				if ($user->hasPermission($permission["category_edit"], $this))
 				{
 					$title = "
                         <div class='category_title'>
@@ -180,19 +214,17 @@ class Category extends ForumElement
                         <div class='elements_container'>
                             <span class='forum_menu'>";
 
-				if ($user->hasPermission($edit_categories, $this))
+				if ($user->hasPermission($permission["category_edit"], $this))
 				{
-					if ($categories[$i + 1])
-					{
-						$title .= "<a href=\"{$_SERVER['PHP_SELF']}?&o=c{$categories[$i + 1]->getID()}\" class='btn_small btn_silver btn_flat'>&darr;</a> ";
-					}
+					$printContent .= "<a href=\"{$_SERVER['PHP_SELF']}?&o=c{$this->getID()}\" class='btn_small btn_silver btn_flat'>&darr;</a> ";
 				}
+
 				if ($user->hasPermission($permission["board_create"], $this))
 				{
 					$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"btn_small btn_silver btn_flat\">+ Board</a> ";
 				}
 
-				if ($user->hasPermission($delete_categories, $this))
+				if ($user->hasPermission($permission["category_delete"], $this))
 				{
 					$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$this->getID()}' class=\"btn_small btn_silver btn_flat\">Delete</a>";
 				}
@@ -213,12 +245,12 @@ class Category extends ForumElement
 
 				$printContent .= "</div>";
 
-				if ($user->hasPermission($create_boards))
+				if ($user->hasPermission($permission["board_create"]))
 				{
 					$printContent .= $this->printNewBoardForm();
 				}
 
-				return $printContent . "</div>";
+				return $printContent . "</div><div class='clear'></div>";
 			}
 		}
 	}
@@ -229,11 +261,9 @@ class Category extends ForumElement
 	 */
 	public static function printAll($user)
 	{
-		global $create_categories;
-
 		$printContent = "";
 
-		$categories = Category::getAll();
+		$categories = Category::getAll($con);
 
 		for ($i = 0; $i < count($categories); $i++)
 		{
@@ -247,7 +277,7 @@ class Category extends ForumElement
 	{
 		return "
             <div id='newBoard{$this->getID()}' class='white_content'>
-                    <h1>New Board</h1>
+                 	<h1>New Board</h1>
                     <form action='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&a=new' method='post'>
                             <table>
                                     <tr><td>

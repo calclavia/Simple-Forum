@@ -131,7 +131,8 @@
 	z-index: 2001;
 	-moz-opacity: 0.8;
 	opacity: .80;
-	filter: alpha(opacity =                                                     80);
+	filter: alpha(opacity =                                                       80
+		);
 }
 
 .white_content {
@@ -226,6 +227,7 @@
 	font-size: 13px;
 	font-weight: lighter;
 	color: #424242;
+	padding-bottom: 2px;
 }
 
 .forum .element_title {
@@ -286,40 +288,16 @@
 /**
  * Threads
 */
-.thread_wrapper
-
-
-
-
-
-
-
-margin
-
-
-
-
-:
-
-
- 
-
-
-0
-px
-
-
-
-
-;
+.thread_wrapper {
+	margin: 0 px;
 }
+
 .thread_wrapper .forum_element {
 	padding: 0px 10px;
-	height: 70px;
 }
 
 .thread_wrapper .element_title {
-	font-size: 18px;
+	font-size: 16px;
 	display: inline;
 }
 
@@ -423,6 +401,7 @@ px
 }
 
 .post .forum_signature {
+	font-size: 16px;
 	max-height: 145;
 	overflow: hidden;
 }

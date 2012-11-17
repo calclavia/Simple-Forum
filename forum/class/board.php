@@ -74,33 +74,46 @@ class Board extends ForumElement
 			return $a->getLatestPost()->fields["Time"] < $b->getLatestPost()->fields["Time"];
 		});
 
-		$result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='yes'");
-
-		$boards = array();
-
-		while ($row = mysql_fetch_array($result))
-		{
-			$boards[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
-		}
-
+		$boards = $this->getBoardsUnsorted();
+		
 		usort($boards, function ($a, $b)
 		{
-			if ($a->fields["ForumOrder"] == $b->fields["ForumOrder"] || $a->fields["ForumOrder"] == -1)
+			if ($a->fields["ForumOrder"] > $b->fields["ForumOrder"])
 			{
-				return -1;
+				return 1;
 			}
 
-			if ($b->fields["ForumOrder"] == $a->getID())
-			{
-				return -1;
-			}
-
-			return 1;
+			return -1;
 		});
+
+		$i = 0;
+
+		foreach ($boards as $board)
+		{
+			$board->fields["ForumOrder"] = $i;
+			$board->save(null);
+			$i++;
+		}
 
 		return array_merge($boards, $threads);
 	}
 
+	public function getBoardsUnsorted()
+	{
+		global $table_prefix;
+		
+		$result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='yes'");
+		
+		$boards = array();
+		
+		while ($row = mysql_fetch_array($result))
+		{
+			$boards[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
+		}
+		
+		return $boards;
+	}
+	
 	public function createThread($user, $name, $content = "", $time = -1, $con = false)
 	{
 		global $create_threads;
@@ -260,25 +273,44 @@ class Board extends ForumElement
 		}
 	}
 
-	public function move($user, $id, $con)
+	public function moveDown($user, $con)
 	{
-		global $edit_boards;
+		global $permission;
 
-		if ($user->hasPermission($edit_boards, $this))
+		if ($user->hasPermission($permission["board_edit"], $this))
 		{
-			if ($id == $this->id)
+			if ($this->fields["SubBoard"] == "yes")
 			{
-				$id = -1;
+				$boards = Board::getByID($this->fields["Parent"])->getBoardsUnsorted();
+
 			}
-
-			$newParent = Board::getByID($id)->fields["Parent"];
-
-			if (Category::getByID($newParent) != null)
+			else
 			{
-				$this->fields["Parent"] = $newParent;
-			}
+				$boards = Category::getByID($this->fields["Parent"])->getChildrenUnsorted();
 
-			$this->fields["ForumOrder"] = $id;
+			}
+			if ($this->fields["ForumOrder"] >= count($boards) - 1)
+			{
+				$this->fields["ForumOrder"] = -1;
+			}
+			else
+			{
+				foreach ($boards as $board)
+				{
+					if ($board->fields["ForumOrder"] == $this->fields["ForumOrder"] + 1)
+					{
+						$board->fields["ForumOrder"]--;
+						$board->save($con);
+					}
+					else if ($board->fields["ForumOrder"] > $this->fields["ForumOrder"])
+					{
+						$board->fields["ForumOrder"]++;
+						$board->save($con);
+					}
+				}
+
+				$this->fields["ForumOrder"]++;
+			}
 			$this->save($con);
 		}
 	}

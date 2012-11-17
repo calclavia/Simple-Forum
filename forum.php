@@ -87,7 +87,7 @@ else
 		$category->save($con);
 	}
 
-	$printContent .= Category::printAll($currentUser);
+	$printContent .= Category::printAll($currentUser, $con);
 }
 
 if ($currentUser->hasPermission($create_categories))
