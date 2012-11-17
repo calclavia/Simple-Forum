@@ -227,7 +227,7 @@
 	font-size: 13px;
 	font-weight: lighter;
 	color: #424242;
-	padding-bottom: 2px;
+	margin-bottom: 0px;
 }
 
 .forum .element_title {
@@ -310,9 +310,7 @@
 }
 
 .forum .forum_element .thread_content {
-	margin-top: 4%;
-	margin-left: 20px;
-	margin-bottom: 5px;
+	margin-bottom: 0px;
 }
 
 /**

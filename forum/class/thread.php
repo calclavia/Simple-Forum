@@ -222,16 +222,14 @@ class Thread extends ForumElement
 		return "
             <div class='thread_wrapper " . ($this->isUnread($user) ? "thread_unread" : "thread_normal") . "'>
             <div class='forum_element'>
-                    <div class='two_third'>
-                            <div class='thread_content'>
-                                    <h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a></h3>
-                                <div class='forum_element_info'>
-                                    $thisOwner, {$this->getFirstPost()->getDate()}
-                                </div>
-                            </div>
+                    <div class='two_third thread_content'>
+                         <h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a></h3>
+                         <div class='forum_element_info'>
+                               $thisOwner, {$this->getFirstPost()->getDate()}
+                         </div>
                     </div>
                     <div class='forum_element_info one_third column-last'>
-                            <p>$printLatestPost <br/> $stats</p>
+                         $printLatestPost <br/> $stats
                     </div>
                     <div class='clear'></div>
                 </div>
