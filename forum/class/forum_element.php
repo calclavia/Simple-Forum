@@ -46,7 +46,8 @@ abstract class ForumElement
 				if (is_int($value))
 				{
 					$query .= $value;
-				} else
+				}
+				else
 				{
 					$query .= "'" . mysql_real_escape_string($value) . "'";
 				}
@@ -60,7 +61,8 @@ abstract class ForumElement
 			$maxRows = intval($row['Auto_increment']);
 			$this->id = $maxRows - 1;
 			return true;
-		} else
+		}
+		else
 		{
 			$query = "UPDATE {$table_prefix}{$this->element_name} SET Name='" . mysql_real_escape_string($this->name) . "'";
 
@@ -75,7 +77,8 @@ abstract class ForumElement
 				if (is_int($value))
 				{
 					$query .= $value;
-				} else
+				}
+				else
 				{
 					$query .= "'" . mysql_real_escape_string($value) . "'";
 				}

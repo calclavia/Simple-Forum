@@ -8,17 +8,21 @@
  * o = Reordering
  * m = Moving
  */
-if (!empty($_GET["o"]))
+
+$order = $_GET["o"];
+
+if (!empty($order))
 {
-	if (strstr($_GET["p"], "c") && strstr($_GET["o"], "c"))
+	if (strstr($order, "c"))
 	{
-		$category = Category::getByID(intval(str_replace("c", "", $_GET["p"])));
+		$category = Category::getByID(intval(str_replace("c", "", $order)));
 
 		if ($category != null)
 		{
-			$category->move($currentUser, str_replace("c", "", $_GET["o"]), $con);
+			$category->moveDown($currentUser, $con);
 		}
-	} else if (strstr($_GET["p"], "b") && strstr($_GET["o"], "b"))
+	}
+	else if (strstr($_GET["p"], "b") && strstr($_GET["o"], "b"))
 	{
 		$board = Board::getByID(intval(str_replace("b", "", $_GET["p"])));
 
@@ -44,7 +48,8 @@ if (!empty($_GET["e"]))
 		{
 			$category->edit($currentUser, $title, $con);
 		}
-	} else if (strstr($_GET["e"], "b"))
+	}
+	else if (strstr($_GET["e"], "b"))
 	{
 		$title = clean($_GET["data"], true);
 		$content = clean($_GET["content"], true);
@@ -56,7 +61,8 @@ if (!empty($_GET["e"]))
 			$board->edit($title, $content);
 			$board->save($con);
 		}
-	} else if (strstr($_GET["e"], "t"))
+	}
+	else if (strstr($_GET["e"], "t"))
 	{
 		$title = clean($_GET["data"], true);
 
@@ -71,7 +77,8 @@ if (!empty($_GET["e"]))
 					if ($_GET["sticky"])
 					{
 						$sticky = "yes";
-					} else
+					}
+					else
 					{
 						$sticky = "no";
 					}
@@ -79,7 +86,8 @@ if (!empty($_GET["e"]))
 					if ($_GET["lock"])
 					{
 						$lockTopic = "yes";
-					} else
+					}
+					else
 					{
 						$lockTopic = "no";
 					}
@@ -108,7 +116,8 @@ if (!empty($_GET["d"]))
 				$successes[] = "Removed category: " . $category->name;
 			}
 		}
-	} else if (strstr($_GET["d"], "b"))
+	}
+	else if (strstr($_GET["d"], "b"))
 	{
 		$board = Board::getByID(intval(str_replace("b", "", $_GET["d"])));
 
@@ -120,7 +129,8 @@ if (!empty($_GET["d"]))
 				$successes[] = "Removed board: " . $board->name;
 			}
 		}
-	} else if (strstr($_GET["d"], "p"))
+	}
+	else if (strstr($_GET["d"], "p"))
 	{
 		$post = Post::getByID(intval(str_replace("p", "", $_GET["d"])));
 
@@ -135,7 +145,8 @@ if (!empty($_GET["d"]))
 					$thread = Thread::getByID($post->fields["Parent"]);
 					$thread->delete($con);
 					$successes[] = "Removed thread: " . $thread->name;
-				} else
+				}
+				else
 				{
 					$successes[] = "Removed post from thread: " . $post->name;
 					$post->delete($con);
@@ -167,7 +178,8 @@ if (!empty($request_type))
 	if ($data == "true")
 	{
 		$data = true;
-	} else if ($data == "false")
+	}
+	else if ($data == "false")
 	{
 		$data = false;
 	}
@@ -187,7 +199,8 @@ if (!empty($request_type))
 				$category->edit($currentUser, $title, $con);
 				$successes[] = "Changed category name to: " . $title;
 			}
-		} else if (strstr($edit, "b"))
+		}
+		else if (strstr($edit, "b"))
 		{
 			$data = clean($data, true);
 			$board = Board::getByID(intval(str_replace("b", "", $edit)));
@@ -198,7 +211,8 @@ if (!empty($request_type))
 				{
 					$board->editTitle($currentUser, $data);
 					$successes[] = "Changed board name to: " . $board->name;
-				} else if ($request_type == "description")
+				}
+				else if ($request_type == "description")
 				{
 					$board->editDescription($currentUser, $data);
 					$successes[] = "Changed board description to: " . $board->fields["Description"];
@@ -206,7 +220,8 @@ if (!empty($request_type))
 
 				$board->save($con);
 			}
-		} else if (strstr($edit, "t"))
+		}
+		else if (strstr($edit, "t"))
 		{
 			$thread = Thread::getByID(intval(str_replace("t", "", $edit)));
 			$data = clean($data, true);
@@ -219,11 +234,13 @@ if (!empty($request_type))
 					{
 						$thread->editTitle($currentUser, $data);
 						$successes[] = "Changed thread name to: " . $thread->name;
-					} else if ($request_type == "sticky")
+					}
+					else if ($request_type == "sticky")
 					{
 						$thread->stickThread($currentUser, $data);
 						$successes[] = "Changed thread sticky status.";
-					} else if ($request_type == "lock")
+					}
+					else if ($request_type == "lock")
 					{
 						$thread->lockThread($currentUser, $data);
 						$successes[] = "Changed thread lock status.";
@@ -235,7 +252,8 @@ if (!empty($request_type))
 					}
 				}
 			}
-		} else if ($request_type == "post_edit")
+		}
+		else if ($request_type == "post_edit")
 		{
 			$post = Post::getByID(intval($edit));
 			$data = clean($data);
@@ -246,7 +264,8 @@ if (!empty($request_type))
 				$post->save($con);
 				$successes[] = "Edited Post!";
 			}
-		} else if ($request_type == "signature")
+		}
+		else if ($request_type == "signature")
 		{
 			$data = clean($data);
 
@@ -266,7 +285,8 @@ if (!empty($request_type))
 	if (count($successes) > 0)
 	{
 		echo json_encode($successes);
-	} else
+	}
+	else
 	{
 		echo json_encode(array("Invalid " . $request_type . " Request: " . $edit . ", " . strip_tags($data)));
 	}

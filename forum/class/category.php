@@ -37,7 +37,8 @@ class Category extends ForumElement
 		if ($row["ID"] <= 0)
 		{
 			return null;
-		} else
+		}
+		else
 		{
 			return new Category($row["ID"], $row["Name"], $row["ForumOrder"], $row["Hidden"]);
 		}
@@ -136,18 +137,13 @@ class Category extends ForumElement
 		return null;
 	}
 
-	public function move($user, $id, $con)
+	public function moveDown($user, $con)
 	{
-		global $edit_categories;
+		global $permission;
 
-		if ($user->hasPermission($edit_categories, $this))
+		if ($user->hasPermission($permission["category_edit"], $this))
 		{
-			if ($id == $this->id)
-			{
-				$id = -1;
-			}
-
-			$this->fields["ForumOrder"] = $id;
+			$this->fields["ForumOrder"]++;
 			$this->save($con);
 		}
 	}
@@ -171,15 +167,12 @@ class Category extends ForumElement
                         <div class='category_title'>
                             <h2 class='quick_edit' name='c{$this->getID()}' data-type='ajax' style='display:inline; margin-right:5px;' contenteditable='true'>
                                     {$this->name}
-                            </h2>";
-
-					$title .= "</div>";
-				} else
-				{
-					$title = "
-                        <div>
-                                <h2 id='category{$this->getID()}' class='category_title'>{$this->name}</h2>
+                            </h2>
                         </div>";
+				}
+				else
+				{
+					$title = "<h2 id='category{$this->getID()}' class='category_title'>{$this->name}</h2>";
 				}
 
 				$printContent = "
@@ -191,7 +184,7 @@ class Category extends ForumElement
 				{
 					if ($categories[$i + 1])
 					{
-						$title .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i + 1]->getID()}'\" class='btn_small btn_silver btn_flat'>&darr;</a> ";
+						$title .= "<a href=\"{$_SERVER['PHP_SELF']}?&o=c{$categories[$i + 1]->getID()}\" class='btn_small btn_silver btn_flat'>&darr;</a> ";
 					}
 				}
 				if ($user->hasPermission($permission["board_create"], $this))
@@ -212,7 +205,8 @@ class Category extends ForumElement
 					{
 						$printContent .= $board->printBoard($user);
 					}
-				} else
+				}
+				else
 				{
 					$printContent .= "No boards avaliable.";
 				}

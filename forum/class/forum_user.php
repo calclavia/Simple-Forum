@@ -111,7 +111,8 @@ class ForumUser
 				$query = "INSERT INTO {$table_prefix}users (ID, Moderate, Unread, Posts, Signature) VALUES ({$this->id}, '" . mysql_real_escape_string(serialize($this->moderate)) . "', '" . mysql_real_escape_string(serialize($this->unreadPosts)) . "', {$this->posts}, '" . mysql_real_escape_string($this->signature) . "')";
 				mysql_query($query, $con) or die("Failed to create user data: " . mysql_error() . ", Q = " . $query);
 				return true;
-			} else
+			}
+			else
 			{
 				$query = "UPDATE {$table_prefix}users SET Moderate='" . serialize($this->moderate) . "', Unread='" . serialize($this->unreadPosts) . "', Posts={$this->posts}, Signature='" . mysql_real_escape_string($this->signature) . "' WHERE ID={$this->id} LIMIT 1";
 				mysql_query($query, $con) or die("Failed to save forum element: " . mysql_error() . ", Q = " . $query);
@@ -134,13 +135,15 @@ class ForumUser
 			if (in_array($element->prefix . $element->getID(), $this->moderate))
 			{
 				return true;
-			} else if ($element instanceof Post)
+			}
+			else if ($element instanceof Post)
 			{
 				if ($element->fields["User"] == $this->id)
 				{
 					return true;
 				}
-			} else if ($element instanceof Thread)
+			}
+			else if ($element instanceof Thread)
 			{
 				if ($element->getFirstPost()->fields["User"] == $this->id)
 				{

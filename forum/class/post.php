@@ -48,7 +48,8 @@ class Post extends ForumElement
 		if ($row["ID"] <= 0)
 		{
 			return null;
-		} else
+		}
+		else
 		{
 			return new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"], $row["User"], $row["Time"], $row["LastEditTime"], $row["LastEditUser"]);
 		}
@@ -92,7 +93,8 @@ class Post extends ForumElement
 			<div class='forum_signature quick_edit' name='{$postUser->id}' data-type='signature' contenteditable='true'>
 				{$postUser->signature}
 			</div>";
-		} else
+		}
+		else
 		{
 			$editSignature = "<div class='forum_signature'>{$postUser->signature}</div>";
 		}

@@ -40,7 +40,8 @@ class Board extends ForumElement
 		if ($row["ID"] <= 0)
 		{
 			return null;
-		} else
+		}
+		else
 		{
 			return new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
 		}
@@ -64,7 +65,8 @@ class Board extends ForumElement
 			if ($a->fields["Sticky"] == "yes" && $b->fields["Sticky"] == "no")
 			{
 				return -1;
-			} else if ($a->fields["Sticky"] == "no" && $b->fields["Sticky"] == "yes")
+			}
+			else if ($a->fields["Sticky"] == "no" && $b->fields["Sticky"] == "yes")
 			{
 				return 1;
 			}
@@ -114,7 +116,8 @@ class Board extends ForumElement
 
 					$post = $thread->createPost($content, $user, $time, $con);
 					$post->save($con);
-				} else
+				}
+				else
 				{
 					return new Thread(-1, $this->id, $name, "no", "no", 1);
 				}
@@ -159,7 +162,8 @@ class Board extends ForumElement
 			if ($child instanceof Thread)
 			{
 				$views += intval($child->fields["Views"]);
-			} else if ($child instanceof Board)
+			}
+			else if ($child instanceof Board)
 			{
 				$views += $child->getViews();
 			}
@@ -211,7 +215,8 @@ class Board extends ForumElement
 			if ($board->fields["SubBoard"] == "yes")
 			{
 				$board = Board::getByID(intval($board->fields["Parent"]));
-			} else
+			}
+			else
 			{
 				$board = null;
 			}
@@ -224,7 +229,8 @@ class Board extends ForumElement
 			if ($i == count($elements))
 			{
 				$tree = "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$element->getID()}' class='current'>" . limitString($element->name, 30) . "</a></li>" . $tree;
-			} else
+			}
+			else
 			{
 				$tree = "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$element->getID()}'>" . limitString($element->name, 30) . "</a></li>" . $tree;
 			}
@@ -384,7 +390,8 @@ class Board extends ForumElement
     			<div class='quick_edit' name='b{$this->getID()}' data-type='description' contenteditable='true'>{$this->fields["Description"]}</div>
     		</div>
     		<div class='clear'></div>";
-		} else
+		}
+		else
 		{
 			$thisTitle = "
     		<div>
@@ -434,7 +441,8 @@ class Board extends ForumElement
 					$printContent .= $child->printThread($user);
 				}
 			}
-		} else
+		}
+		else
 		{
 			$printContent .= "<div class='forum_element'>No threads and boards avaliable.</div>";
 		}

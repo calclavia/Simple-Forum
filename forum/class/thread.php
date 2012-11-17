@@ -40,7 +40,8 @@ class Thread extends ForumElement
 		if ($row["ID"] <= 0)
 		{
 			return null;
-		} else
+		}
+		else
 		{
 			return new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Sticky"], $row["LockThread"], $row["Views"]);
 		}
@@ -258,7 +259,8 @@ class Thread extends ForumElement
                     <h2 class='quick_edit' name='t{$this->getID()}' data-type='title' contenteditable='true'>
                             {$this->name}
                     </h2>";
-			} else
+			}
+			else
 			{
 				$thisTitle = "<h2>{$this->name}</h2>";
 			}
@@ -302,7 +304,8 @@ class Thread extends ForumElement
 						}
 
 						$pagination .= "<li><a href='#' class='current'>" . $i . "</a></li>";
-					} else if ($currentPage < $i && $currentPage > $i - 3 || $currentPage > $i && $currentPage < $i + 3)
+					}
+					else if ($currentPage < $i && $currentPage > $i - 3 || $currentPage > $i && $currentPage < $i + 3)
 					{
 						$pagination .= "<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=$i'>" . $i . "</a></li>";
 					}
@@ -322,7 +325,8 @@ class Thread extends ForumElement
 				{
 					$printContent .= $this->printNewPostForm($user, $currentPage);
 				}
-			} else
+			}
+			else
 			{
 				$printContent .= "No posts avaliable.";
 			}

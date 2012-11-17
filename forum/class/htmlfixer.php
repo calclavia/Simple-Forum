@@ -280,7 +280,8 @@ class HtmlFixer
 					$out .= $this->matrix[$i]["pre"];
 					$out .= $this->matrix[$i]["tag"];
 					$out .= $this->matrix[$i]["post"];
-				} else
+				}
+				else
 				{
 					$out .= $this->matrix[$i]["pre"];
 					$out .= $this->matrix[$i]["post"];
@@ -315,7 +316,8 @@ class HtmlFixer
 						$out .= htmlspecialchars($this->matrix[$i]["pre"]) . "<br>";
 					$out .= "" . htmlspecialchars($this->matrix[$i]["tag"]) . "<span style='background-color:red; color:white'>{$i} <em>" . $this->matrix[$i]["tagType"] . "</em></span>";
 					$out .= htmlspecialchars($this->matrix[$i]["post"]);
-				} else
+				}
+				else
 				{
 					if ($this->matrix[$i]["pre"] != "")
 						$out .= htmlspecialchars($this->matrix[$i]["pre"]) . "<br>";
@@ -424,7 +426,8 @@ class HtmlFixer
 						$this->matrix[$j]["post"] = $contenuto;
 						$this->matrix[$j]["parentTag"] = $ind;
 						$tags[$tagType]--;
-					} else
+					}
+					else
 					{
 						if (@preg_match("/" . $tagType . "\/>$/i", $tag) || preg_match("/\/>/i", $tag))
 						{
@@ -438,7 +441,8 @@ class HtmlFixer
 							$this->matrix[$j]["parentTag"] = $indexparentTag;
 							$this->matrix[$j]["pre"] = $contenuto;
 							$this->matrix[$j]["post"] = "";
-						} else
+						}
+						else
 						{
 							/*
 							  it's a open tag
@@ -455,7 +459,8 @@ class HtmlFixer
 						}
 					}
 				}
-			} else
+			}
+			else
 			{
 				/*
 				  content of the tag

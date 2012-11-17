@@ -28,7 +28,8 @@ if (!empty($_GET["p"]))
 				{
 					$thread = $board->createThread($currentUser, clean($_POST["title"], true), clean($_POST["editableContent"]), time(), $con);
 					$successes[] = "Created forum thread!";
-				} else if ($_POST["board_name"] || $_POST["editableContent"])
+				}
+				else if ($_POST["board_name"] || $_POST["editableContent"])
 				{
 					$board->createBoard($currentUser, clean($_POST["board_name"]), clean($_POST["editableContent"]))->save($con);
 				}
@@ -37,7 +38,8 @@ if (!empty($_GET["p"]))
 			$printContent .= $board->printNewThreadForm();
 			$printContent .= $board->printBoardContent($currentUser);
 		}
-	} else if (strstr($_GET["p"], "t"))
+	}
+	else if (strstr($_GET["p"], "t"))
 	{
 		$thread = Thread::getByID(intval(str_replace("t", "", $_GET["p"])));
 
@@ -52,7 +54,8 @@ if (!empty($_GET["p"]))
 
 			$thread->view($currentUser, $con);
 		}
-	} else if (strstr($_GET["p"], "c"))
+	}
+	else if (strstr($_GET["p"], "c"))
 	{
 		$category = Category::getByID(intval(str_replace("c", "", $_GET["p"])));
 
@@ -75,7 +78,8 @@ if (!empty($_GET["p"]))
 		header("Location: forum.php");
 		die();
 	}
-} else
+}
+else
 {
 	if ($_GET["a"] == "new" && $_POST["title"])
 	{
