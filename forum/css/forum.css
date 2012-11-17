@@ -131,7 +131,7 @@
 	z-index: 2001;
 	-moz-opacity: 0.8;
 	opacity: .80;
-	filter: alpha(opacity =                                                 80);
+	filter: alpha(opacity =                                                   80);
 }
 
 .white_content {
@@ -290,14 +290,20 @@
 
 
 
+
+
 margin
+
+
 :
+
  
+
 0
 px
+
+
 ;
-
-
 }
 .thread_wrapper .forum_element {
 	padding: 0px 10px;

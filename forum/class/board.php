@@ -25,9 +25,7 @@ class Board extends ForumElement
 	{
 		global $table_prefix;
 
-		mysql_query(
-				"CREATE TABLE IF NOT EXISTS {$table_prefix}boards (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, ForumOrder int, Description TEXT, SubBoard varchar(5))",
-				$con) or die(mysql_error());
+		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}boards (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, ForumOrder int, Description TEXT, SubBoard varchar(5))", $con) or die(mysql_error());
 	}
 
 	public static function getByID($id)
@@ -44,8 +42,7 @@ class Board extends ForumElement
 			return null;
 		} else
 		{
-			return new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"],
-					$row["Description"], $row["SubBoard"]);
+			return new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
 		}
 	}
 
@@ -59,52 +56,45 @@ class Board extends ForumElement
 
 		while ($row = mysql_fetch_array($result))
 		{
-			$threads[] = new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Sticky"],
-					$row["LockThread"], $row["Views"]);
+			$threads[] = new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Sticky"], $row["LockThread"], $row["Views"]);
 		}
 
-		usort($threads,
-				function ($a, $b)
-				{
-					if ($a->fields["Sticky"] == "yes" && $b->fields["Sticky"] == "no")
-					{
-						return -1;
-					} else if ($a->fields["Sticky"] == "no" && $b->fields["Sticky"] == "yes")
-					{
-						return 1;
-					}
+		usort($threads, function ($a, $b)
+		{
+			if ($a->fields["Sticky"] == "yes" && $b->fields["Sticky"] == "no")
+			{
+				return -1;
+			} else if ($a->fields["Sticky"] == "no" && $b->fields["Sticky"] == "yes")
+			{
+				return 1;
+			}
 
-					return $a->getLatestPost()->fields["Time"]
-							< $b->getLatestPost()->fields["Time"];
-				});
+			return $a->getLatestPost()->fields["Time"] < $b->getLatestPost()->fields["Time"];
+		});
 
-		$result = mysql_query(
-				"SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='yes'");
+		$result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='yes'");
 
 		$boards = array();
 
 		while ($row = mysql_fetch_array($result))
 		{
-			$boards[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"],
-					$row["Description"], $row["SubBoard"]);
+			$boards[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
 		}
 
-		usort($boards,
-				function ($a, $b)
-				{
-					if ($a->fields["ForumOrder"] == $b->fields["ForumOrder"]
-							|| $a->fields["ForumOrder"] == -1)
-					{
-						return -1;
-					}
+		usort($boards, function ($a, $b)
+		{
+			if ($a->fields["ForumOrder"] == $b->fields["ForumOrder"] || $a->fields["ForumOrder"] == -1)
+			{
+				return -1;
+			}
 
-					if ($b->fields["ForumOrder"] == $a->getID())
-					{
-						return -1;
-					}
+			if ($b->fields["ForumOrder"] == $a->getID())
+			{
+				return -1;
+			}
 
-					return 1;
-				});
+			return 1;
+		});
 
 		return array_merge($boards, $threads);
 	}
@@ -233,17 +223,14 @@ class Board extends ForumElement
 
 			if ($i == count($elements))
 			{
-				$tree = "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$element->getID()}' class='current'>"
-						. limitString($element->name, 30) . "</a></li>" . $tree;
+				$tree = "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$element->getID()}' class='current'>" . limitString($element->name, 30) . "</a></li>" . $tree;
 			} else
 			{
-				$tree = "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$element->getID()}'>"
-						. limitString($element->name, 30) . "</a></li>" . $tree;
+				$tree = "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$element->getID()}'>" . limitString($element->name, 30) . "</a></li>" . $tree;
 			}
 		}
 
-		$tree = "<ul class='breadcrumb'><li><a href='{$_SERVER['PHP_SELF']}'>Main</a></li>" . $tree
-				. "</ul>";
+		$tree = "<ul class='breadcrumb'><li><a href='{$_SERVER['PHP_SELF']}'>Main</a></li>" . $tree . "</ul>";
 		return $tree;
 	}
 
@@ -328,12 +315,7 @@ class Board extends ForumElement
 
 			if ($latestPostUser != null && $thread != null)
 			{
-				$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t"
-						. $thread->getID() . "&page="
-						. ceil(count($thread->getPosts()) / $posts_per_page) . "#"
-						. $latestPost->getID() . "'>" . limitString($latestPost->name)
-						. "</a><br /> By: <b>" . limitString($latestPostUser->username, 20)
-						. "</b>, " . $latestPost->getDate() . ".";
+				$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t" . $thread->getID() . "&page=" . ceil(count($thread->getPosts()) / $posts_per_page) . "#" . $latestPost->getID() . "'>" . limitString($latestPost->name) . "</a><br /> By: <b>" . limitString($latestPostUser->username, 20) . "</b>, " . $latestPost->getDate() . ".";
 			}
 		}
 
@@ -343,8 +325,7 @@ class Board extends ForumElement
 		{
 			if ($child instanceof Board)
 			{
-				$subBoards .= "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$child->getID()}'>{$child
-						->name}</a></li>";
+				$subBoards .= "<li><a href='{$_SERVER['PHP_SELF']}?p=b{$child->getID()}'>{$child->name}</a></li>";
 			}
 		}
 
@@ -369,11 +350,9 @@ class Board extends ForumElement
 		return "
 	    	<div class='forum_element drop-shadow'>
 	    		<div class='two_third'>
-	    			<span class='" . ($this->isUnread($user) ? "icon_on" : "icon_off")
-				. "'></span>
+	    			<span class='" . ($this->isUnread($user) ? "icon_on" : "icon_off") . "'></span>
 	    			<div class='board_content'>
-	    				<h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=b{$this
-						->getID()}'>{$this->name}</a></h3>
+	    				<h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=b{$this->getID()}'>{$this->name}</a></h3>
 	    				<div class='element_text'>
 	    					<span>{$this->fields["Description"]}</span>
 	    					<div class='forum_element_info'>$stats</div>
@@ -402,8 +381,7 @@ class Board extends ForumElement
     			<h2 class='quick_edit' name='b{$this->getID()}' data-type='title' contenteditable='true'>
 					{$this->name}
 				</h2>
-    			<div class='quick_edit' name='b{$this->getID()}' data-type='description' contenteditable='true'>{$this
-					->fields["Description"]}</div>
+    			<div class='quick_edit' name='b{$this->getID()}' data-type='description' contenteditable='true'>{$this->fields["Description"]}</div>
     		</div>
     		<div class='clear'></div>";
 		} else
@@ -425,8 +403,7 @@ class Board extends ForumElement
 
 		if ($user->hasPermission($permission["board_create"], $this))
 		{
-			$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this
-					->getID()}')\" class=\"btn_small btn_white btn_flat\">+ Board</a> ";
+			$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"btn_small btn_white btn_flat\">+ Board</a> ";
 		}
 
 		if ($user->hasPermission($permission["board_delete"], $this))

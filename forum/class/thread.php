@@ -25,9 +25,7 @@ class Thread extends ForumElement
 	{
 		global $table_prefix;
 
-		mysql_query(
-				"CREATE TABLE IF NOT EXISTS {$table_prefix}threads (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Sticky varchar(5), LockThread varchar(5), Views int)",
-				$con) or die(mysql_error());
+		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}threads (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Sticky varchar(5), LockThread varchar(5), Views int)", $con) or die(mysql_error());
 	}
 
 	public static function getByID($id)
@@ -44,8 +42,7 @@ class Thread extends ForumElement
 			return null;
 		} else
 		{
-			return new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Sticky"],
-					$row["LockThread"], $row["Views"]);
+			return new Thread($row["ID"], $row["Parent"], $row["Name"], $row["Sticky"], $row["LockThread"], $row["Views"]);
 		}
 	}
 
@@ -59,15 +56,13 @@ class Thread extends ForumElement
 
 		while ($row = mysql_fetch_array($result))
 		{
-			$returnArray[] = new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"],
-					$row["User"], $row["Time"], $row["LastEditTime"], $row["LastEditUser"]);
+			$returnArray[] = new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"], $row["User"], $row["Time"], $row["LastEditTime"], $row["LastEditUser"]);
 		}
 
-		uasort($returnArray,
-				function ($a, $b)
-				{
-					return $a->fields["Time"] > $b->fields["Time"];
-				});
+		uasort($returnArray, function ($a, $b)
+		{
+			return $a->fields["Time"] > $b->fields["Time"];
+		});
 
 		return $returnArray;
 	}
@@ -139,11 +134,7 @@ class Thread extends ForumElement
 
 	public function getTreeAsString()
 	{
-		return str_replace("</ul>",
-				"<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}' class='current'>"
-						. limitString($this->name, 30) . "</a></li></ul>",
-				str_replace("class='current'", "",
-						Board::getByID(intval($this->fields["Parent"]))->getTreeAsString()));
+		return str_replace("</ul>", "<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}' class='current'>" . limitString($this->name, 30) . "</a></li></ul>", str_replace("class='current'", "", Board::getByID(intval($this->fields["Parent"]))->getTreeAsString()));
 	}
 
 	public function view($user, $con)
@@ -216,8 +207,7 @@ class Thread extends ForumElement
 		if ($latestPost->fields["User"] != null)
 		{
 			$latestPostUser = getUserByID($latestPost->fields["User"]);
-			$printLatestPost = "Last Post By: <b>" . $latestPostUser->username . "</b><br />"
-					. $latestPost->getDate();
+			$printLatestPost = "Last Post By: <b>" . $latestPostUser->username . "</b><br />" . $latestPost->getDate();
 		}
 
 		$thisOwner = "Annoymous";
@@ -229,14 +219,11 @@ class Thread extends ForumElement
 		}
 
 		return "
-            <div class='thread_wrapper "
-				. ($this->isUnread($user) ? "thread_unread" : "thread_normal")
-				. "'>
+            <div class='thread_wrapper " . ($this->isUnread($user) ? "thread_unread" : "thread_normal") . "'>
             <div class='forum_element'>
                     <div class='two_third'>
                             <div class='thread_content'>
-                                    <h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=t{$this
-						->getID()}'>{$this->name}</a></h3>
+                                    <h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a></h3>
                                 <div class='forum_element_info'>
                                     $thisOwner, {$this->getFirstPost()->getDate()}
                                 </div>
@@ -281,14 +268,12 @@ class Thread extends ForumElement
                 <br />
                 <div class=\"forum_menu\">";
 
-			if ($user->hasPermission($permission["post_create"], $this)
-					&& $this->fields["LockThread"] != "yes")
+			if ($user->hasPermission($permission["post_create"], $this) && $this->fields["LockThread"] != "yes")
 			{
 				$printContent .= "<a href = \"javascript:void(0)\" onclick = \"$('html, body').animate({scrollTop:  $(document).height()})\" class='btn_small btn_silver btn_flat'>+ Post</a>";
 			}
 
-			$printContent .= "</div><div class='clear'></div><div class='elements_container'>"
-					. $this->getTreeAsString();
+			$printContent .= "</div><div class='clear'></div><div class='elements_container'>" . $this->getTreeAsString();
 
 			if (count($this->getChildren()) > 0)
 			{
@@ -302,8 +287,7 @@ class Thread extends ForumElement
 				$pagination = "
                     <ul class='pagination'>
                     <li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=1' class='first'>First</a></li>
-                    <li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page="
-						. max($currentPage - 1, 1) . "' class='previous'>Previous</a></li>";
+                    <li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=" . max($currentPage - 1, 1) . "' class='previous'>Previous</a></li>";
 
 				foreach ($pages as $page)
 				{
@@ -314,34 +298,27 @@ class Thread extends ForumElement
 						 */
 						foreach ($page as $post)
 						{
-							$printContent .= $post
-									->printPost($user, getUserByID($post->fields["User"]));
+							$printContent .= $post->printPost($user, getUserByID($post->fields["User"]));
 						}
 
 						$pagination .= "<li><a href='#' class='current'>" . $i . "</a></li>";
-					} else if ($currentPage < $i && $currentPage > $i - 3
-							|| $currentPage > $i && $currentPage < $i + 3)
+					} else if ($currentPage < $i && $currentPage > $i - 3 || $currentPage > $i && $currentPage < $i + 3)
 					{
-						$pagination .= "<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=$i'>"
-								. $i . "</a></li>";
+						$pagination .= "<li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=$i'>" . $i . "</a></li>";
 					}
 
 					$i++;
 				}
 
 				$pagination .= "
-                    <li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page="
-						. max(min($currentPage + 1, $i - 1), 1)
-						. "' class='next'>Next</a></li>
-                    <li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=" . ($i - 1)
-						. "' class='last'>Last</a></li>
+                    <li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=" . max(min($currentPage + 1, $i - 1), 1) . "' class='next'>Next</a></li>
+                    <li><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page=" . ($i - 1) . "' class='last'>Last</a></li>
                     </ul>";
 
 				/**
 				 * Print out add new post form.
 				 */
-				if ($user->hasPermission($permission["post_create"], $this)
-						&& $this->fields["LockThread"] != "yes")
+				if ($user->hasPermission($permission["post_create"], $this) && $this->fields["LockThread"] != "yes")
 				{
 					$printContent .= $this->printNewPostForm($user, $currentPage);
 				}
@@ -350,8 +327,7 @@ class Thread extends ForumElement
 				$printContent .= "No posts avaliable.";
 			}
 
-			$printContent .= "<div class='page_numbers'>" . $pagination . "</div>"
-					. $this->getTreeAsString() . "</div>";
+			$printContent .= "<div class='page_numbers'>" . $pagination . "</div>" . $this->getTreeAsString() . "</div>";
 
 			return $printContent;
 		}
@@ -362,8 +338,7 @@ class Thread extends ForumElement
 		return "
 		<div class='post'>
 			<a rel='new'></a>
-			" . $user->printProfile()
-				. "
+			" . $user->printProfile() . "
 			<div class='comment_box'>
 				<div class='comment_inner'>
 					<form action='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page={$currentPage}&a=new' method='post'>

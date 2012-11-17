@@ -33,9 +33,7 @@ class Post extends ForumElement
 	{
 		global $table_prefix;
 
-		mysql_query(
-				"CREATE TABLE IF NOT EXISTS {$table_prefix}posts (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Content TEXT, User int, Time int, LastEditTime int, LastEditUser int)",
-				$con) or die(mysql_error());
+		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}posts (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), Parent int, Content TEXT, User int, Time int, LastEditTime int, LastEditUser int)", $con) or die(mysql_error());
 	}
 
 	public static function getByID($id)
@@ -52,8 +50,7 @@ class Post extends ForumElement
 			return null;
 		} else
 		{
-			return new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"],
-					$row["User"], $row["Time"], $row["LastEditTime"], $row["LastEditUser"]);
+			return new Post($row["ID"], $row["Parent"], $row["Name"], $row["Content"], $row["User"], $row["Time"], $row["LastEditTime"], $row["LastEditUser"]);
 		}
 	}
 
@@ -108,36 +105,30 @@ class Post extends ForumElement
 
 			if ($editUser != null)
 			{
-				$lastEdit = "Last edit: <b>" . $editUser->username . "</b>, "
-						. date("F j, Y, g:i a", $this->fields["LastEditTime"]);
+				$lastEdit = "Last edit: <b>" . $editUser->username . "</b>, " . date("F j, Y, g:i a", $this->fields["LastEditTime"]);
 			}
 		}
 
 		if ($user->hasPermission($permission["post_edit"], $this))
 		{
-			$editPost = "<a href=\"javascript:void(0);\" data-forum-target=\"" . $this->getID()
-					. "\" class=\"post_edit btn_small btn_white btn_flat\">Edit</a>";
+			$editPost = "<a href=\"javascript:void(0);\" data-forum-target=\"" . $this->getID() . "\" class=\"post_edit btn_small btn_white btn_flat\">Edit</a>";
 		}
 
 		if ($user->hasPermission($permission["post_delete"], $this))
 		{
-			$removePost = "<a href=\"javascript:if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$this
-					->fields["Parent"]}&d=p{$this->getID()}';}\" class=\"btn_small btn_white btn_flat\">Delete</a>";
+			$removePost = "<a href=\"javascript:if(confirm('Delete Post?')) {window.location='{$_SERVER['PHP_SELF']}?p=t{$this->fields["Parent"]}&d=p{$this->getID()}';}\" class=\"btn_small btn_white btn_flat\">Delete</a>";
 		}
 
 		if ($user->hasPermission($permission["post_create"], $this))
 		{
-			$quotePost = "<a href=\"javascript: postEditor.insertHtml('<blockquote>'+$('#post_content_"
-					. $this->getID()
-					. "').html()+'<cite>Quoted from {$postUser->username}</cite>
+			$quotePost = "<a href=\"javascript: postEditor.insertHtml('<blockquote>'+$('#post_content_" . $this->getID() . "').html()+'<cite>Quoted from {$postUser->username}</cite>
                 </blockquote><p></p>');\" class=\"btn_small btn_white btn_flat\">Quote</a>";
 		}
 
 		return "
             <div class='post'>
                 <a id='" . $this->getID() . "'></a>
-                " . $postUser->printProfile()
-				. "
+                " . $postUser->printProfile() . "
                 <div class='comment_box'>
                     <div class='comment_inner'>
                         <div class='forum_menu'>
@@ -146,8 +137,7 @@ class Post extends ForumElement
                             $removePost
                         </div>
                         <div class='clear'></div>
-                        <div id='post_content_" . $this->getID()
-				. "'>{$this->fields["Content"]}</div>
+                        <div id='post_content_" . $this->getID() . "'>{$this->fields["Content"]}</div>
                         <div class='hrline_silver'></div>
                         $editSignature
                         <span class='last_edit'>$lastEdit</span>

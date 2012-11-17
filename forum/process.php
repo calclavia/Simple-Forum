@@ -254,8 +254,7 @@ if (!empty($request_type))
 
 			if ($user != null && $user instanceof ForumUser && !empty($data))
 			{
-				if ($currentUser->hasPermission($permission["signature_edit"])
-						|| $currentUser->id == $user->id)
+				if ($currentUser->hasPermission($permission["signature_edit"]) || $currentUser->id == $user->id)
 				{
 					$user->editSignature($data, $con);
 					$successes[] = "Changed signature to: " . $data;
@@ -269,8 +268,7 @@ if (!empty($request_type))
 		echo json_encode($successes);
 	} else
 	{
-		echo json_encode(
-				array("Invalid " . $request_type . " Request: " . $edit . ", " . strip_tags($data)));
+		echo json_encode(array("Invalid " . $request_type . " Request: " . $edit . ", " . strip_tags($data)));
 	}
 }
 ?>

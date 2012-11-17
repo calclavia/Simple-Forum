@@ -23,9 +23,7 @@ class Category extends ForumElement
 	{
 		global $table_prefix;
 
-		mysql_query(
-				"CREATE TABLE IF NOT EXISTS {$table_prefix}categories (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), ForumOrder int, Hidden varchar(5))",
-				$con) or die(mysql_error());
+		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}categories (ID int NOT NULL AUTO_INCREMENT, PRIMARY KEY(ID), Name varchar(255), ForumOrder int, Hidden varchar(5))", $con) or die(mysql_error());
 	}
 
 	public static function getByID($id)
@@ -55,20 +53,18 @@ class Category extends ForumElement
 
 		while ($row = mysql_fetch_array($result))
 		{
-			$returnArray[] = new Category($row["ID"], $row["Name"], $row["ForumOrder"],
-					$row["Hidden"]);
+			$returnArray[] = new Category($row["ID"], $row["Name"], $row["ForumOrder"], $row["Hidden"]);
 		}
 
-		usort($returnArray,
-				function ($a, $b)
-				{
-					if ($a->fields["ForumOrder"] >= $b->fields["ForumOrder"])
-					{
-						return 1;
-					}
+		usort($returnArray, function ($a, $b)
+		{
+			if ($a->fields["ForumOrder"] >= $b->fields["ForumOrder"])
+			{
+				return 1;
+			}
 
-					return -1;
-				});
+			return -1;
+		});
 
 		$i = 0;
 
@@ -88,31 +84,27 @@ class Category extends ForumElement
 
 		$returnArray = array();
 
-		$result = mysql_query(
-				"SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='no'");
+		$result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='no'");
 
 		while ($row = mysql_fetch_array($result))
 		{
-			$returnArray[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"],
-					$row["Name"], $row["Description"], $row["SubBoard"]);
+			$returnArray[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
 		}
 
-		usort($returnArray,
-				function ($a, $b)
-				{
-					if ($a->fields["ForumOrder"] == $b->fields["ForumOrder"]
-							|| $a->fields["ForumOrder"] == -1)
-					{
-						return -1;
-					}
+		usort($returnArray, function ($a, $b)
+		{
+			if ($a->fields["ForumOrder"] == $b->fields["ForumOrder"] || $a->fields["ForumOrder"] == -1)
+			{
+				return -1;
+			}
 
-					if ($b->fields["ForumOrder"] == $a->getID())
-					{
-						return -1;
-					}
+			if ($b->fields["ForumOrder"] == $a->getID())
+			{
+				return -1;
+			}
 
-					return 1;
-				});
+			return 1;
+		});
 
 		return $returnArray;
 	}
@@ -181,28 +173,12 @@ class Category extends ForumElement
                                     {$this->name}
                             </h2>";
 
-					if ($categories[$i + 1])
-					{
-						$title .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this
-								->getID()}&o=c{$categories[$i + 1]->getID()}'\" class='btn_small btn_silver btn_flat'>&darr;</a>";
-					}
-
-					if ($i > 1)
-					{
-						if ($categories[$i - 2])
-						{
-							$title .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this
-									->getID()}&o=c{$categories[$i - 2]->getID()}'\" class='btn_small btn_silver btn_flat'>&uarr;</a>";
-						}
-					}
-
 					$title .= "</div>";
 				} else
 				{
 					$title = "
-                        <div id='c{$this->getID()}'>
-                                <h2 id='category{$this->getID()}' class='category_title'>{$this
-							->name}</h2>
+                        <div>
+                                <h2 id='category{$this->getID()}' class='category_title'>{$this->name}</h2>
                         </div>";
 				}
 
@@ -211,10 +187,16 @@ class Category extends ForumElement
                         <div class='elements_container'>
                             <span class='forum_menu'>";
 
+				if ($user->hasPermission($edit_categories, $this))
+				{
+					if ($categories[$i + 1])
+					{
+						$title .= "<a href='javascript:void(0)' onclick=\"window.location='{$_SERVER['PHP_SELF']}?p=c{$this->getID()}&o=c{$categories[$i + 1]->getID()}'\" class='btn_small btn_silver btn_flat'>&darr;</a> ";
+					}
+				}
 				if ($user->hasPermission($permission["board_create"], $this))
 				{
-					$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this
-							->getID()}')\" class=\"btn_small btn_silver btn_flat\">+ Board</a> ";
+					$printContent .= "<a href=\"javascript:void(0)\" onclick = \"lightBox('newBoard{$this->getID()}')\" class=\"btn_small btn_silver btn_flat\">+ Board</a> ";
 				}
 
 				if ($user->hasPermission($delete_categories, $this))

@@ -54,8 +54,7 @@ abstract class ForumElement
 
 			$query .= ")";
 
-			mysql_query($query)
-					or die("Failed to create forum element: " . mysql_error() . ", Q = " . $query);
+			mysql_query($query) or die("Failed to create forum element: " . mysql_error() . ", Q = " . $query);
 			$result = mysql_query("SHOW TABLE STATUS LIKE '{$table_prefix}{$this->element_name}'");
 			$row = mysql_fetch_array($result);
 			$maxRows = intval($row['Auto_increment']);
@@ -63,8 +62,7 @@ abstract class ForumElement
 			return true;
 		} else
 		{
-			$query = "UPDATE {$table_prefix}{$this->element_name} SET Name='"
-					. mysql_real_escape_string($this->name) . "'";
+			$query = "UPDATE {$table_prefix}{$this->element_name} SET Name='" . mysql_real_escape_string($this->name) . "'";
 
 			$i = 0;
 
@@ -85,8 +83,7 @@ abstract class ForumElement
 
 			$query .= " WHERE ID={$this->id} LIMIT 1";
 
-			mysql_query($query)
-					or die("Failed to save forum element: " . mysql_error() . ", Q = " . $query);
+			mysql_query($query) or die("Failed to save forum element: " . mysql_error() . ", Q = " . $query);
 			return true;
 		}
 

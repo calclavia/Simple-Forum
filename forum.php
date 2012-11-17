@@ -26,15 +26,11 @@ if (!empty($_GET["p"]))
 			{
 				if (!empty($_POST["title"]) && !empty($_POST["editableContent"]))
 				{
-					$thread = $board
-							->createThread($currentUser, clean($_POST["title"], true),
-									clean($_POST["editableContent"]), time(), $con);
+					$thread = $board->createThread($currentUser, clean($_POST["title"], true), clean($_POST["editableContent"]), time(), $con);
 					$successes[] = "Created forum thread!";
 				} else if ($_POST["board_name"] || $_POST["editableContent"])
 				{
-					$board
-							->createBoard($currentUser, clean($_POST["board_name"]),
-									clean($_POST["editableContent"]))->save($con);
+					$board->createBoard($currentUser, clean($_POST["board_name"]), clean($_POST["editableContent"]))->save($con);
 				}
 			}
 
@@ -49,8 +45,7 @@ if (!empty($_GET["p"]))
 		{
 			if ($_GET["a"] == "new" && $_POST["editableContent"])
 			{
-				$post = $thread
-						->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);
+				$post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);
 			}
 
 			$printContent .= $thread->printThreadContent($currentUser, intval($_GET["page"]));
@@ -68,9 +63,7 @@ if (!empty($_GET["p"]))
 				if (empty($_POST["editableContent"]))
 					$_POST["editableContent"] = " ";
 
-				$category
-						->createBoard($currentUser, clean($_POST["title"], true),
-								clean($_POST["editableContent"], true))->save($con);
+				$category->createBoard($currentUser, clean($_POST["title"], true), clean($_POST["editableContent"], true))->save($con);
 			}
 
 			$printContent .= $category->printCategory($currentUser);
@@ -107,12 +100,10 @@ if ($currentUser->hasPermission($create_categories))
 $content = "
         <div class='forum'>
             <div id='forum_notifications' class='notification'></div>
-            <span>Current Time: " . date("F j, Y, g:i a", time())
-		. "</span>
+            <span>Current Time: " . date("F j, Y, g:i a", time()) . "</span>
             $newCategory
             <div style='clear'></div><br />
-            " . $printContent
-		. "
+            " . $printContent . "
             </div>			
         <br/><br/>
         <div id='fade' class='black_overlay' onclick=\"closeLightBox()\"></div>";

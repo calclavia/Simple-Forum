@@ -211,8 +211,7 @@ class HtmlFixer
 			if ($this->matrix[$i]["tagType"] == "div")
 			{ //div cannot stay inside a p, b, etc.
 				$parentType = $this->matrix[$this->matrix[$i]["parentTag"]]["tagType"];
-				if (in_array($parentType,
-						array("p", "b", "i", "font", "u", "small", "strong", "em")))
+				if (in_array($parentType, array("p", "b", "i", "font", "u", "small", "strong", "em")))
 					$flag = true;
 			}
 
@@ -233,34 +232,26 @@ class HtmlFixer
 			if ($this->matrix[$i]["tagType"] == "p")
 			{
 				$parentType = $this->matrix[$this->matrix[$i]["parentTag"]]["tagType"];
-				if (in_array($parentType,
-						array("p", "b", "i", "font", "u", "small", "strong", "em")))
+				if (in_array($parentType, array("p", "b", "i", "font", "u", "small", "strong", "em")))
 					$flag = true;
 			}
 
 			if ($this->matrix[$i]["tagType"] == "table")
 			{
 				$parentType = $this->matrix[$this->matrix[$i]["parentTag"]]["tagType"];
-				if (in_array($parentType,
-						array("p", "b", "i", "font", "u", "small", "strong", "em", "tr", "table")))
+				if (in_array($parentType, array("p", "b", "i", "font", "u", "small", "strong", "em", "tr", "table")))
 					$flag = true;
 			}
 			if ($flag)
 			{
 				$errorsCounter++;
 				if ($this->debug)
-					echo "<div style='color:#ff0000'>Found a <b>" . $this->matrix[$i]["tagType"]
-							. "</b> tag inside a <b>" . htmlspecialchars($parentType)
-							. "</b> tag at node $i: MOVED</div>";
+					echo "<div style='color:#ff0000'>Found a <b>" . $this->matrix[$i]["tagType"] . "</b> tag inside a <b>" . htmlspecialchars($parentType) . "</b> tag at node $i: MOVED</div>";
 
 				$swap = $this->matrix[$this->matrix[$i]["parentTag"]]["parentTag"];
 				if ($this->debug)
-					echo "<div style='color:#ff0000'>Every node that has parent "
-							. $this->matrix[$i]["parentTag"] . " will have parent " . $swap
-							. "</div>";
-				$this->matrix[$this->matrix[$i]["parentTag"]]["tag"] = "<!-- T A G \""
-						. $this->matrix[$this->matrix[$i]["parentTag"]]["tagType"]
-						. "\" R E M O V E D -->";
+					echo "<div style='color:#ff0000'>Every node that has parent " . $this->matrix[$i]["parentTag"] . " will have parent " . $swap . "</div>";
+				$this->matrix[$this->matrix[$i]["parentTag"]]["tag"] = "<!-- T A G \"" . $this->matrix[$this->matrix[$i]["parentTag"]]["tagType"] . "\" R E M O V E D -->";
 				$this->matrix[$this->matrix[$i]["parentTag"]]["tagType"] = "";
 				$hoSpostato = 0;
 				for ($j = count($this->matrix) - 1; $j >= $i; $j--)
@@ -300,8 +291,7 @@ class HtmlFixer
 					if ($this->matrix[$i]["tagType"] != "")
 					{
 						//write the closing tag
-						if (!in_array($this->matrix[$i]["tagType"],
-								array("br", "img", "hr", "input")))
+						if (!in_array($this->matrix[$i]["tagType"], array("br", "img", "hr", "input")))
 							$out .= "</" . $this->matrix[$i]["tagType"] . ">";
 					}
 				}
@@ -323,9 +313,7 @@ class HtmlFixer
 				{
 					if ($this->matrix[$i]["pre"] != "")
 						$out .= htmlspecialchars($this->matrix[$i]["pre"]) . "<br>";
-					$out .= "" . htmlspecialchars($this->matrix[$i]["tag"])
-							. "<span style='background-color:red; color:white'>{$i} <em>"
-							. $this->matrix[$i]["tagType"] . "</em></span>";
+					$out .= "" . htmlspecialchars($this->matrix[$i]["tag"]) . "<span style='background-color:red; color:white'>{$i} <em>" . $this->matrix[$i]["tagType"] . "</em></span>";
 					$out .= htmlspecialchars($this->matrix[$i]["post"]);
 				} else
 				{
@@ -338,13 +326,8 @@ class HtmlFixer
 					$out .= "<div>" . $this->findSonsOfDisplayCode($i) . "</div>\n";
 					if ($this->matrix[$i]["tagType"] != "")
 					{
-						if (($this->matrix[$i]["tagType"] != "br")
-								&& ($this->matrix[$i]["tagType"] != "img")
-								&& ($this->matrix[$i]["tagType"] != "hr")
-								&& ($this->matrix[$i]["tagType"] != "input"))
-							$out .= "<div style='color:red'>"
-									. htmlspecialchars("</" . $this->matrix[$i]["tagType"] . ">")
-									. "{$i} <em>" . $this->matrix[$i]["tagType"] . "</em></div>";
+						if (($this->matrix[$i]["tagType"] != "br") && ($this->matrix[$i]["tagType"] != "img") && ($this->matrix[$i]["tagType"] != "hr") && ($this->matrix[$i]["tagType"] != "input"))
+							$out .= "<div style='color:red'>" . htmlspecialchars("</" . $this->matrix[$i]["tagType"] . ">") . "{$i} <em>" . $this->matrix[$i]["tagType"] . "</em></div>";
 					}
 				}
 				$out .= "</div>\n";
@@ -359,18 +342,7 @@ class HtmlFixer
 		while ($i < 10)
 		{
 			$i++;
-			$s = preg_replace(
-					array('/[\r\n]/i', '/  /i', '/<p([^>])*>(&nbsp;)*\s*<\/p>/i',
-							'/<span([^>])*>(&nbsp;)*\s*<\/span>/i',
-							'/<strong([^>])*>(&nbsp;)*\s*<\/strong>/i',
-							'/<em([^>])*>(&nbsp;)*\s*<\/em>/i',
-							'/<font([^>])*>(&nbsp;)*\s*<\/font>/i',
-							'/<small([^>])*>(&nbsp;)*\s*<\/small>/i',
-							'/<\?xml:namespace([^>])*><\/\?xml:namespace>/i',
-							'/<\?xml:namespace([^>])*\/>/i', '/class=\"MsoNormal\"/i',
-							'/<o:p><\/o:p>/i', '/<!DOCTYPE([^>])*>/i', '/<!--(.|\s)*?-->/',
-							'/<\?(.|\s)*?\?>/'),
-					array(' ', ' ', '', '', '', '', '', '', '', '', '', ' ', '', ''), trim($s));
+			$s = preg_replace(array('/[\r\n]/i', '/  /i', '/<p([^>])*>(&nbsp;)*\s*<\/p>/i', '/<span([^>])*>(&nbsp;)*\s*<\/span>/i', '/<strong([^>])*>(&nbsp;)*\s*<\/strong>/i', '/<em([^>])*>(&nbsp;)*\s*<\/em>/i', '/<font([^>])*>(&nbsp;)*\s*<\/font>/i', '/<small([^>])*>(&nbsp;)*\s*<\/small>/i', '/<\?xml:namespace([^>])*><\/\?xml:namespace>/i', '/<\?xml:namespace([^>])*\/>/i', '/class=\"MsoNormal\"/i', '/<o:p><\/o:p>/i', '/<!DOCTYPE([^>])*>/i', '/<!--(.|\s)*?-->/', '/<\?(.|\s)*?\?>/'), array(' ', ' ', '', '', '', '', '', '', '', '', '', ' ', '', ''), trim($s));
 		}
 		return $s;
 	}
@@ -432,9 +404,7 @@ class HtmlFixer
 						$tagok = false;
 						/* there is a close tag without any open tag, I delete it */
 						if ($this->debug)
-							echo "<div style='color:#ff0000'>Found a closing tag <b>"
-									. htmlspecialchars($tag)
-									. "</b> at char $i without open tag: REMOVED</div>";
+							echo "<div style='color:#ff0000'>Found a closing tag <b>" . htmlspecialchars($tag) . "</b> at char $i without open tag: REMOVED</div>";
 					}
 				}
 				if ($tagok)
@@ -456,8 +426,7 @@ class HtmlFixer
 						$tags[$tagType]--;
 					} else
 					{
-						if (@preg_match("/" . $tagType . "\/>$/i", $tag)
-								|| preg_match("/\/>/i", $tag))
+						if (@preg_match("/" . $tagType . "\/>$/i", $tag) || preg_match("/\/>/i", $tag))
 						{
 							/*
 							  it's a autoclosing tag
