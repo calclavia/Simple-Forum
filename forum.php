@@ -10,89 +10,92 @@ $printContent = "";
  */
 if (!empty($_GET["p"]))
 {
-    if (strstr($_GET["p"], "p"))
-    {
-        $post = Post::getByID(intval(str_replace("p", "", $_GET["p"])));
-        $_GET["p"] = "t" . $post->fields["Parent"];
-    }
+	if (strstr($_GET["p"], "p"))
+	{
+		$post = Post::getByID(intval(str_replace("p", "", $_GET["p"])));
+		$_GET["p"] = "t" . $post->fields["Parent"];
+	}
 
-    if (strstr($_GET["p"], "b"))
-    {
-        $board = Board::getByID(intval(str_replace("b", "", $_GET["p"])));
+	if (strstr($_GET["p"], "b"))
+	{
+		$board = Board::getByID(intval(str_replace("b", "", $_GET["p"])));
 
-        if ($board != null)
-        {
-            if ($_GET["a"] == "new")
-            {
-                if (!empty($_POST["title"]) && !empty($_POST["editableContent"]))
-                {
-                    $thread = $board->createThread($currentUser, clean($_POST["title"], true), clean($_POST["editableContent"]), time(), $con);
-                    $successes[] = "Created forum thread!";
-                }
-                else if ($_POST["board_name"] || $_POST["editableContent"])
-                {
-                    $board->createBoard($currentUser, clean($_POST["board_name"]), clean($_POST["editableContent"]))->save($con);
-                }
-            }
+		if ($board != null)
+		{
+			if ($_GET["a"] == "new")
+			{
+				if (!empty($_POST["title"]) && !empty($_POST["editableContent"]))
+				{
+					$thread = $board
+							->createThread($currentUser, clean($_POST["title"], true),
+									clean($_POST["editableContent"]), time(), $con);
+					$successes[] = "Created forum thread!";
+				} else if ($_POST["board_name"] || $_POST["editableContent"])
+				{
+					$board
+							->createBoard($currentUser, clean($_POST["board_name"]),
+									clean($_POST["editableContent"]))->save($con);
+				}
+			}
 
-            $printContent .= $board->printNewThreadForm();
-            $printContent .= $board->printBoardContent($currentUser);
-        }
-    }
-    else if (strstr($_GET["p"], "t"))
-    {
-        $thread = Thread::getByID(intval(str_replace("t", "", $_GET["p"])));
+			$printContent .= $board->printNewThreadForm();
+			$printContent .= $board->printBoardContent($currentUser);
+		}
+	} else if (strstr($_GET["p"], "t"))
+	{
+		$thread = Thread::getByID(intval(str_replace("t", "", $_GET["p"])));
 
-        if ($thread != null)
-        {
-            if ($_GET["a"] == "new" && $_POST["editableContent"])
-            {
-                $post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);
-            }
+		if ($thread != null)
+		{
+			if ($_GET["a"] == "new" && $_POST["editableContent"])
+			{
+				$post = $thread
+						->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);
+			}
 
-            $printContent .= $thread->printThreadContent($currentUser, intval($_GET["page"]));
+			$printContent .= $thread->printThreadContent($currentUser, intval($_GET["page"]));
 
-            $thread->view($currentUser, $con);
-        }
-    }
-    else if (strstr($_GET["p"], "c"))
-    {
-        $category = Category::getByID(intval(str_replace("c", "", $_GET["p"])));
+			$thread->view($currentUser, $con);
+		}
+	} else if (strstr($_GET["p"], "c"))
+	{
+		$category = Category::getByID(intval(str_replace("c", "", $_GET["p"])));
 
-        if ($category != null)
-        {
-            if ($_GET["a"] == "new" && !empty($_POST["title"]))
-            {
-                if (empty($_POST["editableContent"]))
-                    $_POST["editableContent"] = " ";
+		if ($category != null)
+		{
+			if ($_GET["a"] == "new" && !empty($_POST["title"]))
+			{
+				if (empty($_POST["editableContent"]))
+					$_POST["editableContent"] = " ";
 
-                $category->createBoard($currentUser, clean($_POST["title"], true), clean($_POST["editableContent"], true))->save($con);
-            }
+				$category
+						->createBoard($currentUser, clean($_POST["title"], true),
+								clean($_POST["editableContent"], true))->save($con);
+			}
 
-            $printContent .= $category->printCategory($currentUser);
-        }
-    }
+			$printContent .= $category->printCategory($currentUser);
+		}
+	}
 
-    if (empty($printContent))
-    {
-        header("Location: forum.php");
-        die();
-    }
-}
-else
+	if (empty($printContent))
+	{
+		header("Location: forum.php");
+		die();
+	}
+} else
 {
-    if ($_GET["a"] == "new" && $_POST["title"])
-    {
-        $category = new Category(-1, clean($_POST["title"]), -1, false);
-        $category->save($con);
-    }
+	if ($_GET["a"] == "new" && $_POST["title"])
+	{
+		$category = new Category(-1, clean($_POST["title"]), -1, false);
+		$category->save($con);
+	}
 
-    $printContent .= Category::printAll($currentUser);
+	$printContent .= Category::printAll($currentUser);
 }
 
 if ($currentUser->hasPermission($create_categories))
 {
-    $newCategory .= "
+	$newCategory .= "
         <span class='forum_menu'>
             <form  action='{$_SERVER['PHP_SELF']}?a=new' method='post'>
                     <input type='text' name='title'>
@@ -104,10 +107,12 @@ if ($currentUser->hasPermission($create_categories))
 $content = "
         <div class='forum'>
             <div id='forum_notifications' class='notification'></div>
-            <span>Current Time: " . date("F j, Y, g:i a", time()) . "</span>
+            <span>Current Time: " . date("F j, Y, g:i a", time())
+		. "</span>
             $newCategory
             <div style='clear'></div><br />
-            " . $printContent . "
+            " . $printContent
+		. "
             </div>			
         <br/><br/>
         <div id='fade' class='black_overlay' onclick=\"closeLightBox()\"></div>";

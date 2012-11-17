@@ -2,189 +2,187 @@
  * Shadows
 */
 .drop-shadow {
-    position: relative;
-    float: left;
-    padding: 10px;
-    margin: 10px;
-    width: 95%;
-    background: #ffffff;
-    -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px
-        rgba(0, 0, 0, 0.1) inset;
-    -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px
-        rgba(0, 0, 0, 0.1) inset;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1)
-        inset;
-    background: #ffffff;
+	position: relative;
+	float: left;
+	padding: 10px;
+	margin: 10px;
+	width: 95%;
+	background: #ffffff;
+	-webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px
+		rgba(0, 0, 0, 0.1) inset;
+	-moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px
+		rgba(0, 0, 0, 0.1) inset;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1)
+		inset;
+	background: #ffffff;
 }
 
 /**
  * Collumn Styles
 */
 .one_half {
-    width: 48%;
+	width: 48%;
 }
 
 .one_third {
-    width: 30.5%;
+	width: 30.5%;
 }
 
 .one_fourth {
-    width: 22%;
+	width: 22%;
 }
 
 .one_fifth {
-    width: 16.8%;
+	width: 16.8%;
 }
 
 .one_sixth {
-    width: 13.33%;
+	width: 13.33%;
 }
 
 .two_fifth {
-    width: 37.6%;
+	width: 37.6%;
 }
 
 .two_third {
-    width: 65.33%;
+	width: 65.33%;
 }
 
 .three_fifth {
-    width: 58.4%;
+	width: 58.4%;
 }
 
 .three_fourth {
-    width: 74%;
+	width: 74%;
 }
 
 .four_fifth {
-    width: 67.2%;
+	width: 67.2%;
 }
 
 .five_sixth {
-    width: 82.67%;
+	width: 82.67%;
 }
 
 .one_half,.one_third,.two_third,.three_fourth,.one_fourth,.one_fifth,.two_fifth,.three_fifth,.four_fifth,.one_sixth,.five_sixth
-{
-    position: relative;
-    margin-right: 4%;
-    margin-bottom: 20px;
-    float: left;
+	{
+	position: relative;
+	margin-right: 4%;
+	margin-bottom: 20px;
+	float: left;
 }
 
 .column-last {
-    margin-right: 0 !important;
-    clear: right;
+	margin-right: 0 !important;
+	clear: right;
 }
 
 .tabs_type_2 .one_third {
-    width: 29%;
+	width: 29%;
 }
 
 .hrline_silver {
-    background-color: #ddd;
-    margin-top: 12px;
-    margin-bottom: 12px;
-    height: 1px;
-    margin-left: auto;
-    margin-right: auto;
+	background-color: #ddd;
+	margin-top: 12px;
+	margin-bottom: 12px;
+	height: 1px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .hrline_gray {
-    background-color: #ccc;
-    margin-top: 12px;
-    margin-bottom: 12px;
-    height: 1px;
-    margin-left: auto;
-    margin-right: auto;
+	background-color: #ccc;
+	margin-top: 12px;
+	margin-bottom: 12px;
+	height: 1px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .hrline_black {
-    background-color: #000;
-    margin-top: 12px;
-    margin-bottom: 12px;
-    height: 1px;
-    margin-left: auto;
-    margin-right: auto;
+	background-color: #000;
+	margin-top: 12px;
+	margin-bottom: 12px;
+	height: 1px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .hrline_red {
-    background-color: #c00;
-    margin-top: 12px;
-    margin-bottom: 12px;
-    height: 1px;
-    margin-left: auto;
-    margin-right: auto;
+	background-color: #c00;
+	margin-top: 12px;
+	margin-bottom: 12px;
+	height: 1px;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 /**
  * Lightbox
 */
 .black_overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: black;
-    z-index: 2001;
-    -moz-opacity: 0.8;
-    opacity: .80;
-    filter: alpha(opacity =                                               80);
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	z-index: 2001;
+	-moz-opacity: 0.8;
+	opacity: .80;
+	filter: alpha(opacity =                                                 80);
 }
 
 .white_content {
-    display: none;
-    position: fixed;
-    top: 15%;
-    left: 25%;
-    width: 50%;
-    height: 70%;
-    padding: 15px;
-    background-color: white;
-    z-index: 2002;
-    overflow: auto;
-    color: #000;
+	display: none;
+	position: fixed;
+	top: 15%;
+	left: 25%;
+	width: 50%;
+	height: 70%;
+	padding: 15px;
+	background-color: white;
+	z-index: 2002;
+	overflow: auto;
+	color: #000;
 }
 
 .white_content h1 {
-    display: inline;
-    margin: 5px;
+	display: inline;
+	margin: 5px;
 }
 
 .clear {
-    clear: both;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    font-size: 0px;
-    line-height: 0px;
+	clear: both;
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	font-size: 0px;
+	line-height: 0px;
 }
 
 /**
  * General
 */
 .forum {
-    width: 100%;
-    padding: 5px;
-    margin: 5px;
+	width: 100%;
+	padding: 5px;
+	margin: 5px;
 }
 
 .forum a {
-    text-decoration: none;
-    font-weight: bold;
+	text-decoration: none;
+	font-weight: bold;
 }
 
-.forum .notification
-{
-    display:none;
-    max-height: 100px;
+.forum .notification {
+	display: none;
+	max-height: 100px;
 }
 
-.forum blockquote
-{
-    font-size: 14px;
+.forum blockquote {
+	font-size: 14px;
 	background-color: #F3F3F3;
 	margin: 20px 0;
 	padding: 5px 7px 10px 45px;
@@ -195,101 +193,94 @@
 	background-position: 7px 6px;
 }
 
-.forum blockquote a
-{
-    color:#111 !important;
+.forum blockquote a {
+	color: #111 !important;
 }
 
 .forum_menu {
-    float: right;
-    margin-bottom: 8px;
+	float: right;
+	margin-bottom: 8px;
 }
 
 .dragText,.inline_form {
-    display: none;
+	display: none;
 }
 
 .inlineEdit input {
-    display: none;
+	display: none;
 }
 
 .elements_container {
-    margin: 8px 0px;
-    padding: 15px;
+	margin: 8px 0px;
+	padding: 15px;
 }
 
 /**
  * Forum Elements
 */
-.forum_element
-{
-    color: #000000;
+.forum_element {
+	color: #000000;
 }
 
-.forum_element_info
-{
-    font-size: 13px;
-    font-weight: lighter;
-    color: #424242;
+.forum_element_info {
+	font-size: 13px;
+	font-weight: lighter;
+	color: #424242;
 }
 
-.forum .element_title
-{
-    font-size: 20px;
-    font-weight: bold;
-    display: inline;
-    padding-top: 8px;
+.forum .element_title {
+	font-size: 20px;
+	font-weight: bold;
+	display: inline;
+	padding-top: 8px;
 }
 
-.forum .forum_element .element_text
-{
-    font-size: 15px;
+.forum .forum_element .element_text {
+	font-size: 15px;
 }
 
 /**
  * Category
 */
-
-.forum .category_title
-{
-    padding-left: 15px;
-    padding-top: 15px;
+.forum .category_title {
+	padding-left: 15px;
+	padding-top: 15px;
 }
 
 /**
  * Boards
 */
 .forum .forum_element .icon_on,.forum .forum_element .icon_off {
-    height: 41px;
-    width: 38px;
-    float: left;
-    margin: 10px 0 10px 4px;
+	height: 41px;
+	width: 38px;
+	float: left;
+	margin: 10px 0 10px 4px;
 }
 
 .forum .forum_element .icon_on {
-    background-image: url(img/on.png);
+	background-image: url(img/on.png);
 }
 
 .forum .forum_element .icon_off {
-    background-image: url(img/off.png);
+	background-image: url(img/off.png);
 }
 
 .forum .forum_element .sub_boards li {
-    padding-left: 5px;
+	padding-left: 5px;
 }
 
 .forum .forum_element .sub_boards li {
-    list-style-type: none;
+	list-style-type: none;
 }
 
 .forum .forum_element .board_content {
-    margin: 0px 0px 0px 56px;
+	margin: 0px 0px 0px 56px;
 }
 
 .forum .page_numbers {
-    padding: 10px;
-    margin: 0px auto;
-    width: 400px;
+	padding: 10px;
+	margin: 0px auto;
+	width: 400px;
 }
 
 /**
@@ -297,134 +288,127 @@
 */
 .thread_wrapper
 
-margin: 0px;
+
+
+margin
+:
+ 
+0
+px
+;
+
+
+}
+.thread_wrapper .forum_element {
+	padding: 0px 10px;
+	height: 70px;
 }
 
-.thread_wrapper .forum_element
-{
-    padding: 0px 10px;
-    height: 70px;
-}
-
-.thread_wrapper .element_title
-{
-    font-size: 18px;
-    display: inline;
+.thread_wrapper .element_title {
+	font-size: 18px;
+	display: inline;
 }
 
 .thread_unread {
-    background-color: #FFFFC8;
+	background-color: #FFFFC8;
 }
 
 .thread_normal {
-    background-color: inherit;
+	background-color: inherit;
 }
 
-.forum .forum_element .thread_content
-{
-    margin-top: 4%;
-    margin-left: 20px;
-    margin-bottom: 5px;
+.forum .forum_element .thread_content {
+	margin-top: 4%;
+	margin-left: 20px;
+	margin-bottom: 5px;
 }
 
 /**
  * Posts
 */
-.post
-{
-    margin-bottom: 16px;
-    color: black;
-    padding: 10px;
+.post {
+	margin-bottom: 16px;
+	color: black;
+	padding: 10px;
 }
 
-.post .forum_profile
-{
-    float: left;
-    text-align: center;
+.post .forum_profile {
+	float: left;
+	text-align: center;
 }
 
-.post .forum_profile .profile_info
-{
-    padding-left: 5px;
+.post .forum_profile .profile_info {
+	padding-left: 5px;
 }
 
-.post .avatar
-{
-    background: #fff;
-    padding: 2px;
-    border: 1px solid #d8d8d8;
-    position: relative;
+.post .avatar {
+	background: #fff;
+	padding: 2px;
+	border: 1px solid #d8d8d8;
+	position: relative;
 }
 
-.post .username
-{
-    color: #383838;
-    font-weight: bold;
-    clear: left;
+.post .username {
+	color: #383838;
+	font-weight: bold;
+	clear: left;
 }
 
-.post .comment_box
-{
-    float: right;
-    padding-bottom: 8px;
-    height: auto;
-    background: #fff;
-    border: 1px solid #d8d8d8;
-    position: relative;
-    width: 75%;
+.post .comment_box {
+	float: right;
+	padding-bottom: 8px;
+	height: auto;
+	background: #fff;
+	border: 1px solid #d8d8d8;
+	position: relative;
+	width: 75%;
 }
 
-.post .comment_box:before
-{
-    content: '';
-    width: 15px;
-    height: 15px;
-    background: #fff;
-    border-left: 1px solid #d8d8d8;
-    border-bottom: 1px solid #d8d8d8;
-    position: absolute;
-    top: 50px;
-    left: -8px;
-    transform: rotate(45deg);
-    -webkit-transform: rotate(45deg);
-    -moz-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
-    -o-transform: rotate(45deg);
+.post .comment_box:before {
+	content: '';
+	width: 15px;
+	height: 15px;
+	background: #fff;
+	border-left: 1px solid #d8d8d8;
+	border-bottom: 1px solid #d8d8d8;
+	position: absolute;
+	top: 50px;
+	left: -8px;
+	transform: rotate(45deg);
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
+	-ms-transform: rotate(45deg);
+	-o-transform: rotate(45deg);
 }
 
-.post .comment_inner
-{
-    color: #454545;
-    line-height: 14px;
-    margin: 4px 10px 0 15px;
+.post .comment_inner {
+	color: #454545;
+	line-height: 14px;
+	margin: 4px 10px 0 15px;
 }
 
-.post .comment_inner:focus
-{
-    outline: none;
+.post .comment_inner:focus {
+	outline: none;
 }
 
-.post .last_edit
-{
-    font-size: 11px;
-    color: #b7b7b7;
-    text-decoration: none;
-    margin-top: 8px;
-    position: relative;
-    float: left;
+.post .last_edit {
+	font-size: 11px;
+	color: #b7b7b7;
+	text-decoration: none;
+	margin-top: 8px;
+	position: relative;
+	float: left;
 }
 
-.post .date
-{
-    font-size: 11px;
-    color: #b7b7b7;
-    margin-top: 8px;
-    text-decoration: none;
-    float: right;
+.post .date {
+	font-size: 11px;
+	color: #b7b7b7;
+	margin-top: 8px;
+	text-decoration: none;
+	float: right;
 }
 
-.post .forum_signature
-{
-    max-height: 145;
-    overflow: hidden;
+.post .forum_signature {
+	max-height: 145;
+	overflow: hidden;
 }

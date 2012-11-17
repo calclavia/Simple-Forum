@@ -72,7 +72,7 @@ class Category extends ForumElement
 
 		$i = 0;
 
-		foreach ($returnArray as $categpry)
+		foreach ($returnArray as $category)
 		{
 			$category->fields["ForumOrder"] = $i;
 			$category->save($con);
