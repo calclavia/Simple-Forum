@@ -374,15 +374,7 @@ class Board extends ForumElement
 
 		if ($user->hasPermission($permission['board_edit'], $this))
 		{
-			$dropData = "
-    			class='draggable' draggable='true' ondragstart=\"drag(event, 'b{$this->getID()}')\"
-    			ondrop=\"drop(event, 'b{$this->getID()}')\" ondragover='allowDrop(event)'
-    			";
-
-			$dropData2 = "
-    			class='draggable' draggable='true' ondragstart=\"drag(event, 'b{$this->getID()}')\"
-    			ondrop=\"move(event, 'b{$this->getID()}')\" ondragover='allowDrop(event)'
-    			";
+			$orderHTML = "<a href=\"{$_SERVER['PHP_SELF']}?&o=b{$this->getID()}\" class='btn_small btn_silver btn_flat'>&darr;</a>";
 		}
 
 		return "
@@ -390,7 +382,7 @@ class Board extends ForumElement
 	    		<div class='two_third'>
 	    			<span class='" . ($this->isUnread($user) ? "icon_on" : "icon_off") . "'></span>
 	    			<div class='board_content'>
-	    				<h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=b{$this->getID()}'>{$this->name}</a></h3>
+	    				<h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=b{$this->getID()}'>{$this->name}</a> $orderHTML</h3>
 	    				<div class='element_text'>
 	    					<span>{$this->fields["Description"]}</span>
 	    					<div class='forum_element_info'>$stats</div>

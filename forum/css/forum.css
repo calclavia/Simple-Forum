@@ -131,8 +131,8 @@
 	z-index: 2001;
 	-moz-opacity: 0.8;
 	opacity: .80;
-	filter: alpha(opacity =                                                       80
-		);
+	filter: alpha(opacity =                                                        
+		80);
 }
 
 .white_content {
@@ -399,7 +399,7 @@
 }
 
 .post .forum_signature {
-	font-size: 16px;
-	max-height: 145;
+	font-size: 16px; max-height : 145;
 	overflow: hidden;
+	max-height: 145;
 }

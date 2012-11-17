@@ -22,13 +22,13 @@ if (!empty($order))
 			$category->moveDown($currentUser, $con);
 		}
 	}
-	else if (strstr($_GET["p"], "b") && strstr($_GET["o"], "b"))
+	else if (strstr($order, "b"))
 	{
-		$board = Board::getByID(intval(str_replace("b", "", $_GET["p"])));
-
+		$board = Board::getByID(intval(str_replace("b", "", $order)));
+	
 		if ($board != null)
 		{
-			$board->move($currentUser, str_replace("b", "", $_GET["o"]), $con);
+			$board->moveDown($currentUser, $con);
 		}
 	}
 
