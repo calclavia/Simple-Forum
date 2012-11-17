@@ -1,5 +1,30 @@
 <?php
 
+abstract class ProcessRequest
+{
+	public $user;
+	public $type;
+	public $element;
+	public $data;
+	
+	/**
+	 * Proccess a request.
+	 * @param ForumUser $user - The current user doing this request.
+	 * @param int $type - The type of request being done.
+	 * @param ForumElement $element - The element the request is being done to.
+	 * @param Mixed $data - Data to be proccessed.
+	 */
+	function __construct($user, $type, $element, $data)
+	{
+		$this->user = $user;
+		$this->type = $type;
+		$this->element = $element;
+		$this->data = $data;
+	}
+	
+	public abstract function doRequest();
+}
+
 /**
  * Process different GET and POST submitted actions.
  * a = Adding
@@ -25,7 +50,7 @@ if (!empty($order))
 	else if (strstr($order, "b"))
 	{
 		$board = Board::getByID(intval(str_replace("b", "", $order)));
-	
+
 		if ($board != null)
 		{
 			$board->moveDown($currentUser, $con);
