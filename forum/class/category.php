@@ -211,7 +211,7 @@ class Category extends ForumElement
 
 				if ($user->hasPermission($permission["board_create"], $this))
 				{
-					$printContent .= "<a href=\"javascript: $('#newBoard{$this->getID()}').stop(true, true).slideToggle();\" class=\"btn_small btn_silver btn_flat\">+ Board</a> ";
+					$printContent .= "<a href=\"javascript: void(0)\" data-forum-target='{$this->getID()}' class=\"new_board_button btn_small btn_silver btn_flat\">+ Board</a> ";
 				}
 
 				if ($user->hasPermission($permission["category_delete"], $this))
@@ -270,12 +270,12 @@ class Category extends ForumElement
 	public function printNewBoardForm()
 	{
 		return "
-		<div id='newBoard{$this->getID()}' style='display:none;' class='forum_element drop-shadow'>
+		<div id='newBoard_{$this->getID()}' style='display:none;' class='forum_element drop-shadow'>
 	    		<div class='two_third'>
 	    			<span class='icon_on'></span>
 	    			<div class='board_content'>
-	    				<h3 class='element_title' id='title_{$this->getID()}' contenteditable='true'>Title</h3>
-	    				<div class='element_text' id='content_{$this->getID()}' contenteditable='true'>Enter your description for the board.</div>
+	    				<h3 class='element_title' id='title_{$this->getID()}'>Title</h3>
+	    				<div class='element_text' id='content_{$this->getID()}'>Enter your description for the board.</div>
 	    			</div>
 	    		</div>
 	    		<div class='forum_element_info one_third column-last'>

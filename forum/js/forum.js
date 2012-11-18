@@ -89,6 +89,12 @@ $(document).ready(function() {
         });
     });
 	
+	$('.new_board_button').click(function(){
+		$('#title_'+$(this).data('forum-target')).attr('contenteditable', 'true');
+		$('#content_'+$(this).data('forum-target')).attr('contenteditable', 'true');
+		$('#newBoard_'+$(this).data('forum-target')).stop(true, true).slideToggle();
+	});
+	
     $('.new_board').click(function(){
         $.ajax({
             type: "POST",

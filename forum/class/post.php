@@ -122,7 +122,7 @@ class Post extends ForumElement
 
 		if ($user->hasPermission($permission["post_create"], $this))
 		{
-			$quotePost = "<a href=\"javascript: $('#editableContentNewPost').val('<blockquote>'+$('#post_content_" . $this->getID() . "').html()+'<cite>Quoted from {$postUser->username}</cite>
+			$quotePost = "<a href=\"javascript: postEditor.insertHtml('<blockquote>'+$('#post_content_" . $this->getID() . "').html()+'<cite>Quoted from {$postUser->username}</cite>
                 </blockquote><p></p>');\" class=\"btn_small btn_white btn_flat\">Quote</a>";
 		}
 
