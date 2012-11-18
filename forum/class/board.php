@@ -75,7 +75,7 @@ class Board extends ForumElement
 		});
 
 		$boards = $this->getBoardsUnsorted();
-		
+
 		usort($boards, function ($a, $b)
 		{
 			if ($a->fields["ForumOrder"] > $b->fields["ForumOrder"])
@@ -101,19 +101,19 @@ class Board extends ForumElement
 	public function getBoardsUnsorted()
 	{
 		global $table_prefix;
-		
+
 		$result = mysql_query("SELECT * FROM {$table_prefix}boards WHERE Parent={$this->id} AND SubBoard='yes'");
-		
+
 		$boards = array();
-		
+
 		while ($row = mysql_fetch_array($result))
 		{
 			$boards[] = new Board($row["ID"], $row["Parent"], $row["ForumOrder"], $row["Name"], $row["Description"], $row["SubBoard"]);
 		}
-		
+
 		return $boards;
 	}
-	
+
 	public function createThread($user, $name, $content = "", $time = -1, $con = false)
 	{
 		global $create_threads;
@@ -141,12 +141,12 @@ class Board extends ForumElement
 	public function createBoard($user, $name, $description)
 	{
 		global $permission;
-	
+
 		if ($user->hasPermission($permission["board_create"], $this))
 		{
 			return new Board(-1, $this->id, -1, $name, $description, "yes");
 		}
-	
+
 		return null;
 	}
 
@@ -256,22 +256,27 @@ class Board extends ForumElement
 
 	public function editTitle($user, $title)
 	{
-		global $edit_boards;
+		global $permission;
 
-		if ($user->hasPermission($edit_boards, $this))
+		if ($user->hasPermission($permission["board_edit"], $this))
 		{
-			$this->name = clean($title, true);
+			$this->name = $title;
+			return true;
 		}
+
+		return false;
 	}
 
 	public function editDescription($user, $description)
 	{
-		global $edit_boards;
+		global $permission;
 
-		if ($user->hasPermission($edit_boards, $this))
+		if ($user->hasPermission($permission["board_edit"], $this))
 		{
 			$this->fields["Description"] = $description;
+			return true;
 		}
+		return false;
 	}
 
 	public function moveDown($user, $con)
@@ -328,7 +333,7 @@ class Board extends ForumElement
 
 		return false;
 	}
-	
+
 	public function getParent()
 	{
 		return ($this->fields["SubBoard"] == "yes" ? Board::getByID($this->fields["Parent"]) : Category::getByID($this->fields["Parent"]));
@@ -384,7 +389,7 @@ class Board extends ForumElement
 		}
 
 		return "
-	    	<div class='forum_element drop-shadow'>
+	    	<div class='board_box forum_element drop-shadow'>
 	    		<div class='two_third'>
 	    			<span class='" . ($this->isUnread($user) ? "icon_on" : "icon_off") . "'></span>
 	    			<div class='board_content'>
@@ -399,6 +404,7 @@ class Board extends ForumElement
 	    			<p>$printLatestPost</p>
 	    			<div class='sub_boards'>
 	    				$subBoards
+	    				<div class='clear'></div>
 	    			</div>
 	    		</div>
                 <div class='clear'></div>
@@ -410,6 +416,11 @@ class Board extends ForumElement
 		global $permission;
 
 		$printContent = "<div class='board'><div class=\"forum_menu\">";
+
+		if ($user->hasPermission($permission["board_edit"], $this))
+		{
+			$printContent .= "<a href=\"javascript:void(0)\" data-forum-target='{$this->getID()}' class='board_edit btn_small btn_white btn_flat'>Edit</a> ";
+		}
 
 		if ($user->hasPermission($permission["thread_create"], $this))
 		{
@@ -426,34 +437,18 @@ class Board extends ForumElement
 			$printContent .= "<a href=\"javascript: if(confirm('Delete Board and ALL content within?')) {window.location='{$_SERVER['PHP_SELF']}?d=b{$this->getID()}'}\" class=\"btn_small btn_white btn_flat\">Delete</a>";
 		}
 
-		$printContent .= "</div>";
-
-		if ($user->hasPermission($permission["board_edit"], $this))
-		{
-			$printContent .= "
-			<div>
-				<h2 class='quick_edit editable_title' name='b{$this->getID()}' data-type='title' contenteditable='true'>
-					{$this->name}
-				</h2>
-				<div class='quick_edit' name='b{$this->getID()}' data-type='description' contenteditable='true'>{$this->fields["Description"]}</div>
-			</div>";
-		}
-		else
-		{
-			$printContent .=  "
-			<div>
-				<h2>{$this->name}</h2>
-				<div style='width:70%'>{$this->fields["Description"]}</div>
-			</div>";
-		}
-		
-		$printContent .= "<div class='clear'></div><div class='elements_container'>" . $this->getTreeAsString();
+		$printContent .= "
+		</div>
+		<h2 class='editable_title header_title' id='board_title_{$this->getID()}'>{$this->name}</h2>
+		<div class='editable_title' id='board_description_{$this->getID()}'>{$this->fields["Description"]}</div>
+		<div class='clear'></div>
+		<div class='elements_container'>" . $this->getTreeAsString();
 
 		if ($user->hasPermission($permission["board_create"], $this))
 		{
 			$printContent .= $this->printNewBoardForm();
 		}
-		
+
 		if (count($this->getChildren()) > 0)
 		{
 			foreach ($this->getChildren() as $child)

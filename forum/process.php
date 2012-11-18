@@ -45,6 +45,10 @@ abstract class ProcessRequest
 		{
 			return (new EditCategory($currentUser, $elementID, array($_POST["data1"]), $con))->request();
 		}
+		else if ($request_type == 5)
+		{
+			return (new EditBoard($currentUser, $elementID, array($_POST["data1"], $_POST["data2"]), $con))->request();
+		}
 
 		return false;
 	}
@@ -61,6 +65,35 @@ abstract class ProcessRequest
 	protected abstract function doRequest();
 }
 
+class EditBoard extends ProcessRequest
+{
+	function __construct($user, $elementID, $data, $con)
+	{
+		parent::__construct($user, Board::getByID(intval($elementID)), $data, $con);
+	}
+
+	public function doRequest()
+	{
+		$this->data[0] = limitString(clean($this->data[0], true), 30);
+		$this->data[1] = limitString(clean($this->data[1], true), 150);
+
+		if (!empty($this->data[0]))
+		{
+			if ($this->element->editTitle($this->user, $this->data[0]) && $this->element->editDescription($this->user, $this->data[1]))
+			{
+				$this->element->save($this->con);
+				return "Successfully edited board.";
+			}
+			else
+			{
+				return "Failed to edited board.";
+			}
+		}
+
+		return "Invalid board name";
+	}
+}
+
 class EditCategory extends ProcessRequest
 {
 	function __construct($user, $elementID, $data, $con)
@@ -74,17 +107,17 @@ class EditCategory extends ProcessRequest
 
 		if (!empty($this->data[0]))
 		{
-			if ($category->edit($this->user, $this->data[0], $this->con))
+			if ($this->element->edit($this->user, $this->data[0], $this->con))
 			{
-				return "Edited category name to: " . $this->data[0];
+				return "Successfully edited category name to: " . $this->data[0];
 			}
 			else
 			{
-				return "Failed to edit category";
+				return "Failed to edited category.";
 			}
 		}
 
-		return "Invalid category name: ".$this->data[0];
+		return "Invalid category name.";
 	}
 }
 
@@ -105,9 +138,9 @@ class EditThread extends ProcessRequest
 			$this->element->stickThread($this->user, ($this->data[1] == "true" ? true : false));
 			$this->element->lockThread($this->user, ($this->data[2] == "true" ? true : false));
 			$this->element->save($this->con);
-			return "Edited Thread!";
+			return "Successfully edited thread.";
 		}
-		return "Invalid thread name: ".$this->data[0];
+		return "Invalid thread name.";
 	}
 }
 
@@ -357,27 +390,6 @@ if (!empty($request_type))
 			{
 				$category->edit($currentUser, $title, $con);
 				$successes[] = "Changed category name to: " . $title;
-			}
-		}
-		else if (strstr($edit, "b"))
-		{
-			$data = clean($data, true);
-			$board = Board::getByID(intval(str_replace("b", "", $edit)));
-
-			if ($board != null && !empty($data))
-			{
-				if ($request_type == "title")
-				{
-					$board->editTitle($currentUser, $data);
-					$successes[] = "Changed board name to: " . $board->name;
-				}
-				else if ($request_type == "description")
-				{
-					$board->editDescription($currentUser, $data);
-					$successes[] = "Changed board description to: " . $board->fields["Description"];
-				}
-
-				$board->save($con);
 			}
 		}
 		else if ($request_type == "post_edit")

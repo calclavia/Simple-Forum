@@ -206,10 +206,6 @@ class Category extends ForumElement
 				if ($user->hasPermission($permission["category_edit"], $this))
 				{
 					$printContent .= "<a href=\"{$_SERVER['PHP_SELF']}?&o=c{$this->getID()}\" class='btn_small btn_silver btn_flat'>&darr;</a> ";
-				}
-
-				if ($user->hasPermission($permission["category_edit"], $this))
-				{
 					$printContent .= "<a href=\"javascript:void(0)\" data-forum-target='{$this->getID()}' class='category_edit btn_small btn_silver btn_flat'>Edit</a> ";
 				}
 
