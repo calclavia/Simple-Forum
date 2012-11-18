@@ -10,15 +10,14 @@ class Post extends ForumElement
 	function __construct($id, $parent, $name, $content, $userID, $time, $lastEditTime, $lastEditUser)
 	{
 		$this->id = $id;
-		$this->name = stripslashes(str_replace("\\r\\n", "", $name));
+		$this->name = clean(str_replace("\\r\\n", "", $name), true);
 
 		$this->element_name = "posts";
 		$this->prefix = "p";
 
 		$this->fields["Parent"] = $parent;
 		$this->fields["User"] = $userID;
-		$this->fields["Content"] = str_replace("\\r\\n", "", $content);
-		//$this->fields["Content"] = stripslashes("Â", "", str_replace(str_replace("\\r\\n", "", $content)));
+		$this->fields["Content"] = clean(str_replace("\\r\\n", "", $content));
 		$this->fields["Time"] = $time;
 		$this->fields["LastEditTime"] = $lastEditTime;
 		$this->fields["LastEditUser"] = $lastEditUser;
@@ -123,7 +122,7 @@ class Post extends ForumElement
 
 		if ($user->hasPermission($permission["post_create"], $this))
 		{
-			$quotePost = "<a href=\"javascript: postEditor.insertHtml('<blockquote>'+$('#post_content_" . $this->getID() . "').html()+'<cite>Quoted from {$postUser->username}</cite>
+			$quotePost = "<a href=\"javascript: $('#editableContentNewPost').val('<blockquote>'+$('#post_content_" . $this->getID() . "').html()+'<cite>Quoted from {$postUser->username}</cite>
                 </blockquote><p></p>');\" class=\"btn_small btn_white btn_flat\">Quote</a>";
 		}
 

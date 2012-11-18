@@ -133,7 +133,10 @@ class Category extends ForumElement
 		if ($con != null)
 		{
 			$this->save($con);
+			return true;
 		}
+		
+		return false;
 	}
 
 	public function createBoard($user, $name, $description)
@@ -195,28 +198,19 @@ class Category extends ForumElement
 		{
 			if ($this->fields["Hidden"] != "yes")
 			{
-				if ($user->hasPermission($permission["category_edit"], $this))
-				{
-					$title = "
-                        <div class='category_title'>
-                            <h2 class='quick_edit' name='c{$this->getID()}' data-type='ajax' style='display:inline; margin-right:5px;' contenteditable='true'>
-                                    {$this->name}
-                            </h2>
-                        </div>";
-				}
-				else
-				{
-					$title = "<h2 id='category{$this->getID()}' class='category_title'>{$this->name}</h2>";
-				}
 
 				$printContent = "
                     <div class='category'>
-                        <div class='elements_container'>
-                            <span class='forum_menu'>";
+                        <div class='forum_menu'>";
 
 				if ($user->hasPermission($permission["category_edit"], $this))
 				{
 					$printContent .= "<a href=\"{$_SERVER['PHP_SELF']}?&o=c{$this->getID()}\" class='btn_small btn_silver btn_flat'>&darr;</a> ";
+				}
+
+				if ($user->hasPermission($permission["category_edit"], $this))
+				{
+					$printContent .= "<a href=\"javascript:void(0)\" data-forum-target='{$this->getID()}' class='category_edit btn_small btn_silver btn_flat'>Edit</a> ";
 				}
 
 				if ($user->hasPermission($permission["board_create"], $this))
@@ -229,7 +223,16 @@ class Category extends ForumElement
 					$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=c{$this->getID()}' class=\"btn_small btn_silver btn_flat\">Delete</a>";
 				}
 
-				$printContent .= "</span>$title<div class='clear'></div>";
+				$printContent .= "</div>";
+
+				$printContent .= "<h2 id='category_title_{$this->getID()}' class='editable_title category_title'>{$this->name}</h2>";
+
+				$printContent .= "<div class='clear'></div><div class='elements_container'>";
+
+				if ($user->hasPermission($permission["board_create"]))
+				{
+					$printContent .= $this->printNewBoardForm();
+				}
 
 				if (count($this->getChildren()) > 0)
 				{
@@ -241,11 +244,6 @@ class Category extends ForumElement
 				else
 				{
 					$printContent .= "No boards avaliable.";
-				}
-
-				if ($user->hasPermission($permission["board_create"]))
-				{
-					$printContent .= $this->printNewBoardForm();
 				}
 
 				$printContent .= "</div>";

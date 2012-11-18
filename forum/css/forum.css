@@ -131,8 +131,9 @@
 	z-index: 2001;
 	-moz-opacity: 0.8;
 	opacity: .80;
-	filter: alpha(opacity =                                                         
-		 80);
+	filter: alpha(opacity =    
+		                                                         
+		      80);
 }
 
 .white_content {
@@ -200,7 +201,6 @@
 
 .forum_menu {
 	float: right;
-	margin-bottom: 8px;
 }
 
 .dragText,.inline_form {
@@ -213,7 +213,15 @@
 
 .elements_container {
 	margin: 8px 0px;
-	padding: 15px;
+}
+
+.hidden_field {
+	display: none;
+}
+
+.editable_title {
+	width: 70%;
+	overflow: hidden;
 }
 
 /**
@@ -293,7 +301,8 @@
  * Threads
 */
 .thread_wrapper {
-	margin: 0 px;
+	padding: 5px 25px;
+	margin: 0px;
 }
 
 .thread_wrapper .forum_element {
@@ -307,6 +316,10 @@
 
 .thread_unread {
 	background-color: #FFFFC8;
+}
+
+.thread_sticky {
+	background-color: #FFBABA;
 }
 
 .thread_normal {
@@ -377,7 +390,6 @@
 
 .post .comment_inner {
 	color: #454545;
-	line-height: 14px;
 	margin: 4px 10px 0 15px;
 }
 

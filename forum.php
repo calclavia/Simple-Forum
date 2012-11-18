@@ -121,8 +121,9 @@ $head = "
         <link href=\"forum/css/breadcrum.css\" rel=\"stylesheet\" type=\"text/css\" />
         <link href=\"forum/css/pagination.css\" rel=\"stylesheet\" type=\"text/css\" />
         <link href=\"forum/css/forum.css\" rel=\"stylesheet\" type=\"text/css\" />
-  		<script type='text/javascript' src='forum/lib/tiny_mce/tiny_mce.js'></script>
-		<script type='text/javascript' src='forum/js/forum.js'></script>";
+  		<script type='text/javascript' src='{$jquery_path}'></script>
+  		<script type='text/javascript' src='{$editor_js_path}'></script>
+  		<script type='text/javascript' src='forum/js/forum.js'></script>";
 
 /**
  * Echo the variable $head in your head and $content in the place where you have your main body.

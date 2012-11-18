@@ -114,7 +114,7 @@ class ForumUser
 			}
 			else
 			{
-				$query = "UPDATE {$table_prefix}users SET Moderate='" . serialize($this->moderate) . "', Unread='" . serialize($this->unreadPosts) . "', Posts={$this->posts}, Signature='" . mysql_real_escape_string($this->signature) . "' WHERE ID={$this->id} LIMIT 1";
+				$query = "UPDATE {$table_prefix}users SET Moderate='" . serialize($this->moderate) . "', Unread='" . mysql_real_escape_string(serialize($this->unreadPosts)) . "', Posts={$this->posts}, Signature='" . mysql_real_escape_string($this->signature) . "' WHERE ID={$this->id} LIMIT 1";
 				mysql_query($query, $con) or die("Failed to save forum element: " . mysql_error() . ", Q = " . $query);
 				return true;
 			}

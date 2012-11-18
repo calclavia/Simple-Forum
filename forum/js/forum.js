@@ -56,7 +56,6 @@ function move(ev, targetID)
 function resultBlock(data)
 {
     $("#forum_notifications").empty();
-    $("#forum_notifications").fadeIn('fast');
 
     var appendString = '<ul>';
 	
@@ -68,8 +67,7 @@ function resultBlock(data)
     appendString += '</ul>';
 	
     $("#forum_notifications").append(appendString);
-	
-    $("#forum_notifications").fadeOut(10000);
+    $("#forum_notifications").slideDown('slow').delay(5000).slideUp('slow');
 }
 
 var lastPostEditor;
@@ -180,7 +178,71 @@ $(document).ready(function() {
             $(this).addClass('editing');
         }
     });
-	
+
+    $('.thread_edit').click(function(){
+	    if($(this).hasClass('editing'))
+	    {
+	        $.ajax({
+	            type: "POST",
+	            url: "forum/process.php",
+	            dataType: 'json',
+	            data: {
+	                ajax: 3, 
+	                element: $(this).data('forum-target'), 
+	                data1: $('#thread_title_'+$(this).data('forum-target')).html(),
+	                data2: $('#sticky_'+$(this).data('forum-target')).is(':checked'),
+	                data3: $('#lock_'+$(this).data('forum-target')).is(':checked')
+	            }
+	        }).done(function( msg ) {
+	            resultBlock(msg);
+	        });
+			
+	        $('#thread_title_'+$(this).data('forum-target')).attr('contenteditable', 'false');
+	        $('#sticky_'+$(this).data('forum-target')).parent().slideUp();
+	        $('#lock_'+$(this).data('forum-target')).parent().slideUp();
+	        $(this).html('Edit');
+	        $(this).removeClass('editing');
+	    }
+	    else
+	    {
+	        $('#thread_title_'+$(this).data('forum-target')).attr('contenteditable', 'true');
+	        $('#sticky_'+$(this).data('forum-target')).parent().slideDown();
+	        $('#lock_'+$(this).data('forum-target')).parent().slideDown();
+	        $('#thread_title_'+$(this).data('forum-target')).focus();
+	        $(this).html("Save");
+	        $(this).addClass('editing');
+	    }
+	});
+    
+    $('.category_edit').click(function(){
+	    if($(this).hasClass('editing'))
+	    {
+	        $.ajax({
+	            type: "POST",
+	            url: "forum/process.php",
+	            dataType: 'json',
+	            data: {
+	                ajax: 4, 
+	                element: $(this).data('forum-target'), 
+	                data1: $('#category_title_'+$(this).data('forum-target')).html(),
+	            }
+	        }).done(function( msg ) {
+	            resultBlock(msg);
+	        });
+			
+	        $('#category_title_'+$(this).data('forum-target')).attr('contenteditable', 'false');
+	        $(this).html('Edit');
+	        $(this).removeClass('editing');
+	    }
+	    else
+	    {
+	        $('#category_title_'+$(this).data('forum-target')).attr('contenteditable', 'true');
+	        $('#category_title_'+$(this).data('forum-target')).focus();
+	        $(this).html("Save");
+	        $(this).addClass('editing');
+	    }
+	});
+    	
     $('.post_edit_active')
 	
     $('.draggable').hover(function(){
@@ -200,21 +262,10 @@ $(document).ready(function() {
         $(this).parent().find('.inline_form').fadeOut('slow');
     });
     
-    tinyMCE.init({
-    	theme : "advanced",
-        mode : "textareas",
-        /*theme_advanced_styles : "Code=codeStyle;Quote=quoteStyle",
-        plugins : "bbcode",
-        theme_advanced_buttons1 : "bold,italic,underline,undo,redo,link,unlink,image,forecolor,styleselect,removeformat,cleanup,code",
-        theme_advanced_buttons2 : "",
-        theme_advanced_buttons3 : "",
-        theme_advanced_toolbar_location : "bottom",
-        theme_advanced_toolbar_align : "center",
-        content_css : "css/bbcode.css",
-        add_unload_trigger : false,
-        remove_linebreaks : false,
-        inline_styles : false,
-        convert_fonts_to_spans : false,*/
-        entity_encoding : "raw"
+    $('.editors').each(function(){
+    	CKEDITOR.replace($(this).attr('id'), {
+            height:'250', 
+            width: '548'
+        });
     });
 });

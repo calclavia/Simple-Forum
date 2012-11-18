@@ -409,28 +409,7 @@ class Board extends ForumElement
 	{
 		global $permission;
 
-		if ($user->hasPermission($permission["board_edit"], $this))
-		{
-			$thisTitle = "
-    		<div>
-    			<h2 class='quick_edit' name='b{$this->getID()}' data-type='title' contenteditable='true'>
-					{$this->name}
-				</h2>
-    			<div class='quick_edit' name='b{$this->getID()}' data-type='description' contenteditable='true'>{$this->fields["Description"]}</div>
-    		</div>
-    		<div class='clear'></div>";
-		}
-		else
-		{
-			$thisTitle = "
-    		<div>
-    			<h2>{$this->name}</h2>
-    			<div style='width:70%'>{$this->fields["Description"]}</div>
-    		</div>
-    		";
-		}
-
-		$printContent .= $thisTitle . "<div class=\"forum_menu\">";
+		$printContent = "<div class='board'><div class=\"forum_menu\">";
 
 		if ($user->hasPermission($permission["thread_create"], $this))
 		{
@@ -444,12 +423,31 @@ class Board extends ForumElement
 
 		if ($user->hasPermission($permission["board_delete"], $this))
 		{
-			$printContent .= "<a href='{$_SERVER['PHP_SELF']}?d=b{$this->getID()}' class=\"btn_small btn_white btn_flat\">Delete</a>";
+			$printContent .= "<a href=\"javascript: if(confirm('Delete Board and ALL content within?')) {window.location='{$_SERVER['PHP_SELF']}?d=b{$this->getID()}'}\" class=\"btn_small btn_white btn_flat\">Delete</a>";
 		}
 
-		$printContent .= "</div><div class='clear'></div>";
+		$printContent .= "</div>";
 
-		$printContent .= "<div class='elements_container'>" . $this->getTreeAsString();
+		if ($user->hasPermission($permission["board_edit"], $this))
+		{
+			$printContent .= "
+			<div>
+				<h2 class='quick_edit editable_title' name='b{$this->getID()}' data-type='title' contenteditable='true'>
+					{$this->name}
+				</h2>
+				<div class='quick_edit' name='b{$this->getID()}' data-type='description' contenteditable='true'>{$this->fields["Description"]}</div>
+			</div>";
+		}
+		else
+		{
+			$printContent .=  "
+			<div>
+				<h2>{$this->name}</h2>
+				<div style='width:70%'>{$this->fields["Description"]}</div>
+			</div>";
+		}
+		
+		$printContent .= "<div class='clear'></div><div class='elements_container'>" . $this->getTreeAsString();
 
 		if ($user->hasPermission($permission["board_create"], $this))
 		{
@@ -466,7 +464,7 @@ class Board extends ForumElement
 				}
 			}
 
-			$printContent .= "</div><div class='elements_container'>";
+			$printContent .= "<div class='clear'></div></div><div class='elements_container'>";
 
 			foreach ($this->getChildren() as $child)
 			{
@@ -481,7 +479,7 @@ class Board extends ForumElement
 			$printContent .= "<div class='forum_element'>No threads and boards avaliable.</div>";
 		}
 
-		$printContent .= $this->getTreeAsString() . "</div>";
+		$printContent .= $this->getTreeAsString() . "<div class='clear'></div></div></div>";
 
 		return $printContent;
 	}

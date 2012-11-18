@@ -27,55 +27,125 @@ abstract class ProcessRequest
 		$this->con = $con;
 	}
 
-	/**
-	 * Proccess a request.
-	 */
-	public abstract function doRequest();
+	public static function processRequest($currentUser, $request_type, $elementID, $con)
+	{
+		if ($request_type == 1)
+		{
+			return (new NewBoard($currentUser, Category::getByID(intval($elementID)), array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->request();
+		}
+		else if ($request_type == 2)
+		{
+			return (new NewBoard($currentUser, Board::getByID(intval($elementID)), array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->request();
+		}
+		else if ($request_type == 3)
+		{
+			return (new EditThread($currentUser, $elementID, array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->request();
+		}
+		else if ($request_type == 4)
+		{
+			return (new EditCategory($currentUser, $elementID, array($_POST["data1"]), $con))->request();
+		}
+
+		return false;
+	}
+
+	public function request()
+	{
+		if ($this->user != null && $this->element != null)
+		{
+			return $this->doRequest();
+		}
+		return "Failed to process request.";
+	}
+
+	protected abstract function doRequest();
 }
 
-class NewBoard extends ProcessRequest
+class EditCategory extends ProcessRequest
 {
-	function __construct($user, $element, $data, $con)
+	function __construct($user, $elementID, $data, $con)
 	{
-		parent::__construct($user, $element, $data, $con);
+		parent::__construct($user, Category::getByID(intval($elementID)), $data, $con);
 	}
 
 	public function doRequest()
 	{
+		$this->data[0] = clean($this->data[0], true);
+
+		if (!empty($this->data[0]))
+		{
+			if ($category->edit($this->user, $this->data[0], $this->con))
+			{
+				return "Edited category name to: " . $this->data[0];
+			}
+			else
+			{
+				return "Failed to edit category";
+			}
+		}
+
+		return "Invalid category name: ".$this->data[0];
+	}
+}
+
+class EditThread extends ProcessRequest
+{
+	function __construct($user, $elementID, $data, $con)
+	{
+		parent::__construct($user, Thread::getByID(intval($elementID)), $data, $con);
+	}
+
+	public function doRequest()
+	{
+		$this->data[0] = clean($this->data[0], true);
+
+		if (!empty($this->data[0]))
+		{
+			$this->element->editTitle($this->user, $this->data[0]);
+			$this->element->stickThread($this->user, ($this->data[1] == "true" ? true : false));
+			$this->element->lockThread($this->user, ($this->data[2] == "true" ? true : false));
+			$this->element->save($this->con);
+			return "Edited Thread!";
+		}
+		return "Invalid thread name: ".$this->data[0];
+	}
+}
+
+class NewBoard extends ProcessRequest
+{
+	public function doRequest()
+	{
 		global $permission;
 
-		if ($this->element != null)
+		$this->data[0] = clean($this->data[0], true);
+		$this->data[1] = clean($this->data[1], true);
+
+		if (!empty($this->data[0]))
 		{
-			$this->data[0] = clean($this->data[0], true);
-			$this->data[1] = clean($this->data[1], true);
+			$board = $this->element->createBoard($this->user, $this->data[0], $this->data[1]);
 
-			if (!empty($this->data[0]))
+			if ($board != null)
 			{
-				$board = $this->element->createBoard($this->user, $this->data[0], $this->data[1]);
+				$board->save($this->con);
 
-				if ($board != null)
+				$this->user->moderate($board);
+				$this->user->save($this->con);
+
+				foreach (explode(",", strtolower($this->data[2]) . ",") as $username)
 				{
-					$board->save($this->con);
+					$user = getUserByUsername(trim($username));
 
-					$this->user->moderate($board);
-					$this->user->save($this->con);
-
-					foreach (explode(",", strtolower($this->data[2]) . ",") as $username)
+					if ($user != null)
 					{
-						$user = getUserByUsername(trim($username));
-
-						if ($user != null)
+						if ($user->id > 0)
 						{
-							if ($user->id > 0)
-							{
-								$user->moderate($board);
-								$user->save($this->con);
-							}
+							$user->moderate($board);
+							$user->save($this->con);
 						}
 					}
-
-					return "Created new board!";
 				}
+
+				return "Created new board!";
 			}
 		}
 
@@ -269,15 +339,11 @@ if (!empty($request_type))
 
 	$edit = $_POST["e"];
 
-	$element = $_POST["element"];
+	$request = ProcessRequest::processRequest($currentUser, $request_type, $_POST["element"], $con);
 
-	if ($request_type == 1)
+	if ($request)
 	{
-		$successes[] = (new NewBoard($currentUser, Category::getByID(intval($element)), array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->doRequest();
-	}
-	else if ($request_type == 2)
-	{
-		$successes[] = (new NewBoard($currentUser, Board::getByID(intval($element)), array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->doRequest();
+		$successes[] = $request;
 	}
 	else if (!empty($edit))
 	{
@@ -312,38 +378,6 @@ if (!empty($request_type))
 				}
 
 				$board->save($con);
-			}
-		}
-		else if (strstr($edit, "t"))
-		{
-			$thread = Thread::getByID(intval(str_replace("t", "", $edit)));
-			$data = clean($data, true);
-
-			if ($thread != null)
-			{
-				if ($thread != null)
-				{
-					if ($request_type == "title")
-					{
-						$thread->editTitle($currentUser, $data);
-						$successes[] = "Changed thread name to: " . $thread->name;
-					}
-					else if ($request_type == "sticky")
-					{
-						$thread->stickThread($currentUser, $data);
-						$successes[] = "Changed thread sticky status.";
-					}
-					else if ($request_type == "lock")
-					{
-						$thread->lockThread($currentUser, $data);
-						$successes[] = "Changed thread lock status.";
-					}
-
-					if (count($successes) > 0)
-					{
-						$thread->save($con);
-					}
-				}
 			}
 		}
 		else if ($request_type == "post_edit")

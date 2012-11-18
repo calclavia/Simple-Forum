@@ -10,7 +10,7 @@ class Thread extends ForumElement
 	function __construct($id, $parent, $name, $sticky, $lockThread, $views)
 	{
 		$this->id = $id;
-		$this->name = stripslashes(str_replace("\\r\\n", "", $name));
+		$this->name = clean(str_replace("\\r\\n", "", $name), true);
 
 		$this->element_name = "threads";
 		$this->prefix = "t";
@@ -163,7 +163,7 @@ class Thread extends ForumElement
 	{
 		global $permission;
 
-		if ($user->hasPermission($permission['thread_sticky']))
+		if ($user->hasPermission($permission['thread_sticky'], $this))
 		{
 			$this->fields["Sticky"] = ($status ? "yes" : "no");
 		}
@@ -173,7 +173,7 @@ class Thread extends ForumElement
 	{
 		global $permission;
 
-		if ($user->hasPermission($permission['thread_lock']))
+		if ($user->hasPermission($permission['thread_lock'], $this))
 		{
 			$this->fields["LockThread"] = ($status ? "yes" : "no");
 		}
@@ -220,7 +220,7 @@ class Thread extends ForumElement
 		}
 
 		return "
-            <div class='thread_wrapper " . ($this->isUnread($user) ? "thread_unread" : "thread_normal") . "'>
+            <div class='thread_wrapper " . ($this->isUnread($user) ? "thread_unread" : ($this->fields["Sticky"] == "yes" ? "thread_sticky" : "thread_normal")). "'>
             <div class='forum_element'>
                     <div class='two_third thread_content'>
                          <h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a></h3>
@@ -251,29 +251,39 @@ class Thread extends ForumElement
 
 		if ($this != null)
 		{
-			if ($user->hasPermission($permission["thread_edit"], $this))
-			{
-				$thisTitle = "
-                    <h2 class='quick_edit' name='t{$this->getID()}' data-type='title' contenteditable='true'>
-                            {$this->name}
-                    </h2>";
-			}
-			else
-			{
-				$thisTitle = "<h2>{$this->name}</h2>";
-			}
 
 			$printContent .= "
-                $thisTitle
-                <br />
-                <div class=\"forum_menu\">";
+			<div class='thread'>
+			
+            <div class=\"forum_menu\">";
+
+			if ($user->hasPermission($permission["thread_sticky"], $this))
+			{
+				$stick = "<span class='hidden_field'>Stick: <input type='checkbox' id='sticky_{$this->getID()}' ".($this->fields["Sticky"] == "yes"? "checked='checked'" : "")."></span>";
+			}
+			
+			if ($user->hasPermission($permission["thread_lock"], $this))
+			{
+				$lock = "<span class='hidden_field'>Lock: <input type='checkbox' id='lock_{$this->getID()}' ".($this->fields["LockThread"] == "yes"? "checked='checked'" : "")."></span>";
+			}
+
+			if ($user->hasPermission($permission["thread_edit"], $this))
+			{
+				$printContent .= "<a href =\"javascript:void(0)\" data-forum-target='{$this->getID()}' class='thread_edit btn_small btn_silver btn_flat'>Edit</a> ";
+			}
 
 			if ($user->hasPermission($permission["post_create"], $this) && $this->fields["LockThread"] != "yes")
 			{
-				$printContent .= "<a href = \"javascript:void(0)\" onclick = \"$('html, body').animate({scrollTop:  $(document).height()})\" class='btn_small btn_silver btn_flat'>+ Post</a>";
+				$printContent .= "<a href = \"javascript:$('html, body').animate({scrollTop:  $(document).height()})\" class='btn_small btn_silver btn_flat'>+ Post</a>";
 			}
 
-			$printContent .= "</div><div class='clear'></div><div class='elements_container'>" . $this->getTreeAsString();
+			$printContent .= "
+			</div>
+			<div>
+				<h2 id='thread_title_{$this->getID()}' class='editable_title'>{$this->name}</h2>
+				$stick $lock
+			</div>
+			<div class='clear'></div><div class='elements_container'>" . $this->getTreeAsString();
 
 			if (count($this->getChildren()) > 0)
 			{
@@ -329,7 +339,7 @@ class Thread extends ForumElement
 				$printContent .= "No posts avaliable.";
 			}
 
-			$printContent .= "<div class='page_numbers'>" . $pagination . "</div>" . $this->getTreeAsString() . "</div>";
+			$printContent .= "<div class='page_numbers'>" . $pagination . "</div>" . $this->getTreeAsString() . "</div></div>";
 
 			return $printContent;
 		}
@@ -344,7 +354,7 @@ class Thread extends ForumElement
 			<div class='comment_box'>
 				<div class='comment_inner'>
 					<form action='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}&page={$currentPage}&a=new' method='post'>
-						<textarea id='editableContentNewPost' name='editableContent' style='width:100%; height: 300px;'></textarea><br />
+						<textarea id='editableContentNewPost' class='editors' name='editableContent' style='width:100%; height: 300px;'></textarea><br />
 						<input type='submit' value='Post'/>
 					</form>
 				</div>
