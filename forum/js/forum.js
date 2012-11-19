@@ -67,7 +67,7 @@ function resultBlock(data)
     appendString += '</ul>';
 	
     $("#forum_notifications").append(appendString);
-    $("#forum_notifications").slideDown('slow').delay(5000).slideUp('slow');
+    $("#forum_notifications").stop(true, true).slideDown('slow').delay(5000).slideUp('slow');
 }
 
 var lastPostEditor;
@@ -262,6 +262,20 @@ $(document).ready(function() {
 	        $(this).addClass('editing');
 	    }
 	});
+    
+    $('.thread_watch').click(function(){
+        $.ajax({
+            type: "POST",
+            url: "forum/process.php",
+            dataType: 'json',
+            data: {
+                ajax: 6, 
+                element: $(this).data('forum-target')
+            }
+        }).done(function( msg ) {
+            resultBlock(msg);
+        });
+    });
     
     $('.board_box').hover(function() {
     	$(this).find('.sub_boards').stop(true, true).slideDown('slow');

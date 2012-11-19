@@ -35,13 +35,14 @@ $permission["thread_create"] = $create_threads = new Permission(6, "Create Threa
 $permission["thread_edity"] = $topic_sticky = new Permission(7, "Edit Threads", "Allows the user to edit thread titles.");
 $permission["thread_sticky"] = $topic_sticky = new Permission(8, "Sticky", "Allows the user to make threads sticky.");
 $permission["thread_lock"] = new Permission(9, "Lock", "Allows the user to lock threads.");
+$permission["thread_watch"] = new Permission(10, "Watch", "Allows the user to watch threads.", true);
 
 //Post Permissions
-$permission["post_create"] = $create_posts = new Permission(10, "Create Posts", "Allows the user to posts.", true);
-$permission["post_edit"] = $edit_posts = new Permission(11, "Edit Posts", "Allows the user to edit all posts.");
-$permission["post_delete"] = $delete_posts = new Permission(12, "Delete Posts", "Allows the user to delete posts.");
+$permission["post_create"] = $create_posts = new Permission(11, "Create Posts", "Allows the user to posts.", true);
+$permission["post_edit"] = $edit_posts = new Permission(12, "Edit Posts", "Allows the user to edit all posts.");
+$permission["post_delete"] = $delete_posts = new Permission(13, "Delete Posts", "Allows the user to delete posts.");
 
 //Miscs
-$permission["signature_edit"] = $edit_siganture = new Permission(13, "Edit Signature", "Allows the user to edit their signature.");
-$permission["board_hide"] = new Permission(14, "View Hidden Board", "Allows the user to access hidden boards.");
+$permission["signature_edit"] = $edit_siganture = new Permission(14, "Edit Signature", "Allows the user to edit their signature.");
+$permission["board_hide"] = new Permission(15, "View Hidden Board", "Allows the user to access hidden boards.");
 ?>

@@ -131,9 +131,9 @@
 	z-index: 2001;
 	-moz-opacity: 0.8;
 	opacity: .80;
-	filter: alpha(opacity =     
+	filter: alpha(opacity =      
 		                                                         
-		       80);
+		        80);
 }
 
 .white_content {
@@ -193,6 +193,8 @@
 	background-image: url(img/blockquotes.png) !important;
 	background-repeat: no-repeat;
 	background-position: 7px 6px;
+	border: 1px;
+	border-style: dotted;
 }
 
 .forum blockquote a {

@@ -1,6 +1,5 @@
 <?php
 
-require_once("models/config.php");
 require_once("forum/config.php");
 
 $printContent = "";
@@ -50,7 +49,7 @@ if (!empty($_GET["p"]))
 				$post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);
 			}
 
-			$printContent .= $thread->printThreadContent($currentUser, intval($_GET["page"]));
+			$printContent .= $thread->printThreadContent($currentUser, $con, intval($_GET["page"]));
 
 			$thread->view($currentUser, $con);
 		}

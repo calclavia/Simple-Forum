@@ -49,6 +49,10 @@ abstract class ProcessRequest
 		{
 			return (new EditBoard($currentUser, $elementID, array($_POST["data1"], $_POST["data2"]), $con))->request();
 		}
+		else if ($request_type == 6)
+		{
+			return (new WatchThread($currentUser, $elementID, null, $con))->request();
+		}
 
 		return false;
 	}
@@ -121,13 +125,16 @@ class EditCategory extends ProcessRequest
 	}
 }
 
-class EditThread extends ProcessRequest
+abstract class ThreadRequest extends ProcessRequest
 {
 	function __construct($user, $elementID, $data, $con)
 	{
 		parent::__construct($user, Thread::getByID(intval($elementID)), $data, $con);
 	}
+}
 
+class EditThread extends ThreadRequest
+{
 	public function doRequest()
 	{
 		$this->data[0] = clean($this->data[0], true);
@@ -141,6 +148,19 @@ class EditThread extends ProcessRequest
 			return "Successfully edited thread.";
 		}
 		return "Invalid thread name.";
+	}
+}
+
+class WatchThread extends ThreadRequest
+{
+	public function doRequest()
+	{
+		if ($this->user->toggleWatch($this->element, $this->con))
+		{
+			return "You are now watching this thread.";
+		}
+		
+		return "You are no longer watching this thread.";
 	}
 }
 
@@ -322,13 +342,21 @@ if (!empty($_GET["d"]))
 
 		if ($post != null)
 		{
-			if ($currentUser->hasPermission($delete_posts, $post))
+			if ($currentUser->hasPermission($permission["post_delete"], $post))
 			{
 				$thread = Thread::getByID($post->fields["Parent"]);
 
 				if ($post->getID() == $thread->getFirstPost()->getID())
 				{
 					$thread = Thread::getByID($post->fields["Parent"]);
+					
+					$users = ForumUser::getAll($con);
+					
+					foreach($users as $user)
+					{
+						$user->unWatch($thread, $con);
+					}
+					
 					$thread->delete($con);
 					$successes[] = "Removed thread: " . $thread->name;
 				}
@@ -353,7 +381,6 @@ $request_type = $_POST["ajax"];
 if (!empty($request_type))
 {
 
-	require_once("../models/config.php");
 	require_once("config.php");
 
 	/**

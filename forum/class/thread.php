@@ -78,15 +78,53 @@ class Thread extends ForumElement
 
 	public function createPost($content, $user, $time, $con)
 	{
+		global $websiteName;
+
 		if ($this->fields["LockThread"] != "yes")
 		{
 			$post = new Post(-1, $this->id, $this->name, $content, $user->id, $time, $time, $userID);
-			$post->save($con);
-			$user->onCreatePost($post, $con);
-			return $post;
+
+			if ($post->save($con))
+			{
+				$user->onCreatePost($post, $con);
+
+				$pageURL = (@$_SERVER["HTTPS"] == "on") ? "https://" : "http://";
+				$pageURL .= $_SERVER["SERVER_NAME"] . $_SERVER["REQUEST_URI"];
+
+				$users = $this->getWatching($con);
+
+				foreach ($users as $watchingUser)
+				{
+					if ($watchingUser->id != $user->id)
+					{
+						$watchingUser->email("{$websiteName}: New Post in {$this->name}!", "Dear {$watchingUser->username},\n   The thread you were watching called \"{$this->name}\" had a new post! Come check it out here: \n $pageURL");
+					}
+				}
+
+				return $post;
+			}
 		}
 
 		return null;
+	}
+	
+	/**
+	 * @return Array<ForumUser> Gets an array of ForumUsers who are watching this thread.
+	 */
+	public function getWatching($con)
+	{
+		$returnArray = array();
+		$users = ForumUser::getAll($con);
+		
+		foreach ($users as $watchingUser)
+		{
+			if ($watchingUser->isWatching($this))
+			{
+				$returnArray[] = $watchingUser;
+			}
+		}
+		
+		return $returnArray;
 	}
 
 	public function getFirstPost()
@@ -220,7 +258,7 @@ class Thread extends ForumElement
 		}
 
 		return "
-            <div class='thread_wrapper " . ($this->isUnread($user) ? "thread_unread" : ($this->fields["Sticky"] == "yes" ? "thread_sticky" : "thread_normal")). "'>
+            <div class='thread_wrapper " . ($this->isUnread($user) ? "thread_unread" : ($this->fields["Sticky"] == "yes" ? "thread_sticky" : "thread_normal")) . "'>
             <div class='forum_element'>
                     <div class='two_third thread_content'>
                          <h3 class='element_title'><a href='{$_SERVER['PHP_SELF']}?p=t{$this->getID()}'>{$this->name}</a></h3>
@@ -242,7 +280,7 @@ class Thread extends ForumElement
 	 * @param Integer $currentPage - The curent page
 	 * @return string The HTML content.
 	 */
-	public function printThreadContent($user, $currentPage = 1)
+	public function printThreadContent($user, $con, $currentPage = 1)
 	{
 		global $permission, $posts_per_page;
 
@@ -259,17 +297,22 @@ class Thread extends ForumElement
 
 			if ($user->hasPermission($permission["thread_sticky"], $this))
 			{
-				$stick = "<span class='hidden_field'>Stick: <input type='checkbox' id='sticky_{$this->getID()}' ".($this->fields["Sticky"] == "yes"? "checked='checked'" : "")."></span>";
+				$stick = "<span class='hidden_field'>Stick: <input type='checkbox' id='sticky_{$this->getID()}' " . ($this->fields["Sticky"] == "yes" ? "checked='checked'" : "") . "></span>";
 			}
-			
+
 			if ($user->hasPermission($permission["thread_lock"], $this))
 			{
-				$lock = "<span class='hidden_field'>Lock: <input type='checkbox' id='lock_{$this->getID()}' ".($this->fields["LockThread"] == "yes"? "checked='checked'" : "")."></span>";
+				$lock = "<span class='hidden_field'>Lock: <input type='checkbox' id='lock_{$this->getID()}' " . ($this->fields["LockThread"] == "yes" ? "checked='checked'" : "") . "></span>";
 			}
 
 			if ($user->hasPermission($permission["thread_edit"], $this))
 			{
-				$printContent .= "<a href =\"javascript:void(0)\" data-forum-target='{$this->getID()}' class='thread_edit btn_small btn_silver btn_flat'>Edit</a> ";
+				$printContent .= "<a href=\"javascript:void(0)\" data-forum-target='{$this->getID()}' class='thread_edit btn_small btn_silver btn_flat'>Edit</a> ";
+			}
+
+			if ($user->hasPermission($permission["thread_watch"], $this))
+			{
+				$printContent .= "<a href=\"javascript:void(0)\" data-forum-target='{$this->getID()}'class='thread_watch btn_small btn_silver btn_flat'>" . ($user->isWatching($this) ? "Unwatch" : "Watch") . " Thread (".count($this->getWatching($con)).")</a> ";
 			}
 
 			if ($user->hasPermission($permission["post_create"], $this) && $this->fields["LockThread"] != "yes")

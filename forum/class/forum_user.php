@@ -19,9 +19,14 @@ class ForumUser
 	public $email;
 
 	/**
-	 * @String - The title of this user for display.
+	 * @String The title of this user for display.
 	 */
 	public $title;
+
+	/**
+	 * @int The date this user registered.
+	 */
+	public $dateRegistered;
 
 	//Forum Data
 	/**
@@ -40,9 +45,11 @@ class ForumUser
 	public $unreadPosts = array();
 
 	/**
-	 * @int - Email Privacy Status. 0 - Protected, 1 - Allow Email, 2 - Show Email.
+	 * @int - Email Privacy Status. 1 - Protected, 2 - Allow Email, 3 - Show Email.
 	 */
-	public $emailPrivacy = 0;
+	public $privacy = 1;
+
+	public $watching = array();
 
 	/**
 	 * @string - The signature of the user.
@@ -71,19 +78,27 @@ class ForumUser
 			{
 				$this->posts = intval($row["Posts"]);
 				$this->moderate = unserialize($row["Moderate"]);
-				$this->unreadPosts = unserialize($row["Unread"]);
 
 				if (!is_array($this->moderate))
 				{
 					$this->moderate = array();
 				}
+				$this->unreadPosts = unserialize($row["Unread"]);
 
 				if (!is_array($this->unreadPosts))
 				{
 					$this->unreadPosts = array();
 				}
+				$this->watching = unserialize($row["Watching"]);
 
-				$this->signature = stripslashes(str_replace("\\r\\n", "", $row["Signature"]));
+				if (!is_array($this->watching))
+				{
+					$this->watching = array();
+				}
+
+				$this->privacy = $row["Privacy"];
+
+				$this->signature = clean(str_replace("\\r\\n", "", $row["Signature"]));
 			}
 
 			$this->save($con);
@@ -93,7 +108,7 @@ class ForumUser
 	public static function setUp($con)
 	{
 		global $table_prefix;
-		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}users (ID int NOT NULL, Moderate varchar(255), Unread varchar(255), Posts int, Signature TEXT, EmailPrivacy int)", $con) or die(mysql_error());
+		mysql_query("CREATE TABLE IF NOT EXISTS {$table_prefix}users (ID int NOT NULL, Moderate text, Unread text, Posts int, Signature text, Watching text, Privacy int)", $con) or die(mysql_error());
 		return true;
 	}
 
@@ -108,19 +123,42 @@ class ForumUser
 
 			if ($row["ID"] <= 0 || empty($row))
 			{
-				$query = "INSERT INTO {$table_prefix}users (ID, Moderate, Unread, Posts, Signature) VALUES ({$this->id}, '" . mysql_real_escape_string(serialize($this->moderate)) . "', '" . mysql_real_escape_string(serialize($this->unreadPosts)) . "', {$this->posts}, '" . mysql_real_escape_string($this->signature) . "')";
+				$query = "INSERT INTO {$table_prefix}users (ID, Moderate, Unread, Posts, Signature, Watching, Privacy) VALUES ({$this->id}, '" . mysql_real_escape_string(serialize($this->moderate)) . "', '" . mysql_real_escape_string(serialize($this->unreadPosts)) . "', {$this->posts}, '" . mysql_real_escape_string($this->signature) . "', '" . mysql_real_escape_string(serialize($this->watching)) . "', " . $this->privacy . ")";
 				mysql_query($query, $con) or die("Failed to create user data: " . mysql_error() . ", Q = " . $query);
 				return true;
 			}
 			else
 			{
-				$query = "UPDATE {$table_prefix}users SET Moderate='" . serialize($this->moderate) . "', Unread='" . mysql_real_escape_string(serialize($this->unreadPosts)) . "', Posts={$this->posts}, Signature='" . mysql_real_escape_string($this->signature) . "' WHERE ID={$this->id} LIMIT 1";
+				$query = "UPDATE {$table_prefix}users SET Moderate='" . serialize($this->moderate) . "', Unread='" . mysql_real_escape_string(serialize($this->unreadPosts)) . "', Posts={$this->posts}, Signature='" . mysql_real_escape_string($this->signature) . "', Watching='" . mysql_real_escape_string(serialize($this->watching)) . "', Privacy=" . $this->privacy . " WHERE ID={$this->id} LIMIT 1";
 				mysql_query($query, $con) or die("Failed to save forum element: " . mysql_error() . ", Q = " . $query);
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	public static function getAll($con)
+	{
+		global $table_prefix;
+
+		$returnArray = array();
+		$result = mysql_query("SELECT * FROM {$table_prefix}users", $con) or die("ForumUser: Failed to retrieve data!");
+
+		while ($row = mysql_fetch_array($result))
+		{
+			$user = getUserByID($row["ID"]);
+
+			if ($user != null)
+			{
+				if ($user->id > 0)
+				{
+					$returnArray[] = $user;
+				}
+			}
+		}
+
+		return $returnArray;
 	}
 
 	public function hasPermission($permission, $element = null)
@@ -170,7 +208,7 @@ class ForumUser
 		$this->moderate[] = $element->prefix . $element->getID();
 	}
 
-	public function unmoderate($element)
+	public function isModerating($element)
 	{
 		if (in_array($element->prefix . $element->getID(), $this->moderate))
 		{
@@ -178,6 +216,58 @@ class ForumUser
 		}
 
 		return true;
+	}
+
+	public function unModerate($element)
+	{
+		if ($this->isModerating($element))
+		{
+			$this->moderate = array_diff($this->moderate, array($element->prefix . $element->getID()));
+			return true;
+		}
+		return false;
+	}
+
+	public function toggleWatch($thread, $con)
+	{
+		if (!$this->unWatch($thread, null))
+		{
+			$this->watching[] = $thread->getID();
+		}
+
+		if ($con != null)
+		{
+			$this->save($con);
+		}
+
+		return $this->isWatching($thread);
+	}
+
+	public function unWatch($thread, $con)
+	{
+		if ($this->isWatching($thread))
+		{
+			$this->watching = array_diff($this->watching, array($thread->getID()));
+			
+			if ($con != null)
+			{
+				$this->save($con);
+			}
+			
+			return true;
+		}
+		
+		return false;
+	}
+
+	public function isWatching($thread)
+	{
+		if (in_array($thread->getID(), $this->watching))
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -195,8 +285,6 @@ class ForumUser
 
 	public function onCreatePost($post, $con)
 	{
-		global $table_prefix;
-
 		$this->moderate($post);
 		$this->posts++;
 		$this->save($con);
@@ -204,21 +292,12 @@ class ForumUser
 		/**
 		 * Make all other user have this post set as unread.
 		 */
-		$result = mysql_query("SELECT * FROM {$table_prefix}users", $con);
+		$users = self::getAll($con);
 
-		while ($row = mysql_fetch_array($result))
+		foreach ($users as $user)
 		{
-			$unread = unserialize($row["Unread"]);
-
-			if (!is_array($unread))
-			{
-				$unread = array();
-			}
-
-			$unread[] = $post->getID();
-
-			$query = "UPDATE {$table_prefix}users SET Unread='" . serialize($unread) . "' WHERE ID={$row["ID"]} LIMIT 1";
-			mysql_query($query, $con) or die("Failed to save other user data: " . mysql_error() . ", Q = " . $query);
+			$user->unreadPosts[] = $post->getID();
+			$user->save($con);
 		}
 
 		return true;
@@ -234,6 +313,18 @@ class ForumUser
 		}
 
 		return false;
+	}
+
+	public function email($subject, $message)
+	{
+		global $websiteName, $emailAddress;
+
+		$header = "MIME-Version: 1.0\r\n";
+		$header .= "Content-type: text/plain; charset=iso-8859-1\r\n";
+		$header .= "From: " . $websiteName . " <" . $emailAddress . ">\r\n";
+
+		$message = wordwrap($message, 70);
+		return mail($this->email, $subject, $message, $header);
 	}
 
 	public function printProfile()
