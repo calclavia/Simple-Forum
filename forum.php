@@ -35,7 +35,7 @@ if (!empty($_GET["p"]))
 			}
 
 			$printContent .= $board->printNewThreadForm();
-			$printContent .= $board->printBoardContent($currentUser);
+			$printContent .= $board->printBoardContent($currentUser, $con);
 		}
 	}
 	else if (strstr($_GET["p"], "t"))

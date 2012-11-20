@@ -47,7 +47,7 @@ abstract class ProcessRequest
 		}
 		else if ($request_type == 5)
 		{
-			return (new EditBoard($currentUser, $elementID, array($_POST["data1"], $_POST["data2"]), $con))->request();
+			return (new EditBoard($currentUser, $elementID, array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->request();
 		}
 		else if ($request_type == 6)
 		{
@@ -78,13 +78,30 @@ class EditBoard extends ProcessRequest
 
 	public function doRequest()
 	{
+		global $permission;
+
 		$this->data[0] = limitString(clean($this->data[0], true), 30);
 		$this->data[1] = limitString(clean($this->data[1], true), 150);
+		$this->data[2] = clean($this->data[2], true);
 
-		if (!empty($this->data[0]))
+		if (!empty($this->data[0]) && $this->user->hasPermission($permission["board_edit"], $this->element))
 		{
 			if ($this->element->editTitle($this->user, $this->data[0]) && $this->element->editDescription($this->user, $this->data[1]))
 			{
+				foreach (explode(",", strtolower($this->data[2]) . ",") as $username)
+				{
+					$user = getUserByUsername(trim($username));
+
+					if ($user != null)
+					{
+						if ($user->id > 0)
+						{
+							$user->moderate($this->element);
+							$user->save($this->con);
+						}
+					}
+				}
+
 				$this->element->save($this->con);
 				return "Successfully edited board.";
 			}
@@ -159,7 +176,7 @@ class WatchThread extends ThreadRequest
 		{
 			return "You are now watching this thread.";
 		}
-		
+
 		return "You are no longer watching this thread.";
 	}
 }
@@ -349,14 +366,14 @@ if (!empty($_GET["d"]))
 				if ($post->getID() == $thread->getFirstPost()->getID())
 				{
 					$thread = Thread::getByID($post->fields["Parent"]);
-					
+
 					$users = ForumUser::getAll($con);
-					
-					foreach($users as $user)
+
+					foreach ($users as $user)
 					{
 						$user->unWatch($thread, $con);
 					}
-					
+
 					$thread->delete($con);
 					$successes[] = "Removed thread: " . $thread->name;
 				}

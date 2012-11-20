@@ -18,9 +18,33 @@ abstract class ForumElement
 		return $this->id;
 	}
 
-	public function isModerator($userID)
+	public function getModerators($con)
 	{
-		return false;
+		$moderators = array();
+		$users = ForumUser::getAll($con);
+		
+		foreach ($users as $user)
+		{
+			if ($user->isModerating($this))
+			{
+				$moderators[] = $user;
+			}
+		}
+
+		return $moderators;
+	}
+	
+	public function getModeratorsAsString($con)
+	{
+		$returnString = "";
+		$moderators = $this->getModerators($con);
+		
+		foreach($moderators as $moderator)
+		{
+			$returnString .= $moderator->username.",";
+		}
+		
+		return $returnString;
 	}
 
 	public function save($con)

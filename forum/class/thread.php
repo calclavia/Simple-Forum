@@ -107,7 +107,7 @@ class Thread extends ForumElement
 
 		return null;
 	}
-	
+
 	/**
 	 * @return Array<ForumUser> Gets an array of ForumUsers who are watching this thread.
 	 */
@@ -115,7 +115,7 @@ class Thread extends ForumElement
 	{
 		$returnArray = array();
 		$users = ForumUser::getAll($con);
-		
+
 		foreach ($users as $watchingUser)
 		{
 			if ($watchingUser->isWatching($this))
@@ -123,7 +123,7 @@ class Thread extends ForumElement
 				$returnArray[] = $watchingUser;
 			}
 		}
-		
+
 		return $returnArray;
 	}
 
@@ -305,6 +305,18 @@ class Thread extends ForumElement
 				$lock = "<span class='hidden_field'>Lock: <input type='checkbox' id='lock_{$this->getID()}' " . ($this->fields["LockThread"] == "yes" ? "checked='checked'" : "") . "></span>";
 			}
 
+			if ($user->hasPermission($permission["thread_move"], $this))
+			{
+				$move = "
+				<span class='hidden_field'>
+					Move:
+					<select id='move_{$this->getID()}'>
+					  <option value="volvo">Volvo</option>
+
+					</select>
+				</span>";
+			}
+
 			if ($user->hasPermission($permission["thread_edit"], $this))
 			{
 				$printContent .= "<a href=\"javascript:void(0)\" data-forum-target='{$this->getID()}' class='thread_edit btn_small btn_silver btn_flat'>Edit</a> ";
@@ -312,7 +324,7 @@ class Thread extends ForumElement
 
 			if ($user->hasPermission($permission["thread_watch"], $this))
 			{
-				$printContent .= "<a href=\"javascript:void(0)\" data-forum-target='{$this->getID()}'class='thread_watch btn_small btn_silver btn_flat'>" . ($user->isWatching($this) ? "Unwatch" : "Watch") . " Thread (".count($this->getWatching($con)).")</a> ";
+				$printContent .= "<a href=\"javascript:void(0)\" data-forum-target='{$this->getID()}'class='thread_watch btn_small btn_silver btn_flat'>" . ($user->isWatching($this) ? "Unwatch" : "Watch") . " Thread (" . count($this->getWatching($con)) . ")</a> ";
 			}
 
 			if ($user->hasPermission($permission["post_create"], $this) && $this->fields["LockThread"] != "yes")
@@ -324,7 +336,7 @@ class Thread extends ForumElement
 			</div>
 			<div>
 				<h2 id='thread_title_{$this->getID()}' class='editable_title'>{$this->name}</h2>
-				$stick $lock
+				$stick $lock $move
 			</div>
 			<div class='clear'></div><div class='elements_container'>" . $this->getTreeAsString();
 

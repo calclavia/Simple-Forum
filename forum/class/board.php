@@ -6,7 +6,6 @@
  */
 class Board extends ForumElement
 {
-
 	function __construct($id, $parent, $order, $name, $description, $subBoard)
 	{
 		$this->id = $id;
@@ -411,7 +410,7 @@ class Board extends ForumElement
 	    	</div>";
 	}
 
-	public function printBoardContent($user)
+	public function printBoardContent($user, $con)
 	{
 		global $permission;
 
@@ -420,6 +419,7 @@ class Board extends ForumElement
 		if ($user->hasPermission($permission["board_edit"], $this))
 		{
 			$printContent .= "<a href=\"javascript:void(0)\" data-forum-target='{$this->getID()}' class='board_edit btn_small btn_white btn_flat'>Edit</a> ";
+			$moderators .= "<span class='hidden_field'>Moderators: <input type='text' id='moderators_{$this->getID()}' value='{$this->getModeratorsAsString($con)}'></span>";
 		}
 
 		if ($user->hasPermission($permission["thread_create"], $this))
@@ -441,6 +441,7 @@ class Board extends ForumElement
 		</div>
 		<h2 class='editable_title header_title' id='board_title_{$this->getID()}'>{$this->name}</h2>
 		<div class='editable_title' id='board_description_{$this->getID()}'>{$this->fields["Description"]}</div>
+		$moderators
 		<div class='clear'></div>
 		<div class='elements_container'>" . $this->getTreeAsString();
 

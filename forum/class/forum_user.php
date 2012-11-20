@@ -210,12 +210,7 @@ class ForumUser
 
 	public function isModerating($element)
 	{
-		if (in_array($element->prefix . $element->getID(), $this->moderate))
-		{
-			return false;
-		}
-
-		return true;
+		return in_array($element->prefix . $element->getID(), $this->moderate);
 	}
 
 	public function unModerate($element)
