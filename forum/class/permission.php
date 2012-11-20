@@ -29,7 +29,7 @@ $permission["delete_delete"] = $delete_categories = new Permission(2, "Delete Ca
 $permission["board_create"] = $create_boards = new Permission(3, "Create Boards", "Allows the user to create boards.");
 $permission["board_edit"] = $edit_boards = new Permission(4, "Edit Boards", "Allows the user to edit boards.");
 $permission["board_delete"] = $delete_boards = new Permission(5, "Delete Boards", "Allows the user to delete boards.");
-$permission["board_move"] =  new Permission(6, "Move Boards", "Allows the user to move boards.");
+$permission["board_move"] = new Permission(6, "Move Boards", "Allows the user to move boards.");
 
 //Thread Permissions
 $permission["thread_create"] = $create_threads = new Permission(7, "Create Threads", "Allows the user to create threads.", true);

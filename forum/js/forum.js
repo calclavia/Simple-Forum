@@ -179,21 +179,22 @@ $(document).ready(function() {
 	                element: $(this).data('forum-target'), 
 	                data1: $('#thread_title_'+$(this).data('forum-target')).html(),
 	                data2: $('#sticky_'+$(this).data('forum-target')).is(':checked'),
-	                data3: $('#lock_'+$(this).data('forum-target')).is(':checked')
+	                data3: $('#lock_'+$(this).data('forum-target')).is(':checked'),
+	                data4: $('#move_'+$(this).data('forum-target')).val()
 	            }
 	        }).done(function( msg ) {
 	            resultBlock(msg);
 	        });
 			
 	        $('#thread_title_'+$(this).data('forum-target')).attr('contenteditable', 'false');
-	        $('.hidden_field').parent().slideUp();
+	        $('.hidden_field').slideUp();
 	        $(this).html('Edit');
 	        $(this).removeClass('editing');
 	    }
 	    else
 	    {
 	        $('#thread_title_'+$(this).data('forum-target')).attr('contenteditable', 'true');
-	        $('.hidden_field').parent().slideDown();
+	        $('.hidden_field').slideDown();
 	        $('#thread_title_'+$(this).data('forum-target')).focus();
 	        $(this).html("Save");
 	        $(this).addClass('editing');
@@ -241,7 +242,8 @@ $(document).ready(function() {
 	                element: $(this).data('forum-target'), 
 	                data1: $('#board_title_'+$(this).data('forum-target')).html(),
 	                data2: $('#board_description_'+$(this).data('forum-target')).html(),
-	                data3: $('#moderators_'+$(this).data('forum-target')).val()
+	                data3: $('#moderators_'+$(this).data('forum-target')).val(),
+	                data4: $('#move_'+$(this).data('forum-target')).val()
 	            }
 	        }).done(function( msg ) {
 	            resultBlock(msg);
@@ -249,7 +251,7 @@ $(document).ready(function() {
 			
 	        $('#board_title_'+$(this).data('forum-target')).attr('contenteditable', 'false');
 	        $('#board_description_'+$(this).data('forum-target')).attr('contenteditable', 'false');
-	        $('#moderators_'+$(this).data('forum-target')).parent().slideUp();
+	        $('.hidden_field').slideUp();
 	        $(this).html('Edit');
 	        $(this).removeClass('editing');
 	    }
@@ -258,7 +260,7 @@ $(document).ready(function() {
 	        $('#board_title_'+$(this).data('forum-target')).attr('contenteditable', 'true');
 	        $('#board_description_'+$(this).data('forum-target')).attr('contenteditable', 'true');
 	        $('#board_title_'+$(this).data('forum-target')).focus();
-	        $('#moderators_'+$(this).data('forum-target')).parent().slideDown();
+	        $('.hidden_field').slideDown();
 	        $(this).html("Save");
 	        $(this).addClass('editing');
 	    }

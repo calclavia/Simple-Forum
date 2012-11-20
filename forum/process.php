@@ -1,5 +1,4 @@
 <?php
-
 abstract class ProcessRequest
 {
 	/**
@@ -39,7 +38,7 @@ abstract class ProcessRequest
 		}
 		else if ($request_type == 3)
 		{
-			return (new EditThread($currentUser, $elementID, array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->request();
+			return (new EditThread($currentUser, $elementID, array($_POST["data1"], $_POST["data2"], $_POST["data3"], $_POST["data4"]), $con))->request();
 		}
 		else if ($request_type == 4)
 		{
@@ -47,7 +46,7 @@ abstract class ProcessRequest
 		}
 		else if ($request_type == 5)
 		{
-			return (new EditBoard($currentUser, $elementID, array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->request();
+			return (new EditBoard($currentUser, $elementID, array($_POST["data1"], $_POST["data2"], $_POST["data3"], $_POST["data4"]), $con))->request();
 		}
 		else if ($request_type == 6)
 		{
@@ -67,52 +66,6 @@ abstract class ProcessRequest
 	}
 
 	protected abstract function doRequest();
-}
-
-class EditBoard extends ProcessRequest
-{
-	function __construct($user, $elementID, $data, $con)
-	{
-		parent::__construct($user, Board::getByID(intval($elementID)), $data, $con);
-	}
-
-	public function doRequest()
-	{
-		global $permission;
-
-		$this->data[0] = limitString(clean($this->data[0], true), 30);
-		$this->data[1] = limitString(clean($this->data[1], true), 150);
-		$this->data[2] = clean($this->data[2], true);
-
-		if (!empty($this->data[0]) && $this->user->hasPermission($permission["board_edit"], $this->element))
-		{
-			if ($this->element->editTitle($this->user, $this->data[0]) && $this->element->editDescription($this->user, $this->data[1]))
-			{
-				foreach (explode(",", strtolower($this->data[2]) . ",") as $username)
-				{
-					$user = getUserByUsername(trim($username));
-
-					if ($user != null)
-					{
-						if ($user->id > 0)
-						{
-							$user->moderate($this->element);
-							$user->save($this->con);
-						}
-					}
-				}
-
-				$this->element->save($this->con);
-				return "Successfully edited board.";
-			}
-			else
-			{
-				return "Failed to edited board.";
-			}
-		}
-
-		return "Invalid board name";
-	}
 }
 
 class EditCategory extends ProcessRequest
@@ -161,6 +114,7 @@ class EditThread extends ThreadRequest
 			$this->element->editTitle($this->user, $this->data[0]);
 			$this->element->stickThread($this->user, ($this->data[1] == "true" ? true : false));
 			$this->element->lockThread($this->user, ($this->data[2] == "true" ? true : false));
+			$this->element->move($this->user, intval($this->data[3]));
 			$this->element->save($this->con);
 			return "Successfully edited thread.";
 		}
@@ -220,6 +174,59 @@ class NewBoard extends ProcessRequest
 		}
 
 		return "Failed to create a new board.";
+	}
+}
+
+abstract class BoardRequest extends ProcessRequest
+{
+	function __construct($user, $elementID, $data, $con)
+	{
+		parent::__construct($user, Board::getByID(intval($elementID)), $data, $con);
+	}
+}
+
+class EditBoard extends BoardRequest
+{
+	public function doRequest()
+	{
+		global $permission;
+
+		$this->data[0] = limitString(clean($this->data[0], true), 30);
+		$this->data[1] = limitString(clean($this->data[1], true), 300);
+		$this->data[2] = clean($this->data[2], true);
+
+		if (!empty($this->data[0]) && $this->user->hasPermission($permission["board_edit"], $this->element))
+		{
+			if ($this->element->editTitle($this->user, $this->data[0]) && $this->element->editDescription($this->user, $this->data[1]))
+			{
+				foreach (explode(",", strtolower($this->data[2]) . ",") as $username)
+				{
+					$user = getUserByUsername(trim($username));
+
+					if ($user != null)
+					{
+						if ($user->id > 0)
+						{
+							$user->moderate($this->element);
+							$user->save($this->con);
+						}
+					}
+				}
+
+				if (!empty($this->data[3]))
+				{
+					$this->element->move($this->user, ForumElement::getElementFromCode($this->data[3]));
+				}
+				$this->element->save($this->con);
+				return "Successfully edited board.";
+			}
+			else
+			{
+				return "Failed to edited board.";
+			}
+		}
+
+		return "Invalid board name";
 	}
 }
 

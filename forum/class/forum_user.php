@@ -243,15 +243,15 @@ class ForumUser
 		if ($this->isWatching($thread))
 		{
 			$this->watching = array_diff($this->watching, array($thread->getID()));
-			
+
 			if ($con != null)
 			{
 				$this->save($con);
 			}
-			
+
 			return true;
 		}
-		
+
 		return false;
 	}
 

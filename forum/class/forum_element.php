@@ -22,7 +22,7 @@ abstract class ForumElement
 	{
 		$moderators = array();
 		$users = ForumUser::getAll($con);
-		
+
 		foreach ($users as $user)
 		{
 			if ($user->isModerating($this))
@@ -33,17 +33,17 @@ abstract class ForumElement
 
 		return $moderators;
 	}
-	
+
 	public function getModeratorsAsString($con)
 	{
 		$returnString = "";
 		$moderators = $this->getModerators($con);
-		
-		foreach($moderators as $moderator)
+
+		foreach ($moderators as $moderator)
 		{
-			$returnString .= $moderator->username.",";
+			$returnString .= $moderator->username . ",";
 		}
-		
+
 		return $returnString;
 	}
 
@@ -142,6 +142,28 @@ abstract class ForumElement
 		}
 
 		mysql_query("DELETE FROM {$table_prefix}{$this->element_name} WHERE ID={$this->id} LIMIT 1");
+	}
+
+	public static function getElementFromCode($string)
+	{
+		if (strstr($string, "c"))
+		{
+			return Category::getByID(intval(str_replace("c", "", $string)));
+		}
+		else if (strstr($string, "b"))
+		{
+			return Board::getByID(intval(str_replace("b", "", $string)));
+		}
+		else if (strstr($string, "t"))
+		{
+			return Thread::getByID(intval(str_replace("t", "", $string)));
+		}
+		else if (strstr($string, "p"))
+		{
+			return Post::getByID(intval(str_replace("p", "", $string)));
+		}
+
+		return null;
 	}
 
 	public abstract function getChildren();

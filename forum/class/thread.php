@@ -108,6 +108,27 @@ class Thread extends ForumElement
 		return null;
 	}
 
+	public function move($user, $boardID)
+	{
+		global $permission;
+
+		if ($boardID > 0)
+		{
+			$board = Board::getByID($boardID);
+
+			if ($board != null)
+			{
+				if ($user->hasPermission($permission["thread_move"], Board::getByID($this->fields["Parent"])))
+				{
+					$this->fields["Parent"] = $board->getID();
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * @return Array<ForumUser> Gets an array of ForumUsers who are watching this thread.
 	 */
@@ -191,7 +212,7 @@ class Thread extends ForumElement
 	{
 		global $permission;
 
-		if ($user->hasPermission($permission['thread_edit']))
+		if ($user->hasPermission($permission['thread_edit'], $this))
 		{
 			$this->name = $name;
 		}
@@ -233,6 +254,11 @@ class Thread extends ForumElement
 	public function getViews()
 	{
 		return $this->fields["Views"];
+	}
+
+	public function getParent()
+	{
+		return Board::getByID($this->fields["Parent"]);
 	}
 
 	public function printThread($user)
@@ -295,7 +321,7 @@ class Thread extends ForumElement
 			
             <div class=\"forum_menu\">";
 
-			if ($user->hasPermission($permission["thread_sticky"], $this))
+			if ($user->hasPermission($permission["thread_sticky"], Board::getByID($this->fields["Parent"])))
 			{
 				$stick = "<span class='hidden_field'>Stick: <input type='checkbox' id='sticky_{$this->getID()}' " . ($this->fields["Sticky"] == "yes" ? "checked='checked'" : "") . "></span>";
 			}
@@ -305,16 +331,36 @@ class Thread extends ForumElement
 				$lock = "<span class='hidden_field'>Lock: <input type='checkbox' id='lock_{$this->getID()}' " . ($this->fields["LockThread"] == "yes" ? "checked='checked'" : "") . "></span>";
 			}
 
-			if ($user->hasPermission($permission["thread_move"], $this))
+			if ($user->hasPermission($permission["thread_move"], Board::getByID($this->fields["Parent"])))
 			{
-				$move = "
-				<span class='hidden_field'>
-					Move:
-					<select id='move_{$this->getID()}'>
-					  <option value="volvo">Volvo</option>
+				$move = "<span class='hidden_field'>Move:<select id='move_{$this->getID()}'>";
+				$move .= "<option value='-1'>--</option>";
 
-					</select>
-				</span>";
+				$categories = Category::getAll($con);
+				foreach ($categories as $category)
+				{
+					if ($category != null)
+					{
+						foreach ($category->getChildren() as $board)
+						{
+							$move .= "<option value='{$board->getID()}'>{$board->name}</option>";
+
+							foreach ($board->getAllSubBoards($con) as $subBoard)
+							{
+								$indent = "";
+
+								foreach ($subBoard->getAllParents($con) as $parent)
+								{
+									$indent .= " -";
+								}
+
+								$move .= "<option value='{$subBoard->getID()}'>{$indent} {$subBoard->name}</option>";
+							}
+						}
+					}
+				}
+
+				$move .= "</select></span>";
 			}
 
 			if ($user->hasPermission($permission["thread_edit"], $this))

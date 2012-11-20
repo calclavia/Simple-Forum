@@ -135,7 +135,7 @@ class Category extends ForumElement
 			$this->save($con);
 			return true;
 		}
-		
+
 		return false;
 	}
 

@@ -113,6 +113,37 @@ class Board extends ForumElement
 		return $boards;
 	}
 
+	public function getAllSubBoards($con)
+	{
+		$returnArray = array();
+
+		foreach ($this->getChildren() as $subBoard)
+		{
+			if ($subBoard instanceof Board)
+			{
+				$returnArray[] = $subBoard;
+				$returnArray = array_merge($returnArray, $subBoard->getAllSubBoards());
+			}
+		}
+
+		return $returnArray;
+	}
+
+	public function getAllParents($con)
+	{
+		$returnArray = array();
+
+		$parent = $this->getParent();
+
+		do
+		{
+			$returnArray[] = $parent = $parent->getParent();
+		}
+		while ($parent != null && $parent instanceof Board);
+
+		return $returnArray;
+	}
+
 	public function createThread($user, $name, $content = "", $time = -1, $con = false)
 	{
 		global $create_threads;
@@ -147,6 +178,28 @@ class Board extends ForumElement
 		}
 
 		return null;
+	}
+
+	public function move($user, $parent)
+	{
+		global $permission;
+
+		if ($parent != null && $user->hasPermission($permission["board_move"], $this->getParent()))
+		{
+			if ($parent instanceof Board)
+			{
+				$this->fields["SubBoard"] = "yes";
+			}
+			else
+			{
+				$this->fields["SubBoard"] = "no";
+			}
+
+			$this->fields["Parent"] = $parent->getID();
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -437,11 +490,45 @@ class Board extends ForumElement
 			$printContent .= "<a href=\"javascript: if(confirm('Delete Board and ALL content within?')) {window.location='{$_SERVER['PHP_SELF']}?d=b{$this->getID()}'}\" class=\"btn_small btn_white btn_flat\">Delete</a>";
 		}
 
+		if ($user->hasPermission($permission["board_move"], $this->getParent()))
+		{
+			$move = "<span class='hidden_field'>Move:<select id='move_{$this->getID()}'>";
+			$move .= "<option value='-1'>--</option>";
+
+			$categories = Category::getAll($con);
+			foreach ($categories as $category)
+			{
+				if ($category != null)
+				{
+					$move .= "<option value='c{$category->getID()}'>{$category->name}</option>";
+
+					foreach ($category->getChildren() as $board)
+					{
+						$move .= "<option value='b{$board->getID()}'> - {$board->name}</option>";
+
+						foreach ($board->getAllSubBoards($con) as $subBoard)
+						{
+							$indent = " -";
+
+							foreach ($subBoard->getAllParents($con) as $parent)
+							{
+								$indent .= " -";
+							}
+
+							$move .= "<option value='b{$subBoard->getID()}'>{$indent} {$subBoard->name}</option>";
+						}
+					}
+				}
+			}
+
+			$move .= "</select></span>";
+		}
+
 		$printContent .= "
 		</div>
 		<h2 class='editable_title header_title' id='board_title_{$this->getID()}'>{$this->name}</h2>
 		<div class='editable_title' id='board_description_{$this->getID()}'>{$this->fields["Description"]}</div>
-		$moderators
+		$moderators $move
 		<div class='clear'></div>
 		<div class='elements_container'>" . $this->getTreeAsString();
 
