@@ -169,6 +169,11 @@ class Thread extends ForumElement
 
 		return null;
 	}
+	
+	public function getParent()
+	{
+		return Board::getByID($this->fields["Parent"]);
+	}
 
 	public function getLatestPost()
 	{
@@ -254,11 +259,6 @@ class Thread extends ForumElement
 	public function getViews()
 	{
 		return $this->fields["Views"];
-	}
-
-	public function getParent()
-	{
-		return Board::getByID($this->fields["Parent"]);
 	}
 
 	public function printThread($user)

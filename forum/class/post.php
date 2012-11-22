@@ -58,6 +58,11 @@ class Post extends ForumElement
 	{
 		return null;
 	}
+	
+	public function getParent()
+	{
+		return Thread::getByID($this->fields["Parent"]);
+	}
 
 	public function edit($newContent, $user, $time)
 	{

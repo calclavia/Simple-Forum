@@ -30,6 +30,11 @@ abstract class ForumElement
 				$moderators[] = $user;
 			}
 		}
+		
+		if(!($this instanceof Category) && $this->getParent() != null)
+		{
+			$moderators = array_merge($moderators, $this->getParent()->getModerators($con));
+		}
 
 		return $moderators;
 	}
@@ -166,6 +171,8 @@ abstract class ForumElement
 		return null;
 	}
 
+	public abstract function getParent();
+	
 	public abstract function getChildren();
 }
 

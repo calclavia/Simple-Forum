@@ -104,6 +104,11 @@ class Category extends ForumElement
 
 		return $returnArray;
 	}
+	
+	public function getParent()
+	{
+		return null;
+	}
 
 	public function getChildrenUnsorted()
 	{
