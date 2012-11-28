@@ -280,7 +280,7 @@ $(document).ready(function() {
         });
     });
     
-    $('.board_box').hover(function() {
+    $('.board_info').hover(function() {
     	$(this).find('.sub_boards').stop(true, true).slideDown();
     }, function() {
     	$(this).find('.sub_boards').stop(true, true).slideUp();

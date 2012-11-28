@@ -441,7 +441,7 @@ class Board extends ForumElement
 		}
 
 		return "
-	    	<div class='board_box forum_element drop-shadow'>
+	    	<div class='board_box forum_element'>
 	    		<div class='two_third'>
 	    			<span class='" . ($this->isUnread($user) ? "icon_on" : "icon_off") . "'></span>
 	    			<div class='board_content'>
@@ -452,7 +452,7 @@ class Board extends ForumElement
 	    				</div>
 	    			</div>
 	    		</div>
-	    		<div class='forum_element_info one_third column-last'>
+	    		<div class='board_info forum_element_info one_third column-last'>
 	    			<p>$printLatestPost</p>
 	    			<div class='sub_boards'>
 	    				$subBoards
@@ -460,7 +460,8 @@ class Board extends ForumElement
 	    			</div>
 	    		</div>
                 <div class='clear'></div>
-	    	</div>";
+	    	</div>
+			<div class='hrline_silver'></div>";
 	}
 
 	public function printBoardContent($user, $con)

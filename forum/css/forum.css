@@ -281,6 +281,10 @@
 }
 
 /* Board Box */
+.board_box{
+	margin: 15px 0px;
+}
+
 .forum .forum_element .icon_on,.forum .forum_element .icon_off {
 	height: 41px;
 	width: 38px;
