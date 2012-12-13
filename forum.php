@@ -23,14 +23,20 @@ if (!empty($_GET["p"]))
 		{
 			if ($_GET["a"] == "new")
 			{
-				if (!empty($_POST["title"]) && !empty($_POST["editableContent"]))
+				if($currentUser != null)
 				{
-					$thread = $board->createThread($currentUser, clean($_POST["title"], true), clean($_POST["editableContent"]), time(), $con);
-					$successes[] = "Created forum thread!";
-				}
-				else if ($_POST["board_name"] || $_POST["editableContent"])
-				{
-					$board->createBoard($currentUser, clean($_POST["board_name"]), clean($_POST["editableContent"]))->save($con);
+					if($currentUser->id > 0)
+					{
+						if (!empty($_POST["title"]) && !empty($_POST["editableContent"]))
+						{
+							$thread = $board->createThread($currentUser, clean($_POST["title"], true), clean($_POST["editableContent"]), time(), $con);
+							$successes[] = "Created forum thread!";
+						}
+						else if ($_POST["board_name"] || $_POST["editableContent"])
+						{
+							$board->createBoard($currentUser, clean($_POST["board_name"]), clean($_POST["editableContent"]))->save($con);
+						}
+					}
 				}
 			}
 
@@ -46,7 +52,13 @@ if (!empty($_GET["p"]))
 		{
 			if ($_GET["a"] == "new" && $_POST["editableContent"])
 			{
-				$post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);
+				if($currentUser != null)
+				{
+					if($currentUser->id > 0)
+					{
+						$post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);
+					}
+				}
 			}
 
 			$printContent .= $thread->printThreadContent($currentUser, $con, intval($_GET["page"]));

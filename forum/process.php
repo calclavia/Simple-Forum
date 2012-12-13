@@ -28,29 +28,35 @@ abstract class ProcessRequest
 
 	public static function processRequest($currentUser, $request_type, $elementID, $con)
 	{
-		if ($request_type == 1)
+		if($currentUser != null)
 		{
-			return (new NewBoard($currentUser, Category::getByID(intval($elementID)), array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->request();
-		}
-		else if ($request_type == 2)
-		{
-			return (new NewBoard($currentUser, Board::getByID(intval($elementID)), array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->request();
-		}
-		else if ($request_type == 3)
-		{
-			return (new EditThread($currentUser, $elementID, array($_POST["data1"], $_POST["data2"], $_POST["data3"], $_POST["data4"]), $con))->request();
-		}
-		else if ($request_type == 4)
-		{
-			return (new EditCategory($currentUser, $elementID, array($_POST["data1"]), $con))->request();
-		}
-		else if ($request_type == 5)
-		{
-			return (new EditBoard($currentUser, $elementID, array($_POST["data1"], $_POST["data2"], $_POST["data3"], $_POST["data4"]), $con))->request();
-		}
-		else if ($request_type == 6)
-		{
-			return (new WatchThread($currentUser, $elementID, null, $con))->request();
+			if($currentUser->id > 0)
+			{
+				if ($request_type == 1)
+				{
+					return (new NewBoard($currentUser, Category::getByID(intval($elementID)), array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->request();
+				}
+				else if ($request_type == 2)
+				{
+					return (new NewBoard($currentUser, Board::getByID(intval($elementID)), array($_POST["data1"], $_POST["data2"], $_POST["data3"]), $con))->request();
+				}
+				else if ($request_type == 3)
+				{
+					return (new EditThread($currentUser, $elementID, array($_POST["data1"], $_POST["data2"], $_POST["data3"], $_POST["data4"]), $con))->request();
+				}
+				else if ($request_type == 4)
+				{
+					return (new EditCategory($currentUser, $elementID, array($_POST["data1"]), $con))->request();
+				}
+				else if ($request_type == 5)
+				{
+					return (new EditBoard($currentUser, $elementID, array($_POST["data1"], $_POST["data2"], $_POST["data3"], $_POST["data4"]), $con))->request();
+				}
+				else if ($request_type == 6)
+				{
+					return (new WatchThread($currentUser, $elementID, null, $con))->request();
+				}
+			}
 		}
 
 		return false;
