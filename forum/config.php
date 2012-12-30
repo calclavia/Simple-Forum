@@ -1,5 +1,6 @@
 <?php
-require_once(dirname(__FILE__) . "/../models/config.php");
+//Include your own login information files here.
+require_once (dirname(__FILE__) . "/../models/config.php");
 
 /**
  * Include this at the very beginning of your PHP page.
@@ -10,10 +11,10 @@ $websiteName = "Simple Forum";
 $emailAddress = "example@example.com";
 
 //MySQL Variables
-$mysql_host = "localhost";
-$mysql_username = "";
-$mysql_password = "";
-$db_name = "";
+$mysql_host = $db_host;
+$mysql_username = $db_user;
+$mysql_password = $db_pass;
+$db_name = $db_general;
 $table_prefix = "forum_";
 
 $con = mysql_connect($mysql_host, $mysql_username, $mysql_password) or die('Could not connect: ' . mysql_error());
@@ -30,15 +31,15 @@ $editor_js_path = "ckeditor/ckeditor.js";
 //The directory in which this forum will be saved in.
 $DATA_DIRECTORY = dirname(__FILE__) . "/data/";
 
-require_once(dirname(__FILE__) . "/class/htmlfixer.php");
-require_once(dirname(__FILE__) . "/class/forum_element.php");
+require_once (dirname(__FILE__) . "/class/htmlfixer.php");
+require_once (dirname(__FILE__) . "/class/forum_element.php");
 
-require_once(dirname(__FILE__) . "/class/category.php");
-require_once(dirname(__FILE__) . "/class/board.php");
-require_once(dirname(__FILE__) . "/class/thread.php");
-require_once(dirname(__FILE__) . "/class/post.php");
-require_once(dirname(__FILE__) . "/class/permission.php");
-require_once(dirname(__FILE__) . "/class/forum_user.php");
+require_once (dirname(__FILE__) . "/class/category.php");
+require_once (dirname(__FILE__) . "/class/board.php");
+require_once (dirname(__FILE__) . "/class/thread.php");
+require_once (dirname(__FILE__) . "/class/post.php");
+require_once (dirname(__FILE__) . "/class/permission.php");
+require_once (dirname(__FILE__) . "/class/forum_user.php");
 
 /**
  * A global function required to determine if a permission is granted for this user using the forum.
@@ -55,7 +56,7 @@ function hasPermission($user, $comparePermission, $element)
 		return false;
 	}
 
-	if ($loggedInUser->checkPermission(array(2)))
+	if ($loggedInUser -> checkPermission(array(2)))
 	{
 		return true;
 	}
@@ -63,7 +64,7 @@ function hasPermission($user, $comparePermission, $element)
 	/**
 	 * UE Modder Special Permission
 	 */
-	if ($loggedInUser->checkPermission(array(4)))
+	if ($loggedInUser -> checkPermission(array(4)))
 	{
 		return $comparePermission == $permission["thread_lock"];
 	}
@@ -84,8 +85,8 @@ function getUserByID($id)
 	if ($userdetails != null && !empty($userdetails) && count($userdetails) > 0)
 	{
 		$newUser = new ForumUser($userdetails["id"], $userdetails["user_name"], $userdetails["email"], $con);
-		$newUser->title = $userdetails["title"];
-		$newUser->dateRegistered = $userdetails["sign_up_stamp"];
+		$newUser -> title = $userdetails["title"];
+		$newUser -> dateRegistered = $userdetails["sign_up_stamp"];
 
 		return $newUser;
 	}
@@ -95,7 +96,14 @@ function getUserByID($id)
 
 function getUserByUsername($username)
 {
-	return getUserByID(fetchUserDetails($username)["id"]);
+	$user = fetchUserDetails($username);
+
+	if ($user != null)
+	{
+		return getUserByID($user["id"]);
+		return getUserByID($user["id"]);
+	}
+
 }
 
 /**
@@ -107,11 +115,11 @@ function clean($string, $veryClean = false)
 
 	if ($veryClean)
 	{
-		return stripslashes(htmlentities(strip_tags($htmlFixer->getFixedHtml(trim($string)))));
+		return stripslashes(htmlentities(strip_tags($htmlFixer -> getFixedHtml(trim($string)))));
 	}
 	else
 	{
-		return stripslashes(strip_tags($htmlFixer->getFixedHtml(trim($string)), "<img><u><i><p><span><div><strong><q><blockquote><b><a><ul><ol><li><h1><h2><h3><h4><h5><h6>"));
+		return stripslashes(strip_tags($htmlFixer -> getFixedHtml(trim($string)), "<img><u><i><p><span><div><strong><q><blockquote><b><a><ul><ol><li><h1><h2><h3><h4><h5><h6>"));
 	}
 }
 
@@ -124,7 +132,7 @@ function limitString($string, $limit = 25)
 }
 
 if ($_SERVER['PHP_SELF'] != "/forum/setup.php")
-	$currentUser = getUserByID($loggedInUser->user_id);
+	$currentUser = getUserByID($loggedInUser -> user_id);
 
-require_once(dirname(__FILE__) . "/process.php");
+require_once (dirname(__FILE__) . "/process.php");
 ?>

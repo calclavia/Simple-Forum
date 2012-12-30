@@ -1,6 +1,6 @@
 <?php
 
-require_once("forum/config.php");
+require_once ("forum/config.php");
 
 $printContent = "";
 
@@ -12,7 +12,7 @@ if (!empty($_GET["p"]))
 	if (strstr($_GET["p"], "p"))
 	{
 		$post = Post::getByID(intval(str_replace("p", "", $_GET["p"])));
-		$_GET["p"] = "t" . $post->fields["Parent"];
+		$_GET["p"] = "t" . $post -> fields["Parent"];
 	}
 
 	if (strstr($_GET["p"], "b"))
@@ -23,28 +23,30 @@ if (!empty($_GET["p"]))
 		{
 			if ($_GET["a"] == "new")
 			{
-				if($currentUser != null)
+				if ($currentUser != null)
 				{
-					if($currentUser->id > 0)
+					if ($currentUser -> id > 0)
 					{
 						if (!empty($_POST["title"]) && !empty($_POST["editableContent"]))
 						{
-							$thread = $board->createThread($currentUser, clean($_POST["title"], true), clean($_POST["editableContent"]), time(), $con);
+							$thread = $board -> createThread($currentUser, clean($_POST["title"], true), clean($_POST["editableContent"]), time(), $con);
 							$successes[] = "Created forum thread!";
 						}
-						else if ($_POST["board_name"] || $_POST["editableContent"])
+						else
+						if ($_POST["board_name"] || $_POST["editableContent"])
 						{
-							$board->createBoard($currentUser, clean($_POST["board_name"]), clean($_POST["editableContent"]))->save($con);
+							$board -> createBoard($currentUser, clean($_POST["board_name"]), clean($_POST["editableContent"])) -> save($con);
 						}
 					}
 				}
 			}
 
-			$printContent .= $board->printNewThreadForm();
-			$printContent .= $board->printBoardContent($currentUser, $con);
+			$printContent .= $board -> printNewThreadForm();
+			$printContent .= $board -> printBoardContent($currentUser, $con);
 		}
 	}
-	else if (strstr($_GET["p"], "t"))
+	else
+	if (strstr($_GET["p"], "t"))
 	{
 		$thread = Thread::getByID(intval(str_replace("t", "", $_GET["p"])));
 
@@ -52,21 +54,22 @@ if (!empty($_GET["p"]))
 		{
 			if ($_GET["a"] == "new" && $_POST["editableContent"])
 			{
-				if($currentUser != null)
+				if ($currentUser != null)
 				{
-					if($currentUser->id > 0)
+					if ($currentUser -> id > 0)
 					{
-						$post = $thread->createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);
+						$post = $thread -> createPost(clean($_POST["editableContent"]), $currentUser, time(), $con);
 					}
 				}
 			}
 
-			$printContent .= $thread->printThreadContent($currentUser, $con, intval($_GET["page"]));
+			$printContent .= $thread -> printThreadContent($currentUser, $con, intval($_GET["page"]));
 
-			$thread->view($currentUser, $con);
+			$thread -> view($currentUser, $con);
 		}
 	}
-	else if (strstr($_GET["p"], "c"))
+	else
+	if (strstr($_GET["p"], "c"))
 	{
 		$category = Category::getByID(intval(str_replace("c", "", $_GET["p"])));
 
@@ -77,10 +80,10 @@ if (!empty($_GET["p"]))
 				if (empty($_POST["editableContent"]))
 					$_POST["editableContent"] = " ";
 
-				$category->createBoard($currentUser, clean($_POST["title"], true), clean($_POST["editableContent"], true))->save($con);
+				$category -> createBoard($currentUser, clean($_POST["title"], true), clean($_POST["editableContent"], true)) -> save($con);
 			}
 
-			$printContent .= $category->printCategory($currentUser);
+			$printContent .= $category -> printCategory($currentUser);
 		}
 	}
 
@@ -95,13 +98,13 @@ else
 	if ($_GET["a"] == "new" && $_POST["title"])
 	{
 		$category = new Category(-1, clean($_POST["title"]), -1, false);
-		$category->save($con);
+		$category -> save($con);
 	}
 
 	$printContent .= Category::printAll($currentUser, $con);
 }
 
-if ($currentUser->hasPermission($create_categories))
+if ($currentUser -> hasPermission($create_categories))
 {
 	$newCategory .= "
         <span class='forum_menu'>
@@ -139,5 +142,7 @@ $head = "
 /**
  * Echo the variable $head in your head and $content in the place where you have your main body.
  */
-require_once("template.php");
+require_once ("template.php");
+
+mysql_close($con);
 ?>
