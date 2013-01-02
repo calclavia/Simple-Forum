@@ -18,6 +18,7 @@ class Board extends ForumElement
 		$this->fields["ForumOrder"] = $order;
 		$this->fields["Description"] = $description;
 		$this->fields["SubBoard"] = $subBoard;
+		$this->childrenCache = null;
 	}
 
 	public static function setUp($con)
@@ -46,8 +47,11 @@ class Board extends ForumElement
 		}
 	}
 
-	public function getChildren()
+	public function getChildren($forceRefresh = false)
 	{
+		if($this->childrenCache != null && !$forceRefresh)
+			return $this->childrenCache;
+	
 		global $table_prefix;
 
 		$threads = array();
@@ -94,7 +98,8 @@ class Board extends ForumElement
 			$i++;
 		}
 
-		return array_merge($boards, $threads);
+		$this->childrenCache = array_merge($boards, $threads);
+		return $this->childrenCache;
 	}
 
 	public function getBoardsUnsorted()
@@ -218,38 +223,9 @@ class Board extends ForumElement
 
 		return $posts;
 	}
-	public function getPostCount()
-	{
-		$sum = 0;
-	
-		$result = mysql_query("SELECT * FROM {$table_prefix}threads WHERE Parent={$this->id}"); 
-		$sum += intval(mysql_num_rows($result)); 
-		
-		foreach ($this->getBoardsUnsorted() as $childBoard)
-		{
-			$sum += $childBoard->getPostCount();
-		}
-		return intval($sum);
-		
-	}
-	
+
 	public function getViews()
 	{
-		$sum = 0;
-	
-		$result = mysql_query("SELECT SUM(Views) AS Views_sum FROM {$table_prefix}threads WHERE Parent={$this->id}"); 
-		$row = mysql_fetch_assoc($result); 
-		$sum += intval($row['Views_sum']);
-		
-		foreach ($this->getBoardsUnsorted() as $childBoard)
-		{
-			$sum += $childBoard->getViews();
-		}
-		return intval($sum);
-		
-		
-		
-	/*
 		$views = 0;
 
 		foreach ($this->getChildren() as $child)
@@ -265,7 +241,6 @@ class Board extends ForumElement
 		}
 
 		return intval($views);
-	*/
 	}
 
 	/**
@@ -433,8 +408,7 @@ class Board extends ForumElement
 		/**
 		 * Display the stats.
 		 */
-		//$stats = count($this->getPosts()) . " post(s) " . $this->getViews() . " view(s)";
-		$stats = $this->getPostCount() . " post(s) " . $this->getViews() . " view(s)";
+		$stats = count($this->getPosts()) . " post(s) " . $this->getViews() . " view(s)";
 
 		$printLatestPost = "No posts.";
 
@@ -447,16 +421,13 @@ class Board extends ForumElement
 
 			if ($latestPostUser != null && $thread != null)
 			{
-//				$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t" . $thread->getID() . "&page=" . ceil(count($thread->getPosts()) / $posts_per_page) . "#" . $latestPost->getID() . "'>" . limitString($latestPost->name) . "</a><br /> By: <b>" . limitString($latestPostUser->username, 20) . "</b>, " . $latestPost->getDate() . ".";
-				$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t" . $thread->getID() . "&page=" . ceil($thread->getPostCount() / $posts_per_page) . "#" . $latestPost->getID() . "'>" . limitString($latestPost->name) . "</a><br /> By: <b>" . limitString($latestPostUser->username, 20) . "</b>, " . $latestPost->getDate() . ".";
+				$printLatestPost = "Lastest: <a href='{$_SERVER['PHP_SELF']}?p=t" . $thread->getID() . "&page=" . ceil(count($thread->getPosts()) / $posts_per_page) . "#" . $latestPost->getID() . "'>" . limitString($latestPost->name) . "</a><br /> By: <b>" . limitString($latestPostUser->username, 20) . "</b>, " . $latestPost->getDate() . ".";
 			}
 		}
 
 		$subBoards = "";
 
-		
-		//foreach ($this->getChildren() as $child)
-		foreach($this->getBoardsUnsorted() as $child)
+		foreach ($this->getChildren() as $child)
 		{
 			if ($child instanceof Board)
 			{
@@ -571,10 +542,10 @@ class Board extends ForumElement
 		{
 			$printContent .= $this->printNewBoardForm();
 		}
-		$cldrn = $this->getChildren();
-		if (count($cldrn) > 0)
+
+		if (count($this->getChildren()) > 0)
 		{
-			foreach ($cldrn as $child)
+			foreach ($this->getChildren() as $child)
 			{
 				if ($child instanceof Board)
 				{
@@ -584,7 +555,7 @@ class Board extends ForumElement
 
 			$printContent .= "<div class='clear'></div></div><div class='elements_container'>";
 
-			foreach ($cldrn as $child)
+			foreach ($this->getChildren() as $child)
 			{
 				if ($child instanceof Thread)
 				{
