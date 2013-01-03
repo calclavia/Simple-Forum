@@ -18,6 +18,7 @@ class Board extends ForumElement
 		$this->fields["ForumOrder"] = $order;
 		$this->fields["Description"] = $description;
 		$this->fields["SubBoard"] = $subBoard;
+		$this->childrenCache = null;
 	}
 
 	public static function setUp($con)
@@ -46,8 +47,11 @@ class Board extends ForumElement
 		}
 	}
 
-	public function getChildren()
+	public function getChildren($forceRefresh = false)
 	{
+		if($this->childrenCache != null && !$forceRefresh)
+			return $this->childrenCache;
+	
 		global $table_prefix;
 
 		$threads = array();
@@ -94,7 +98,8 @@ class Board extends ForumElement
 			$i++;
 		}
 
-		return array_merge($boards, $threads);
+		$this->childrenCache = array_merge($boards, $threads);
+		return $this->childrenCache;
 	}
 
 	public function getBoardsUnsorted()
